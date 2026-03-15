@@ -7,6 +7,7 @@
 
 <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Orbitron:wght@400;600&display=swap" rel="stylesheet">
 <link rel="icon" type="image/png" href="favicon.png">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
   
 <style>
 :root{
@@ -343,6 +344,39 @@ margin-top:auto;
 .fx-switch{position:absolute;left:16px;top:12px;display:flex;gap:8px}
 .fx-btn{color:var(--orange);background:transparent;border:1px solid #1b1b1b;border-radius:14px;padding:8px 12px;letter-spacing:2px;font-size:12px;cursor:pointer;transition:.3s}
 .fx-btn:hover,.fx-btn.active{color:#fff;border-color:#fff;text-shadow:0 0 8px var(--orange)}
+
+@media (max-width: 768px) {
+
+  body{
+    padding:10px;
+  }
+
+  .container{
+    width:100%;
+    padding:10px;
+  }
+
+  h1{
+    font-size:28px;
+    text-align:center;
+  }
+
+  p{
+    font-size:16px;
+  }
+
+  iframe{
+    width:100%;
+    height:220px;
+  }
+
+  .button{
+    width:100%;
+    margin-bottom:10px;
+  }
+
+}
+  
 </style>
 </head>
 
