@@ -1,0 +1,22 @@
+[
+  {"id":"r1","text":"The core law of the server is…","answers":["PvP freedom","Roleplay (RP)","Loot grind","Kill score"],"correctIndex":1,"tags":["rp_core"]},
+  {"id":"r2","text":"Metagaming is…","answers":["Using the charter","Using OOC info for IC advantage","Using slang","Keeping a diary"],"correctIndex":1,"tags":["metagaming"]},
+  {"id":"r3","text":"After death the character remembers…","answers":["Who killed them","Exact place only","Nothing from the last 6 hours","Everything of the fight"],"correctIndex":2,"tags":["nlr"]},
+  {"id":"r4","text":"Returning to the death place is…","answers":["Allowed immediately","Forbidden for 2 in‑game days","Depends on faction","Allowed at night"],"correctIndex":1,"tags":["nlr"]},
+  {"id":"r5","text":"Before opening fire you should…","answers":["Always be silent","Make verbal contact unless true ambush","Ask in Discord","Signal with a flashlight"],"correctIndex":1,"tags":["conflict"]},
+  {"id":"r6","text":"Injury roleplay is…","answers":["Optional","Mandatory","Only for CK","Only for newcomers"],"correctIndex":1,"tags":["conflict"]},
+  {"id":"r7","text":"The goal of captivity is…","answers":["Loot","Information and RP","Teleport","OOC ransom"],"correctIndex":1,"tags":["captivity"]},
+  {"id":"r8","text":"Before CK you must…","answers":["Shoot at once","Give the Last Word","Ask an admin","Record a video"],"correctIndex":1,"tags":["ckill"]},
+  {"id":"r9","text":"Forbidden IC words are…","answers":["Stash, cache","Loot, spawn, farm","Emission, artifact","Boars, dogs"],"correctIndex":1,"tags":["language"]},
+  {"id":"r10","text":"During an emission you should…","answers":["Ignore it","Find shelter and roleplay it","Stay still","Relog"],"correctIndex":1,"tags":["emission"]},
+  {"id":"r11","text":"Creating a faction requires…","answers":["Only a name","Ideology, goals, hierarchy","Only a logo","Donation"],"correctIndex":1,"tags":["factions"]},
+  {"id":"r12","text":"War is coordinated…","answers":["Through Discord","Via IC channels only","YouTube chat","Streams"],"correctIndex":1,"tags":["factions"]},
+  {"id":"r13","text":"Prisoners can be…","answers":["Killed to “clear”","Used for long‑term plots","Teleported","Silently ignored"],"correctIndex":1,"tags":["captivity"]},
+  {"id":"r14","text":"Disputes and questions go…","answers":["In voice chat","Through Discord tickets","In OOC game chat","Via faction leader"],"correctIndex":1,"tags":["procedure"]},
+  {"id":"r15","text":"A faction base should…","answers":["Be empty","Look lived‑in and thematic","Change daily","Have no symbols"],"correctIndex":1,"tags":["base"]},
+  {"id":"l1","text":"According to lore, what year is it inside the Zone?","answers":["2006","2012","2017","2033"],"correctIndex":2,"tags":["lore_timeline"]},
+  {"id":"l2","text":"Where is the starting spawn?","answers":["Pripyat","Jupiter","Chernobyl‑4","Bar"],"correctIndex":2,"tags":["lore_spawn"]},
+  {"id":"l3","text":"How is “Monolith” played now?","answers":["By players","NPC/bots or admins","As traders","As neutrals"],"correctIndex":1,"tags":["lore_monolith"]},
+  {"id":"l4","text":"The North, by lore…","answers":["Is forever forbidden","Requires OOC‑coordination","Must be cleared/researched via RP","Is open to all at start"],"correctIndex":2,"tags":["lore_world"]},
+  {"id":"l5","text":"The “Crystal” in lore is…","answers":["A mineral","A cube artifact","A recording entity of events/emotions","A radio set"],"correctIndex":2,"tags":["lore_core"]}
+]
