@@ -1,0 +1,2402 @@
+[
+  {
+    "id": "lor_en_1",
+    "text": "Which of the following was NOT a symptom of contact with the Crystal before the Chernobyl disaster, according to the lore?",
+    "answers": [
+      "People started speaking forgotten languages.",
+      "People experienced a feeling of falling on level ground.",
+      "People developed superpowers, such as telekinesis.",
+      "People recognized strangers' relatives."
+    ],
+    "c": [2],
+    "tags": ["lore", "crystal"]
+  },
+  {
+    "id": "lor_en_2",
+    "text": "According to the lore, which event was the 'first crack' and a multidimensional emission?",
+    "answers": [
+      "The Chernobyl explosion in 1986.",
+      "The Second Catastrophe in 2006.",
+      "The discovery of obsidian discs in the 70s.",
+      "The start of the reactor construction."
+    ],
+    "c": [0],
+    "tags": ["lore", "timeline"]
+  },
+  {
+    "id": "lor_en_3",
+    "text": "What happened to the people at the epicenter of the Chernobyl NPP during the Second Catastrophe in 2006?",
+    "answers": [
+      "They died instantly from radiation.",
+      "They turned into mutants.",
+      "They froze like statues, and their consciousness 'flowed' into the Crystal.",
+      "They were evacuated by the military."
+    ],
+    "c": [2],
+    "tags": ["lore", "2006_catastrophe"]
+  },
+  {
+    "id": "lor_en_4",
+    "text": "Who are the 'Shadows of the Dark' in the project's lore?",
+    "answers": [
+      "A special type of mutant living underground.",
+      "Survivors of the Second Catastrophe whose consciousness merged with the Crystal.",
+      "A secret faction controlling the Zone.",
+      "Phantoms created by anomalies."
+    ],
+    "c": [1],
+    "tags": ["lore", "factions"]
+  },
+  {
+    "id": "lor_en_5",
+    "text": "What is the main rule when encountering a 'time seam'?",
+    "answers": [
+      "You must not touch anything from the past.",
+      "You must not meet your past self.",
+      "You must leave the anomaly as quickly as possible.",
+      "You must gather as much information as possible."
+    ],
+    "c": [1],
+    "tags": ["lore", "anomalies"]
+  },
+  {
+    "id": "lor_en_6",
+    "text": "According to the lore, which faction is engaged in 'dream collecting'?",
+    "answers": [
+      "The Time Forgers",
+      "The Echoes",
+      "The Archivists",
+      "Duty"
+    ],
+    "c": [2],
+    "tags": ["lore", "factions"]
+  },
+  {
+    "id": "lor_en_7",
+    "text": "What is 'Dark Faith' in the context of the lore?",
+    "answers": [
+      "A religious cult that worships the Zone.",
+      "A state of space where cause and effect are disrupted.",
+      "A powerful artifact that grants wishes.",
+      "A psychotropic weapon developed by scientists."
+    ],
+    "c": [1],
+    "tags": ["lore", "anomalies"]
+  },
+  {
+    "id": "lor_en_8",
+    "text": "Which of the Zone's future scenarios is NOT mentioned in the lore?",
+    "answers": [
+      "The Great Remembrance",
+      "The Birth of Consciousness",
+      "The Reverse Wave",
+      "The Complete Destruction of the Zone"
+    ],
+    "c": [3],
+    "tags": ["lore", "future"]
+  },
+  {
+    "id": "lor_en_9",
+    "text": "According to the lore, how does the player enter the Zone in 2017?",
+    "answers": [
+      "Through an official military checkpoint.",
+      "On a smuggler's helicopter.",
+      "Through an old pre-war sewer system.",
+      "With the help of a guide from the Bar."
+    ],
+    "c": [2],
+    "tags": ["lore", "spawn"]
+  },
+  {
+    "id": "lor_en_10",
+    "text": "According to the lore, what is the main purpose of being in the Zone in 2017?",
+    "answers": [
+      "Finding and selling artifacts.",
+      "Destroying mutants and clearing territories.",
+      "To become a 'converser' with the Zone, to ask the 'Scary Question'.",
+      "Joining the most powerful faction."
+    ],
+    "c": [2],
+    "tags": ["lore", "purpose"]
+  },
+  {
+    "id": "rules_en_1",
+    "text": "Which of the following is a violation of the 'Powergaming' rule (1.3)?",
+    "answers": [
+      "'With a soft clank, I draw my knife and take a step towards you...'",
+      "'I quickly kill you with a knife'",
+      "'I try to stab you in the shoulder with a knife'",
+      "'I swing my knife, aiming for your hand'"
+    ],
+    "c": [1],
+    "tags": ["rules", "rp"]
+  },
+  {
+    "id": "rules_en_2",
+    "text": "Which of these terms are FORBIDDEN in IC speech according to rule 2.1.3?",
+    "answers": [
+      "Khabar, artifact",
+      "Loot, spawn, farm",
+      "Emission, anomaly",
+      "PDA, detector"
+    ],
+    "c": [1],
+    "tags": ["rules", "language"]
+  },
+  {
+    "id": "rules_en_3",
+    "text": "What is the main violation related to metagaming (3.1)?",
+    "answers": [
+      "Using OOC information for IC advantage.",
+      "Discussing game events in Discord after they have ended.",
+      "Watching streams of the game in your free time.",
+      "Using a map for navigation."
+    ],
+    "c": [0],
+    "tags": ["rules", "metagaming"]
+  },
+  {
+    "id": "rules_en_4",
+    "text": "According to the NLR rule (4.1.1), what happens to a character's memory after death?",
+    "answers": [
+      "They remember everything but cannot take revenge.",
+      "Complete amnesia about the circumstances of death and the killers.",
+      "They only remember the killer's face.",
+      "They only forget the last 5 minutes."
+    ],
+    "c": [1],
+    "tags": ["rules", "nlr"]
+  },
+  {
+    "id": "rules_en_5",
+    "text": "In which case, according to rule 4.2.2, is verbal contact NOT required before opening fire?",
+    "answers": [
+      "If the enemy has better equipment.",
+      "If it is a silent ambush.",
+      "If there are more enemies.",
+      "If you are in warring factions."
+    ],
+    "c": [1],
+    "tags": ["rules", "conflict"]
+  },
+  {
+    "id": "rules_en_6",
+    "text": "What is the main purpose of kidnapping according to rule 4.3.1?",
+    "answers": [
+      "To get a ransom in real currency.",
+      "To humiliate the player.",
+      "To break their will, for information, and for RP.",
+      "To take the captive's equipment."
+    ],
+    "c": [2],
+    "tags": ["rules", "captivity"]
+  },
+  {
+    "id": "rules_en_7",
+    "text": "What is MANDATORY to do before performing a CK (5.3.1)?",
+    "answers": [
+      "Get permission from an administrator.",
+      "Give the victim a chance to say their last words.",
+      "Record a video proof.",
+      "Announce your intentions in the OOC chat."
+    ],
+    "c": [1],
+    "tags": ["rules", "ck"]
+  },
+  {
+    "id": "rules_en_8",
+    "text": "What does the 'Law of Reciprocity' (6.1.1) mean?",
+    "answers": [
+      "You must respond to quality RP with a corresponding level of roleplay.",
+      "You must always respond to messages in the OOC chat.",
+      "You must share your loot with other players.",
+      "It is forbidden to kill players of your own faction."
+    ],
+    "c": [0],
+    "tags": ["rules", "quality_rp"]
+  },
+  {
+    "id": "rules_en_9",
+    "text": "What is the consequence of every fifth death of a character according to the 'Law of Return' (6.2.1)?",
+    "answers": [
+      "A temporary ban for 24 hours.",
+      "Loss of all equipment.",
+      "A mandatory final CK and the creation of a new character.",
+      "A decrease in reputation with all factions."
+    ],
+    "c": [2],
+    "tags": ["rules", "quenta"]
+  },
+  {
+    "id": "rules_en_10",
+    "text": "What does the 'Cosmic Quartermaster' rule (7.1.1) prohibit?",
+    "answers": [
+      "Using unrealistic weapons.",
+      "Carrying an illogically large amount of weapons.",
+      "Flying on anomalies.",
+      "Communicating with aliens."
+    ],
+    "c": [1],
+    "tags": ["rules", "realism"]
+  },
+  {
+    "id": "rules_en_11",
+    "text": "What information must be included in a faction registration application (9.1.2)? Select all that apply.",
+    "answers": [
+      "Name, ideology, leader, list of members.",
+      "Approximate territory of influence and admission rules (IC).",
+      "The leader's number of hours in the game.",
+      "Preferred playstyle (PvP/RP)."
+    ],
+    "c": [0, 1],
+    "tags": ["rules", "factions"]
+  },
+  {
+    "id": "rules_en_12",
+    "text": "According to the rules (9.2.1), how should joining a faction occur?",
+    "answers": [
+      "Automatically after submitting an application in Discord.",
+      "Through an IC process of introduction, vetting, and acceptance in the game.",
+      "By a vote among the faction members.",
+      "After paying an entry fee."
+    ],
+    "c": [1],
+    "tags": ["rules", "factions"]
+  },
+  {
+    "id": "rules_en_13",
+    "text": "What does the 'cosmic headquarters' rule (9.3.2) prohibit during a faction war?",
+    "answers": [
+      "The use of artillery.",
+      "Coordinating actions through IC radios.",
+      "Coordinating actions through OOC channels (Discord, etc.).",
+      "Hiring mercenaries."
+    ],
+    "c": [2],
+    "tags": ["rules", "factions", "war"]
+  },
+  {
+    "id": "rules_en_14",
+    "text": "What can be done with captives, according to rule 9.4.2? Select all that apply.",
+    "answers": [
+      "Exchange them for your own members or resources.",
+      "Interrogate them about the enemy's plans.",
+      "Conduct a public execution (according to CK rule 5.0).",
+      "Kill them immediately so they don't get in the way."
+    ],
+    "c": [0, 1, 2],
+    "tags": ["rules", "captivity"]
+  },
+  {
+    "id": "rules_en_15",
+    "text": "What happens to a faction if it loses more than 70% of its members or its leader (9.5)?",
+    "answers": [
+      "It is immediately disbanded, and all members become loners.",
+      "The remaining members can choose a new leader and continue to roleplay.",
+      "The faction's base comes under the control of the administration.",
+      "All of the faction's resources are distributed among the other factions."
+    ],
+    "c": [1],
+    "tags": ["rules", "factions"]
+  },
+  {
+    "id": "rules_en_16",
+    "text": "According to the 'Value of Life' rule (9.6), what can captives be used for? Select all INCORRECT options.",
+    "answers": [
+      "For slave labor (cooking, cleaning weapons).",
+      "For killing to 'clear' the base.",
+      "As a human shield or for interrogations.",
+      "For immediate release without an RP reason."
+    ],
+    "c": [1, 3],
+    "tags": ["rules", "captivity"]
+  },
+  {
+    "id": "rules_en_17",
+    "text": "What are the 'Chronicles of the Zone' (10.1)?",
+    "answers": [
+      "The official news channel in Discord.",
+      "An IC journal that every faction is required to keep.",
+      "A weekly report from the administration on bans.",
+      "A collection of stories from players."
+    ],
+    "c": [1],
+    "tags": ["rules", "world_depth"]
+  },
+  {
+    "id": "rules_en_18",
+    "text": "What does the 'Old Scars' rule (10.3) imply?",
+    "answers": [
+      "A character must have physical scars after being wounded.",
+      "If a character is recognized from past events, it is roleplayed through deja vu or unease.",
+      "You cannot return to places where your character was wounded.",
+      "All old bases must be marked with special signs."
+    ],
+    "c": [1],
+    "tags": ["rules", "world_depth"]
+  },
+  {
+    "id": "rules_en_19",
+    "text": "What are the consequences of breaking an IC oath (10.4)?",
+    "answers": [
+      "None, it's a personal matter.",
+      "The character can be declared an oathbreaker, and other factions will have a reason not to trust them.",
+      "An automatic 3-day ban.",
+      "A fine in in-game currency."
+    ],
+    "c": [1],
+    "tags": ["rules", "world_depth"]
+  },
+  {
+    "id": "rules_en_20",
+    "text": "According to the NLR rule (10.5), how much memory does a character lose after a serious injury or death?",
+    "answers": [
+      "Memory of the last 15 minutes.",
+      "Memory of the last 6 real-time hours.",
+      "Memory of the entire day.",
+      "Memory of their faction."
+    ],
+    "c": [1],
+    "tags": ["rules", "nlr"]
+  },
+  {
+    "id": "rules_en_21",
+    "text": "What should a player do after a serious injury according to rule 10.5.3?",
+    "answers": [
+      "Immediately return to battle.",
+      "Spend at least 20 minutes in a safe zone ('green zone').",
+      "Log out of the game for an hour.",
+      "Report the injury to an administrator."
+    ],
+    "c": [1],
+    "tags": ["rules", "nlr", "injury"]
+  },
+  {
+    "id": "rules_en_22",
+    "text": "Which of these communication channels are allowed for coordinating faction actions (10.6.3)? Select all that apply.",
+    "answers": [
+      "In-game radios.",
+      "Face-to-face meetings and couriers.",
+      "Discord chats and voice channels.",
+      "Steam messages."
+    ],
+    "c": [0, 1],
+    "tags": ["rules", "metagaming", "communication"]
+  },
+  {
+    "id": "rules_en_23",
+    "text": "Which of the following is a duty of factions in controlling their territory (10.7.1)?",
+    "answers": [
+      "Staying at the base at all times.",
+      "Going on patrols and checking checkpoints.",
+      "Attacking anyone who approaches the base.",
+      "Ignoring events outside the base."
+    ],
+    "c": [1],
+    "tags": ["rules", "factions", "territory"]
+  },
+  {
+    "id": "rules_en_24",
+    "text": "What can happen if you neglect reconnaissance before an attack (10.9.3)?",
+    "answers": [
+      "Nothing, it is not a violation.",
+      "The enemy may be prepared, which will lead to a loss of resources, injuries, or death.",
+      "The administration will issue a warning.",
+      "The faction will receive a bonus for the next attack."
+    ],
+    "c": [1],
+    "tags": ["rules", "stealth", "recon"]
+  },
+  {
+    "id": "rules_en_25",
+    "text": "According to the rules (11.0), how should you react to a character disguised in your faction's uniform?",
+    "answers": [
+      "Ignore them, as it is an OOC action.",
+      "File a complaint with an administrator.",
+      "IC reactions are considered legitimate, and an attack due to the disguise is part of the RP.",
+      "You must first contact them in the OOC chat."
+    ],
+    "c": [2],
+    "tags": ["rules", "disguise"]
+  },
+  {
+    "id": "rules_en_26",
+    "text": "Which faction has the highest base 'Combat' perk (11.2)?",
+    "answers": [
+      "Duty",
+      "Freedom",
+      "Mercenaries",
+      "Military Stalkers"
+    ],
+    "c": [2],
+    "tags": ["rules", "factions", "perks"]
+  },
+  {
+    "id": "rules_en_27",
+    "text": "Which faction has zero base perks and is entirely dependent on their quenta (11.2)?",
+    "answers": [
+      "Scientists",
+      "Renegades",
+      "Loners",
+      "Bandits"
+    ],
+    "c": [2],
+    "tags": ["rules", "factions", "perks"]
+  },
+  {
+    "id": "rules_en_28",
+    "text": "What are 'Radio Silence' zones (11.3)?",
+    "answers": [
+      "Zones where all communication is prohibited.",
+      "Locations where radios do not work, and you need to use gestures, flashlights, or notes.",
+      "The time when the administration is performing maintenance.",
+      "Zones where you can only communicate through the OOC chat."
+    ],
+    "c": [1],
+    "tags": ["rules", "communication"]
+  },
+  {
+    "id": "rules_en_29",
+    "text": "How is the 'Monolith' faction roleplayed (11.11)?",
+    "answers": [
+      "It is a regular faction for players.",
+      "They are NPCs/bots controlled by the administration who shoot everyone without warning.",
+      "They are peaceful traders with whom you can make deals.",
+      "Players can join 'Monolith' after completing a special quest."
+    ],
+    "c": [1],
+    "tags": ["rules", "factions", "monolith"]
+  },
+  {
+    "id": "rules_en_30",
+    "text": "What is the main conclusion from the server creators?",
+    "answers": [
+      "The main thing is to accumulate as much loot as possible.",
+      "The server is a fabric of players' actions, words, and decisions, where RP and story are paramount.",
+      "Winning the faction war is the main goal of the game.",
+      "You need to level up your character as quickly as possible."
+    ],
+    "c": [1],
+    "tags": ["rules", "philosophy"]
+  },
+  {
+    "id": "rules_en_31",
+    "text": "Which of these actions is mandatory when joining the 'Bandits' (9.2.2)?",
+    "answers": [
+      "Pass a test on knowledge of military regulations.",
+      "Prove usefulness (bring tribute, complete a task).",
+      "Undergo a 'revelation' ritual.",
+      "Pay an administrator."
+    ],
+    "c": [1],
+    "tags": ["rules", "factions"]
+  },
+  {
+    "id": "rules_en_32",
+    "text": "What is the minimum duration of continuous RP interaction with a captive according to rule 9.6.5?",
+    "answers": [
+      "30 minutes",
+      "1-2 hours",
+      "4-6 hours",
+      "15 minutes"
+    ],
+    "c": [1],
+    "tags": ["rules", "captivity"]
+  },
+  {
+    "id": "rules_en_33",
+    "text": "Which of the following is a duty of the 'Duty' faction (10.7.2)?",
+    "answers": [
+      "Advancing north and collecting artifacts.",
+      "Patrolling Cordon, clearing mutants, helping stalkers.",
+      "Strengthening southern checkpoints.",
+      "Conducting medical research."
+    ],
+    "c": [1],
+    "tags": ["rules", "factions"]
+  },
+  {
+    "id": "rules_en_34",
+    "text": "What is 'Destructible Loot' (10.2)?",
+    "answers": [
+      "Loot that disappears after a player's death.",
+      "The ability for winners of a base raid to take resources and spoil what they cannot carry away.",
+      "Items that break when used.",
+      "Artifacts that explode in a backpack."
+    ],
+    "c": [1],
+    "tags": ["rules", "world_depth"]
+  },
+  {
+    "id": "rules_en_35",
+    "text": "Which reconnaissance methods are permitted by rule 10.9.2? Select all that apply.",
+    "answers": [
+      "Surveillance and observation (binoculars, NVGs).",
+      "Using couriers to obtain information.",
+      "Eavesdropping through an OOC channel in Discord.",
+      "Gathering rumors from NPCs and other stalkers."
+    ],
+    "c": [0, 1, 3],
+    "tags": ["rules", "recon"]
+  },
+  {
+    "id": "rules_en_36",
+    "text": "What is the base 'Medicine' perk for the 'Scientists' faction (11.2)?",
+    "answers": [
+      "15%",
+      "25%",
+      "30%",
+      "0%"
+    ],
+    "c": [1],
+    "tags": ["rules", "factions", "perks"]
+  },
+  {
+    "id": "rules_en_37",
+    "text": "In which cases is a CK allowed according to rule 5.2? Select all that apply.",
+    "answers": [
+      "The result of a long-term personal conflict.",
+      "A random shootout in the Zone.",
+      "Execution by faction decision for serious misconduct.",
+      "By mutual OOC agreement of players."
+    ],
+    "c": [0, 2, 3],
+    "tags": ["rules", "ck"]
+  },
+  {
+    "id": "rules_en_38",
+    "text": "Which of the following is an example of violating the 'Metagaming' rule (10.6.2)?",
+    "answers": [
+      "Using an in-game radio for communication.",
+      "Coordinating faction actions via Discord chat during RP.",
+      "A face-to-face meeting with another stalker for negotiations.",
+      "Sending couriers with notes."
+    ],
+    "c": [1],
+    "tags": ["rules", "metagaming"]
+  },
+  {
+    "id": "rules_en_39",
+    "text": "What is every faction required to do according to the 'Chronicles of the Zone' rule (10.1)?",
+    "answers": [
+      "Film every battle.",
+      "Keep an IC journal in the game (notes, documents).",
+      "Publish reports in Discord every day.",
+      "Hand over all artifacts to the administration."
+    ],
+    "c": [1],
+    "tags": ["rules", "world_depth"]
+  },
+  {
+    "id": "rules_en_40",
+    "text": "What punishment is provided for neglecting reconnaissance before an attack (10.9.3)?",
+    "answers": [
+      "An administrative fine.",
+      "Loss of resources, injuries, or character death due to enemy preparedness.",
+      "Account suspension.",
+      "Deprivation of the opportunity to join factions."
+    ],
+    "c": [1],
+    "tags": ["rules", "recon"]
+  },
+  {
+    "id": "lor_en_11",
+    "text": "What was found in the excavations during the construction of the Chernobyl NPP in the 70s, according to the lore?",
+    "answers": [
+      "Radioactive ores.",
+      "Obsidian discs with circles similar to eyes.",
+      "Remains of ancient civilizations.",
+      "Secret bunkers."
+    ],
+    "c": [1],
+    "tags": ["lore", "history"]
+  },
+  {
+    "id": "lor_en_12",
+    "text": "What physical change was often observed in those who survived after the Second Catastrophe?",
+    "answers": [
+      "A change in eye color.",
+      "Stitches on the lips as protection against accidental Truth.",
+      "Lack of fingerprints.",
+      "An increase in height."
+    ],
+    "c": [1],
+    "tags": ["lore", "survivors"]
+  },
+  {
+    "id": "lor_en_13",
+    "text": "What is 'The Merging' in the context of the Zone's anomalous phenomena?",
+    "answers": [
+      "The process of combining two factions.",
+      "A phenomenon where a person's memories begin to mix with someone else's.",
+      "The moment of the Emission explosion.",
+      "A scientific term for artifact formation."
+    ],
+    "c": [1],
+    "tags": ["lore", "anomalies"]
+  },
+  {
+    "id": "lor_en_14",
+    "text": "Who are the 'Time Forgers' and what do they believe in?",
+    "answers": [
+      "Gunsmiths who create unique weapons.",
+      "Fanatics who believe that time can be reforged and changed.",
+      "Scientists studying gravity.",
+      "A group of stalkers guarding the entrance to the Zone."
+    ],
+    "c": [1],
+    "tags": ["lore", "factions"]
+  },
+  {
+    "id": "lor_en_15",
+    "text": "What happens within a 200-meter radius when the 'Dark Faith' anomaly is activated?",
+    "answers": [
+      "A strong fire begins.",
+      "Sound is completely turned off and cause-and-effect relationships are broken.",
+      "Many mutants appear.",
+      "All players lose consciousness."
+    ],
+    "c": [1],
+    "tags": ["lore", "anomalies"]
+  },
+  {
+    "id": "lor_en_16",
+    "text": "What are the translucent creatures called that repeat the last movements of anomaly victims?",
+    "answers": [
+      "Bloodsuckers",
+      "Silent Ghosts",
+      "Controllers",
+      "Shadows"
+    ],
+    "c": [1],
+    "tags": ["lore", "monsters"]
+  },
+  {
+    "id": "lor_en_17",
+    "text": "What smell does a stalker sense when making their way into the Zone through the old sewer?",
+    "answers": [
+      "The smell of rot and swamp.",
+      "The smell of rust and something sweet, medical.",
+      "The smell of gunpowder and burning.",
+      "The smell of fresh ozone."
+    ],
+    "c": [1],
+    "tags": ["lore", "spawn"]
+  },
+  {
+    "id": "lor_en_18",
+    "text": "What, according to the lore, is the basis of the soil in the Zone in 2017?",
+    "answers": [
+      "Ordinary earth and sand.",
+      "Radioactive ash.",
+      "The Crystal, which records everything that happens.",
+      "Metallic debris."
+    ],
+    "c": [2],
+    "tags": ["lore", "crystal"]
+  },
+  {
+    "id": "lor_en_19",
+    "text": "What will happen according to the 'Great Remembrance' scenario?",
+    "answers": [
+      "All stalkers will remember their past outside the Zone.",
+      "The Crystal will reproduce all events over 30 years simultaneously.",
+      "The Zone will disappear, leaving only memories.",
+      "All artifacts will become useless."
+    ],
+    "c": [1],
+    "tags": ["lore", "future"]
+  },
+  {
+    "id": "lor_en_20",
+    "text": "What are 'Echoes' in the medical sense of the Zone?",
+    "answers": [
+      "The name of a rare disease.",
+      "A diagnosis of people whose consciousness is broken by 'The Merging' and they live others' lives.",
+      "Sound hallucinations after an Emission.",
+      "Radiation exposure to the brain."
+    ],
+    "c": [1],
+    "tags": ["lore", "survivors"]
+  },
+  {
+    "id": "rules_en_41",
+    "text": "Which of the following is a violation of the NLR rule (4.1.2)?",
+    "answers": [
+      "Returning to the place of death after 3 in-game days.",
+      "Returning to the place of death earlier than 2 in-game days.",
+      "Discussing the circumstances of death in the OOC chat.",
+      "Creating a new character after death."
+    ],
+    "c": [1],
+    "tags": ["rules", "nlr"]
+  },
+  {
+    "id": "rules_en_42",
+    "text": "Which of these statements is true for the 'Path to Violence' rule (4.2.1)?",
+    "answers": [
+      "Shooting is allowed at any moving object.",
+      "Every bullet must be RP-justified.",
+      "Fire can only be opened after permission from the administration.",
+      "There are no rules of combat in the Zone."
+    ],
+    "c": [1],
+    "tags": ["rules", "conflict"]
+  },
+  {
+    "id": "rules_en_43",
+    "text": "What is a captive required to do according to rule 4.3.3?",
+    "answers": [
+      "Try to kill the kidnappers at the first opportunity.",
+      "Roleplay their status (cannot be silent or act like an invulnerable hero).",
+      "Log out of the game to avoid RP.",
+      "Insult the kidnappers in the OOC chat."
+    ],
+    "c": [1],
+    "tags": ["rules", "captivity"]
+  },
+  {
+    "id": "rules_en_44",
+    "text": "What is an example of a correctly performed CK (5.3.3)?",
+    "answers": [
+      "'You are a traitor. Goodbye' (shot).",
+      "'You are a traitor. What do you have to say in your defense?' (dialogue) -> 'Your defense is worthless' (shot).",
+      "Just a silent shot to the head from an ambush without words.",
+      "Killing a player while the character is sleeping."
+    ],
+    "c": [1],
+    "tags": ["rules", "ck"]
+  },
+  {
+    "id": "rules_en_45",
+    "text": "What should a player do during an 'Emission' according to rule 6.3.1?",
+    "answers": [
+      "Continue with their business.",
+      "Must roleplay searching for shelter.",
+      "Log out of the game until the emission ends.",
+      "Try to collect as many artifacts as possible."
+    ],
+    "c": [1],
+    "tags": ["rules", "world_events"]
+  },
+  {
+    "id": "rules_en_46",
+    "text": "What does the 'Living World Rule' (6.4) mean?",
+    "answers": [
+      "There is no death in the Zone.",
+      "Influence on the world is encouraged: notes, signs, memorials, re-dedication of bases.",
+      "All mutants must be killed.",
+      "The administration constantly changes the map."
+    ],
+    "c": [1],
+    "tags": ["rules", "world_depth"]
+  },
+  {
+    "id": "rules_en_47",
+    "text": "How should loot be found according to rule 7.1.2?",
+    "answers": [
+      "In any random place.",
+      "Loot must be found logically.",
+      "Only in special boxes.",
+      "Loot is issued only by the administration."
+    ],
+    "c": [1],
+    "tags": ["rules", "realism"]
+  },
+  {
+    "id": "rules_en_48",
+    "text": "Which of these is a violation of the 'Language of the Zone' rule (2.1.2)?",
+    "answers": [
+      "'A cargo arrived from Kiev'.",
+      "'Smugglers say everything is calm on the Big Land'.",
+      "'Found a stash with khabar'.",
+      "'Gonna go poke around the old church'."
+    ],
+    "c": [1],
+    "tags": ["rules", "language"]
+  },
+  {
+    "id": "rules_en_49",
+    "text": "Which of these perks corresponds to the 'Mercenaries' faction (11.2)?",
+    "answers": [
+      "Combat 10%, Stealth 5%",
+      "Combat 30%, Stealth 25%",
+      "Combat 15%, Stealth 20%",
+      "Combat 0%, Stealth 0%"
+    ],
+    "c": [1],
+    "tags": ["rules", "factions", "perks"]
+  },
+  {
+    "id": "rules_en_50",
+    "text": "What is a character required to do after a serious injury (10.5.4)?",
+    "answers": [
+      "Immediately run for artifacts.",
+      "Roleplay IC recovery and not participate in dangerous events for at least 20 minutes.",
+      "Delete the character.",
+      "Change faction."
+    ],
+    "c": [1],
+    "tags": ["rules", "nlr", "injury"]
+  },
+  {
+    "id": "rules_en_51",
+    "text": "Which of the following is the 'Military' faction's duty when a new stalker joins (9.2.2)?",
+    "answers": [
+      "Conduct a dedication ritual.",
+      "Conduct an interrogation, check for knowledge of regulations, and issue a first assignment.",
+      "Demand a tribute in the form of artifacts.",
+      "Accept without any checks."
+    ],
+    "c": [1],
+    "tags": ["rules", "factions"]
+  },
+  {
+    "id": "rules_en_52",
+    "text": "What condition is necessary for an official declaration of war between factions (9.3.1)?",
+    "answers": [
+      "Just start shooting at the enemy's base.",
+      "Declare war through leaders in the presence of witnesses or through a note at the base with reasons.",
+      "Write a message in the Discord OOC chat.",
+      "Get permission from all players on the server."
+    ],
+    "c": [1],
+    "tags": ["rules", "factions", "war"]
+  },
+  {
+    "id": "rules_en_53",
+    "text": "What rights do registered factions have according to rule 9.1.3? Select all that apply.",
+    "answers": [
+      "Territory protection (base).",
+      "Declaration of war.",
+      "Conducting executions on behalf of the group.",
+      "Using cheats to win."
+    ],
+    "c": [0, 1, 2],
+    "tags": ["rules", "factions"]
+  },
+  {
+    "id": "rules_en_54",
+    "text": "What can a winning faction do after a war according to rule 9.3.3?",
+    "answers": [
+      "Completely destroy the enemy faction without coordination.",
+      "Obtain RP resources and control over the territory.",
+      "Ban all players of the losing side.",
+      "Take all personal belongings of the losing side's players through OOC."
+    ],
+    "c": [1],
+    "tags": ["rules", "factions", "war"]
+  },
+  {
+    "id": "rules_en_55",
+    "text": "What is allowed to be done with captives in the 'Military' ('Duty') faction according to rule 9.4.3?",
+    "answers": [
+      "Teleport them immediately to prison.",
+      "Escort them to prison through full-fledged dangerous RP.",
+      "Kill them without interrogation.",
+      "Release them immediately after capture."
+    ],
+    "c": [1],
+    "tags": ["rules", "factions", "captivity"]
+  },
+  {
+    "id": "rules_en_56",
+    "text": "Which of these actions with captives is an example of a 'psychological game' (9.6.3)?",
+    "answers": [
+      "Cooking food for the kidnappers.",
+      "Interrogations, re-recruitment, training newcomers on captives.",
+      "Cleaning weapons.",
+      "Collecting firewood."
+    ],
+    "c": [1],
+    "tags": ["rules", "captivity"]
+  },
+  {
+    "id": "rules_en_57",
+    "text": "What condition is necessary for releasing a captive according to rule 9.6.4? Select all that apply.",
+    "answers": [
+      "Escape or ransom.",
+      "Exchange or successful re-recruitment.",
+      "Extreme necessity (serious injury, epidemic).",
+      "The captive is just tired of being in captivity."
+    ],
+    "c": [0, 1, 2],
+    "tags": ["rules", "captivity"]
+  },
+  {
+    "id": "rules_en_58",
+    "text": "What is prohibited when moving through hostile territories according to rule 11.0?",
+    "answers": [
+      "Using stealth and reconnaissance.",
+      "Ignoring RP movement rules.",
+      "Using encryptions through couriers.",
+      "Following quiet passage rules."
+    ],
+    "c": [1],
+    "tags": ["rules", "movement"]
+  },
+  {
+    "id": "rules_en_59",
+    "text": "What is the 'Reconnaissance/Stealth' perk for the 'Freedom' faction (11.2)?",
+    "answers": [
+      "15%",
+      "20%",
+      "25%",
+      "10%"
+    ],
+    "c": [1],
+    "tags": ["rules", "factions", "perks"]
+  },
+  {
+    "id": "rules_en_60",
+    "text": "What rule applies to the 'Monolith' faction (11.12)?",
+    "answers": [
+      "They are required to enter negotiations before shooting.",
+      "They shoot everyone without warning, no negotiations exist.",
+      "They are a neutral trading faction.",
+      "Players can join Monolith through Discord."
+    ],
+    "c": [1],
+    "tags": ["rules", "factions", "monolith"]
+  },
+  {
+    "id": "lor_en_21",
+    "text": "What happens to a person who lingers in the 'Deja Vu' zone, according to the lore?",
+    "answers": [
+      "They will receive superpowers.",
+      "Their memories will begin to mix with others'.",
+      "They will die instantly.",
+      "They will move to 1986 forever."
+    ],
+    "c": [1],
+    "tags": ["lore", "anomalies"]
+  },
+  {
+    "id": "lor_en_22",
+    "text": "Which group in the lore studies the algorithms and language of the Crystal through dreams?",
+    "answers": [
+      "Time Forgers",
+      "Archivists",
+      "Echoes",
+      "Shadows of the Dark"
+    ],
+    "c": [1],
+    "tags": ["lore", "factions"]
+  },
+  {
+    "id": "lor_en_23",
+    "text": "What is the main threat in the 'Dark Faith' anomaly, besides silence?",
+    "answers": [
+      "High radiation.",
+      "Disruption of the cause-and-effect relationship (a shot is seen, but there is no sound and no bullet flew).",
+      "The appearance of bloodsuckers.",
+      "Acid rain."
+    ],
+    "c": [1],
+    "tags": ["lore", "anomalies"]
+  },
+  {
+    "id": "lor_en_24",
+    "text": "What is the fate of the consciousnesses of people frozen at the epicenter of the Chernobyl NPP in 2006?",
+    "answers": [
+      "They were destroyed by the explosion.",
+      "They became part of the Crystal library.",
+      "They turned into controllers.",
+      "They were saved by scientists."
+    ],
+    "c": [1],
+    "tags": ["lore", "crystal"]
+  },
+  {
+    "id": "lor_en_25",
+    "text": "What happens when you meet your past self in a 'time seam'?",
+    "answers": [
+      "You will receive important information.",
+      "Annihilation, erasing, and the birth of a new Echo.",
+      "Nothing will happen, it is safe.",
+      "You will move to the future."
+    ],
+    "c": [1],
+    "tags": ["lore", "anomalies"]
+  },
+  {
+    "id": "lor_en_26",
+    "text": "How is the 'Merging' anomaly described in the lore?",
+    "answers": [
+      "As a physical unification of two bodies.",
+      "As a mixing of memory: forgetting your name, but remembering someone else's birthday.",
+      "As the merging of two anomalies into one powerful one.",
+      "As the process of a person turning into a mutant."
+    ],
+    "c": [1],
+    "tags": ["lore", "anomalies"]
+  },
+  {
+    "id": "lor_en_27",
+    "text": "What is the 'Reverse Wave' in scientists' forecasts?",
+    "answers": [
+      "A powerful tsunami from the Black Sea.",
+      "A process where the Crystal will begin to 'correct' reality outside, superimposing the Zone's memories on cities.",
+      "The return of all stalkers home.",
+      "A surge of radiation going from the outskirts to the center."
+    ],
+    "c": [1],
+    "tags": ["lore", "future"]
+  },
+  {
+    "id": "lor_en_28",
+    "text": "Who are the 'Archivists' by origin?",
+    "answers": [
+      "Former military personnel.",
+      "Former ecologists who became dream collectors.",
+      "A group of surviving local residents.",
+      "Secret government agents."
+    ],
+    "c": [1],
+    "tags": ["lore", "factions"]
+  },
+  {
+    "id": "lor_en_29",
+    "text": "What role do 'Silent Ghosts' play in the lore?",
+    "answers": [
+      "They are the main enemies of stalkers.",
+      "They repeat the last movements of victims, conveying their last horror.",
+      "They point the way to rare artifacts.",
+      "They guard the entrance to the Sarcophagus."
+    ],
+    "c": [1],
+    "tags": ["lore", "monsters"]
+  },
+  {
+    "id": "lor_en_30",
+    "text": "What does the 'Scary Question' mean at the end of the lore?",
+    "answers": [
+      "A question about how to get out of the Zone.",
+      "A question that a stalker must ask the Zone as its 'converser'.",
+      "A question about the location of the Artifact Klondike.",
+      "A question about the causes of the first disaster."
+    ],
+    "c": [1],
+    "tags": ["lore", "purpose"]
+  },
+  {
+    "id": "rules_en_61",
+    "text": "What are factions required to do when capturing a base according to rule 6.4.2?",
+    "answers": [
+      "Just kill all defenders and leave.",
+      "Re-dedicate the base (change symbolism), not just clear it.",
+      "Blow up the base.",
+      "Take all things and leave the base empty."
+    ],
+    "c": [1],
+    "tags": ["rules", "factions"]
+  },
+  {
+    "id": "rules_en_62",
+    "text": "What does the 'Moral Choice System' (10.8.1) imply?",
+    "answers": [
+      "Players can do whatever they want without consequences.",
+      "All actions have IC consequences affecting reputation and resource access.",
+      "The administration chooses who is right and who is wrong.",
+      "The choice of faction during registration."
+    ],
+    "c": [1],
+    "tags": ["rules", "world_depth"]
+  },
+  {
+    "id": "rules_en_63",
+    "text": "What restriction does the 'Stealth in Battles' rule (10.9.4) impose?",
+    "answers": [
+      "It is forbidden to use firearms.",
+      "Aggressive actions must be accompanied by an IC justification as to why it was not possible to remain unnoticed.",
+      "You must always shout before shooting.",
+      "Battles are only allowed during the day."
+    ],
+    "c": [1],
+    "tags": ["rules", "stealth"]
+  },
+  {
+    "id": "rules_en_64",
+    "text": "What is the base 'Combat' perk for the 'Duty' faction (11.2)?",
+    "answers": [
+      "15%",
+      "20%",
+      "25%",
+      "30%"
+    ],
+    "c": [2],
+    "tags": ["rules", "factions", "perks"]
+  },
+  {
+    "id": "rules_en_65",
+    "text": "What happens when you are in an open area during an Emission (6.3.2)?",
+    "answers": [
+      "Nothing, if you have good armor.",
+      "Guaranteed death or mutations (roleplay is mandatory).",
+      "The character just loses some health.",
+      "The character is automatically transferred to the base."
+    ],
+    "c": [1],
+    "tags": ["rules", "world_events"]
+  },
+  {
+    "id": "rules_en_66",
+    "text": "What is prohibited to do with streams and screenshots according to rule 3.2.2?",
+    "answers": [
+      "Share them with friends after the game.",
+      "Use them to track other players (metagaming).",
+      "Post them on social networks.",
+      "Take screenshots of beautiful landscapes."
+    ],
+    "c": [1],
+    "tags": ["rules", "metagaming"]
+  },
+  {
+    "id": "rules_en_67",
+    "text": "What is the main goal of creating a faction according to rule 7.2.2?",
+    "answers": [
+      "Accumulating as much loot as possible.",
+      "Fighting for control and ideas, not for loot.",
+      "Destroying all loners.",
+      "Dominating the leaderboard."
+    ],
+    "c": [1],
+    "tags": ["rules", "factions"]
+  },
+  {
+    "id": "rules_en_68",
+    "text": "How should injuries be roleplayed according to rule 4.2.3?",
+    "answers": [
+      "Ignore them if there is a first aid kit.",
+      "Mandatory roleplay (limping, scream of pain).",
+      "Just write 'I'm wounded' in the chat.",
+      "Roleplaying injuries is not mandatory."
+    ],
+    "c": [1],
+    "tags": ["rules", "conflict"]
+  },
+  {
+    "id": "rules_en_69",
+    "text": "What does the 'Knowledge Through Death' rule (3.2.3) prohibit?",
+    "answers": [
+      "Creating a new character.",
+      "Using information about the killers and the place of death after respawning.",
+      "Returning to the game after death.",
+      "Communicating with other players after death."
+    ],
+    "c": [1],
+    "tags": ["rules", "metagaming", "nlr"]
+  },
+  {
+    "id": "rules_en_70",
+    "text": "What is 'Quenta-correction' in the perks table (11.2)?",
+    "answers": [
+      "The ability to change the character's name.",
+      "The ability to increase or change character skills through a detailed biography (RP-quenta).",
+      "Automatic character level up.",
+      "Changing faction without losing skills."
+    ],
+    "c": [1],
+    "tags": ["rules", "factions", "perks"]
+  },
+  {
+    "id": "rules_en_71",
+    "text": "What is the duty of the 'Military Stalkers and Scientists' faction according to rule 10.7.2?",
+    "answers": [
+      "Patrol only the Cordon.",
+      "Explore northern zones, study anomalies, catch valuable artifacts.",
+      "Engage only in base protection.",
+      "Conduct raids on the Bandits' base."
+    ],
+    "c": [1],
+    "tags": ["rules", "factions", "territory"]
+  },
+  {
+    "id": "rules_en_72",
+    "text": "According to rule 10.5.2, what does a character remember after a serious injury?",
+    "answers": [
+      "Absolutely nothing for the last 24 hours.",
+      "General details (acquaintances, places), but cannot precisely specify the circumstances of death and who wounded them.",
+      "The exact name of the killer and the caliber of their weapon.",
+      "All events up to the last second."
+    ],
+    "c": [1],
+    "tags": ["rules", "nlr"]
+  },
+  {
+    "id": "rules_en_73",
+    "text": "What does rule 10.6.1 prohibit regarding metagaming?",
+    "answers": [
+      "Communicating with friends outside the game.",
+      "Using OOC/Discord knowledge obtained outside the game to solve IC tasks.",
+      "Watching educational videos about the game.",
+      "Using a Zone map from the internet."
+    ],
+    "c": [1],
+    "tags": ["rules", "metagaming"]
+  },
+  {
+    "id": "rules_en_74",
+    "text": "When is OOC discussion in Discord allowed according to rule 10.6.4?",
+    "answers": [
+      "At any time, even during battle.",
+      "Only when characters are not participating in active RP (e.g., at the base, waiting for an event).",
+      "Never, Discord is completely prohibited.",
+      "Only for transmitting tactical information."
+    ],
+    "c": [1],
+    "tags": ["rules", "metagaming"]
+  },
+  {
+    "id": "rules_en_75",
+    "text": "What should a player do with the Discord chat as soon as an RP interaction begins (10.6.5)?",
+    "answers": [
+      "Minimize it and continue writing.",
+      "Close it immediately, everything happens only IC.",
+      "Invite the opponent to Discord to discuss the situation.",
+      "Enable screen sharing."
+    ],
+    "c": [1],
+    "tags": ["rules", "metagaming"]
+  },
+  {
+    "id": "rules_en_76",
+    "text": "Which statement is true for rule 10.7.3 about faction logistics?",
+    "answers": [
+      "If there are few people at the base, patrols can be ignored.",
+      "Players cannot ignore IC duties, even if there are only two people at the base.",
+      "Logistics is only the responsibility of the faction leader.",
+      "Base supply happens automatically."
+    ],
+    "c": [1],
+    "tags": ["rules", "factions", "territory"]
+  },
+  {
+    "id": "rules_en_77",
+    "text": "What can happen when reputation decreases in 'Voice of the Zone' (10.8.2)?",
+    "answers": [
+      "Automatic character ban.",
+      "Restriction of access to resources, artifacts, and key zones.",
+      "The character will become invisible to mutants.",
+      "Nothing, it's just an information message."
+    ],
+    "c": [1],
+    "tags": ["rules", "world_depth"]
+  },
+  {
+    "id": "rules_en_78",
+    "text": "Which reconnaissance methods include 'Surveillance and observation' (10.9.2)?",
+    "answers": [
+      "Only visual inspection without instruments.",
+      "Secret presence at a distance, studying enemy movement.",
+      "Using drones.",
+      "Reading server logs."
+    ],
+    "c": [1],
+    "tags": ["rules", "recon"]
+  },
+  {
+    "id": "rules_en_79",
+    "text": "What are players required to record when conducting reconnaissance (10.9.5)?",
+    "answers": [
+      "Nothing needs to be recorded.",
+      "IC intelligence data: journal entries, reports to commanders, notes on enemy movement.",
+      "The number of mutants killed.",
+      "Their coordinates every 5 minutes."
+    ],
+    "c": [1],
+    "tags": ["rules", "recon"]
+  },
+  {
+    "id": "rules_en_80",
+    "text": "What restriction does the 'Reconnaissance Zone' (10.9.7) impose?",
+    "answers": [
+      "Reconnaissance is allowed only in safe zones.",
+      "Reconnaissance outside the base must be conducted with full readiness for RP danger.",
+      "It is forbidden to conduct reconnaissance at night.",
+      "Reconnaissance requires special administrative permission."
+    ],
+    "c": [1],
+    "tags": ["rules", "recon"]
+  },
+  {
+    "id": "lor_en_31",
+    "text": "What graffiti is scratched on the pipe in the old sewer, according to the lore?",
+    "answers": [
+      "'Strelok was here'",
+      "'HE HEARS THE FLOW'",
+      "'No exit'",
+      "'Death to the zone'"
+    ],
+    "c": [1],
+    "tags": ["lore", "spawn"]
+  },
+  {
+    "id": "lor_en_32",
+    "text": "With what, according to the lore, is the graffiti in the sewer scratched?",
+    "answers": [
+      "A spray can.",
+      "Charcoal.",
+      "Burned flesh.",
+      "Simple chalk."
+    ],
+    "c": [2],
+    "tags": ["lore", "spawn"]
+  },
+  {
+    "id": "lor_en_33",
+    "text": "What sound does the ground make under a stalker's feet in the Zone in 2017?",
+    "answers": [
+      "A dull sound of footsteps on soil.",
+      "A thin ring, like on glass.",
+      "The sound of surf.",
+      "The sound of a working mechanism."
+    ],
+    "c": [1],
+    "tags": ["lore", "crystal"]
+  },
+  {
+    "id": "lor_en_34",
+    "text": "In which scenario will the Zone want to 'communicate' through the materialization of fears?",
+    "answers": [
+      "Great Remembrance",
+      "Birth of Consciousness",
+      "Reverse Wave",
+      "Death of the Zone"
+    ],
+    "c": [1],
+    "tags": ["lore", "future"]
+  },
+  {
+    "id": "lor_en_35",
+    "text": "Which place in the lore is described as 'Gray five-story buildings, abandoned playgrounds'?",
+    "answers": [
+      "Center of Pripyat.",
+      "Chernobyl-4.",
+      "Yanov Station.",
+      "Red Forest."
+    ],
+    "c": [1],
+    "tags": ["lore", "locations"]
+  },
+  {
+    "id": "lor_en_36",
+    "text": "What, according to the lore, happens to sound in the Chernobyl-4 area?",
+    "answers": [
+      "Sound becomes louder.",
+      "Sound flows down into the crack.",
+      "A constant echo appears.",
+      "Sounds completely disappear forever."
+    ],
+    "c": [1],
+    "tags": ["lore", "locations"]
+  },
+  {
+    "id": "lor_en_37",
+    "text": "Who are the 'Echoes' in the context of their behavior?",
+    "answers": [
+      "People who are always silent.",
+      "People speaking with different voices of the dead or those who have never been to the Zone.",
+      "Spy robots.",
+      "Mutants imitating human speech."
+    ],
+    "c": [1],
+    "tags": ["lore", "survivors"]
+  },
+  {
+    "id": "lor_en_38",
+    "text": "What equipment do the 'Archivists' use at their bases?",
+    "answers": [
+      "Only artifact detectors.",
+      "Webs of wires and 'Capsules' — fragments of the past.",
+      "Huge radars.",
+      "Medical scanners."
+    ],
+    "c": [1],
+    "tags": ["lore", "factions"]
+  },
+  {
+    "id": "lor_en_39",
+    "text": "What, according to the lore, does the Crystal do with your every step and shot?",
+    "answers": [
+      "Ignores them.",
+      "Records them as data.",
+      "Destroys their traces.",
+      "Turns them into artifacts."
+    ],
+    "c": [1],
+    "tags": ["lore", "crystal"]
+  },
+  {
+    "id": "lor_en_40",
+    "text": "In what year do the main events of the project's lore take place?",
+    "answers": [
+      "1986",
+      "2006",
+      "2017",
+      "2024"
+    ],
+    "c": [2],
+    "tags": ["lore", "timeline"]
+  },
+  {
+    "id": "rules_en_81",
+    "text": "What does the 'Radio Silence' rule (11.3) mean?",
+    "answers": [
+      "Prohibition on using any chats.",
+      "At certain locations, radios do not work, gestures, flashlights, notes are used.",
+      "The administration disables voice chat for all players.",
+      "The duty to remain silent when meeting Monolith."
+    ],
+    "c": [1],
+    "tags": ["rules", "communication"]
+  },
+  {
+    "id": "rules_en_82",
+    "text": "Which 'green zone' is mentioned in rule 11.4? Select all that apply.",
+    "answers": [
+      "Duty and Freedom bases.",
+      "Cordon, Chernobyl-4, Yanov, Zaton, Bar.",
+      "Any place where there are no mutants.",
+      "Scientists and Military stalkers bases."
+    ],
+    "c": [0, 1, 3],
+    "tags": ["rules", "nlr"]
+  },
+  {
+    "id": "rules_en_83",
+    "text": "What is the role of the 'Mercenaries' faction according to rule 11.5?",
+    "answers": [
+      "Clearing anomalies.",
+      "Assaults, protection, contracts.",
+      "Exploring northern zones.",
+      "Stalker robberies."
+    ],
+    "c": [1],
+    "tags": ["rules", "factions"]
+  },
+  {
+    "id": "rules_en_84",
+    "text": "How do 'Loners' get their characteristics (11.9)?",
+    "answers": [
+      "They have fixed high perks.",
+      "Their characteristics are entirely set by quenta only.",
+      "They receive perks randomly upon spawn.",
+      "They have no characteristics."
+    ],
+    "c": [1],
+    "tags": ["rules", "factions", "perks"]
+  },
+  {
+    "id": "rules_en_85",
+    "text": "What happens if a faction invades another base without an RP reason (11.3)?",
+    "answers": [
+      "It is considered a normal game mechanic.",
+      "It is a violation of RP rules.",
+      "The administration will issue a bonus for aggressive play.",
+      "Nothing will happen."
+    ],
+    "c": [1],
+    "tags": ["rules", "factions", "stealth"]
+  },
+  {
+    "id": "rules_en_86",
+    "text": "Which of these actions is encouraged by the 'Living World' rule (6.4.1)?",
+    "answers": [
+      "Fast quest completion.",
+      "Leaving notes, signs, memorials.",
+      "Killing all NPCs.",
+      "Collecting the maximum amount of loot."
+    ],
+    "c": [1],
+    "tags": ["rules", "world_depth"]
+  },
+  {
+    "id": "rules_en_87",
+    "text": "What does the 'Metagaming' rule prohibit regarding Discord (10.6.2)?",
+    "answers": [
+      "Discussing personal matters.",
+      "Influence of off-game chats on in-game events, faction coordination, or character actions.",
+      "Using Discord to find partners outside the game.",
+      "Reading server rules on Discord."
+    ],
+    "c": [1],
+    "tags": ["rules", "metagaming"]
+  },
+  {
+    "id": "rules_en_88",
+    "text": "What must a player do if their character is recognized by 'Old Scars' (10.3)?",
+    "answers": [
+      "Deny everything.",
+      "Roleplay through vague recognition, deja vu, unease.",
+      "Immediately kill the one who recognized them.",
+      "Log out of the game."
+    ],
+    "c": [1],
+    "tags": ["rules", "world_depth"]
+  },
+  {
+    "id": "rules_en_89",
+    "text": "Which statement about 'Price of Word' (10.4) is true?",
+    "answers": [
+      "Words in game mean nothing.",
+      "An IC solemn promise or oath is considered sacred.",
+      "Breaking an oath is a way to earn reputation.",
+      "Oaths are only allowed for faction leaders."
+    ],
+    "c": [1],
+    "tags": ["rules", "world_depth"]
+  },
+  {
+    "id": "rules_en_90",
+    "text": "What is the minimum roleplay time for complex RP plots (interrogation, re-recruitment) according to rule 11.0?",
+    "answers": [
+      "15 minutes",
+      "1-2 hours",
+      "10 minutes",
+      "5 hours"
+    ],
+    "c": [1],
+    "tags": ["rules", "quality_rp"]
+  },
+  {
+    "id": "rules_en_91",
+    "text": "Which faction has a 'Medicine' perk of 20% by default (11.2)?",
+    "answers": [
+      "Duty",
+      "Freedom",
+      "Scientists",
+      "Bandits"
+    ],
+    "c": [0],
+    "tags": ["rules", "factions", "perks"]
+  },
+  {
+    "id": "rules_en_92",
+    "text": "Which of the following is a violation of the 'Zone Realism' rule (7.1)?",
+    "answers": [
+      "Carrying one assault rifle and a pistol.",
+      "Using illogical loot (e.g., modern electronics in an old cache without history).",
+      "Roleplaying eating food.",
+      "Following hierarchy within a faction."
+    ],
+    "c": [1],
+    "tags": ["rules", "realism"]
+  },
+  {
+    "id": "rules_en_93",
+    "text": "What is 'Quenta Return' (6.2.1)?",
+    "answers": [
+      "Returning character's old items.",
+      "The need to create a new character after the fifth death.",
+      "Return of a player to the server after a ban.",
+      "Restoration of character's old biography."
+    ],
+    "c": [1],
+    "tags": ["rules", "quenta"]
+  },
+  {
+    "id": "rules_en_94",
+    "text": "How should orders be transmitted within a faction during combat (10.6.3)?",
+    "answers": [
+      "Through Discord voice chat.",
+      "Exclusively through IC channels (radios, shouts, gestures).",
+      "Through private messages on Steam.",
+      "Through an administrator."
+    ],
+    "c": [1],
+    "tags": ["rules", "communication"]
+  },
+  {
+    "id": "rules_en_95",
+    "text": "What consequence can breaking an IC oath have (10.4)?",
+    "answers": [
+      "No consequences.",
+      "The character can be declared an oathbreaker, and other factions will stop trusting them.",
+      "The character will receive a charisma bonus.",
+      "The character will be deleted."
+    ],
+    "c": [1],
+    "tags": ["rules", "world_depth"]
+  },
+  {
+    "id": "rules_en_96",
+    "text": "Which statement about the 'Renegades' faction is true (11.2)?",
+    "answers": [
+      "They have no base perks.",
+      "They have base perks (Combat 15%, Medicine 10%, Stealth 20%).",
+      "They are allies of the Military.",
+      "This is a faction only for administration."
+    ],
+    "c": [1],
+    "tags": ["rules", "factions", "perks"]
+  },
+  {
+    "id": "rules_en_97",
+    "text": "What does the 'Cosmic Headquarters' rule (9.3.2) prohibit?",
+    "answers": [
+      "Using heavy machinery.",
+      "Coordination through OOC (off-game radios, Discord) during a war.",
+      "Attacking bases at night.",
+      "Building fortifications."
+    ],
+    "c": [1],
+    "tags": ["rules", "metagaming", "war"]
+  },
+  {
+    "id": "rules_en_98",
+    "text": "What should a player do after every fifth death (6.2)?",
+    "answers": [
+      "Ask the administrator to resurrect them.",
+      "Create a NEW character with a different biography, name, and appearance.",
+      "Continue playing the same character.",
+      "Wait a week until the next entry."
+    ],
+    "c": [1],
+    "tags": ["rules", "quenta"]
+  },
+  {
+    "id": "rules_en_99",
+    "text": "Which information is NOT required in a faction application (9.1.2)?",
+    "answers": [
+      "Ideology and goals.",
+      "List of members.",
+      "Real age of all participants.",
+      "Approximate territory of influence."
+    ],
+    "c": [2],
+    "tags": ["rules", "factions"]
+  },
+  {
+    "id": "rules_en_100",
+    "text": "What is the highest value on the AURORIA server according to the conclusion (12.0)?",
+    "answers": [
+      "The fabric of your actions, words, and decisions, creating legends and sagas.",
+      "The amount of accumulated artifacts.",
+      "Winning every shootout.",
+      "Fast reaching of northern locations."
+    ],
+    "c": [0],
+    "tags": ["rules", "philosophy"]
+  },
+  {
+    "id": "rules_en_101",
+    "text": "Which of these actions is allowed by the 'Disguise and Masking' rule (11.0)?",
+    "answers": [
+      "Using the uniform of an enemy faction for reconnaissance.",
+      "Complaining about a player who killed you for wearing the wrong uniform.",
+      "Automatically gaining access to an enemy base when disguised.",
+      "Hiding your nickname via Discord."
+    ],
+    "c": [0],
+    "tags": ["rules", "disguise"]
+  },
+  {
+    "id": "rules_en_102",
+    "text": "Which of the following is a duty of the 'Bandits' according to rule 11.5?",
+    "answers": [
+      "Clearing the territory of mutants.",
+      "Strengthening southern checkpoints and RP robberies.",
+      "Medical support for loners.",
+      "Exploring the Sarcophagus."
+    ],
+    "c": [1],
+    "tags": ["rules", "factions"]
+  },
+  {
+    "id": "rules_en_103",
+    "text": "What right do registered factions have regarding executions (9.1.3)?",
+    "answers": [
+      "Execute any player without a reason.",
+      "Conduct executions on behalf of the group (following CK rules).",
+      "Execute only their own members.",
+      "Executions are prohibited on the server."
+    ],
+    "c": [1],
+    "tags": ["rules", "factions", "ck"]
+  },
+  {
+    "id": "rules_en_104",
+    "text": "What does rule 10.9.1 prohibit regarding base raids?",
+    "answers": [
+      "Raiding without using grenades.",
+      "Attacking without prior IC preparation and reconnaissance ('jumping' into a location).",
+      "Raiding with fewer than 10 people.",
+      "Raiding the bases of allied factions."
+    ],
+    "c": [1],
+    "tags": ["rules", "stealth", "recon"]
+  },
+  {
+    "id": "rules_en_105",
+    "text": "What punishment can follow treason within a faction (7.2.3)?",
+    "answers": [
+      "None, it's a player's personal matter.",
+      "A complex RP event that must be roleplayed (possibly a CK).",
+      "An automatic ban by the system.",
+      "A fine of 50% of the khabar."
+    ],
+    "c": [1],
+    "tags": ["rules", "factions"]
+  },
+  {
+    "id": "rules_en_106",
+    "text": "What must a stalker do when joining 'Freedom' (9.2.2)?",
+    "answers": [
+      "Show knowledge of Duty's regulations.",
+      "Confirm sharing of the ideology and show combat/useful skills.",
+      "Bring a mutant's head to the leader.",
+      "Pass a radiation test."
+    ],
+    "c": [1],
+    "tags": ["rules", "factions"]
+  },
+  {
+    "id": "rules_en_107",
+    "text": "What information about the territory of influence is specified in a faction application (9.1.2)?",
+    "answers": [
+      "Exact coordinates of every stash.",
+      "Approximate territory of influence.",
+      "A list of all other factions' bases.",
+      "An anomaly map."
+    ],
+    "c": [1],
+    "tags": ["rules", "factions"]
+  },
+  {
+    "id": "rules_en_108",
+    "text": "What right does the status of an official faction give during conflicts (9.1.3)?",
+    "answers": [
+      "The right to ignore NLR rules.",
+      "The right to declare war.",
+      "The right to infinite ammunition.",
+      "The right to administrative help in combat."
+    ],
+    "c": [1],
+    "tags": ["rules", "factions"]
+  },
+  {
+    "id": "rules_en_109",
+    "text": "What does 'captive roleplay' mean according to rule 4.3.3?",
+    "answers": [
+      "The ability to insult kidnappers in OOC.",
+      "The duty to observe their status, not act like a hero.",
+      "The right to log out if they don't like the RP.",
+      "The duty to give up all items without RP."
+    ],
+    "c": [1],
+    "tags": ["rules", "captivity"]
+  },
+  {
+    "id": "rules_en_110",
+    "text": "Which statement about the 'Law of Reciprocity' is true (6.1.2)?",
+    "answers": [
+      "It is forbidden to respond to RP situations with one-word answers or quick kills.",
+      "You must always give as much khabar as you received.",
+      "It is necessary to avenge every killed comrade.",
+      "The rule only applies to faction leaders."
+    ],
+    "c": [0],
+    "tags": ["rules", "quality_rp"]
+  },
+  {
+    "id": "lor_en_41",
+    "text": "According to the scientists' hypothesis in the lore, what is underground in the Zone?",
+    "answers": [
+      "An ordinary tectonic plate.",
+      "The Crystal — an entity that records events and emotions.",
+      "A huge nuclear waste storage facility.",
+      "A void."
+    ],
+    "c": [1],
+    "tags": ["lore", "crystal"]
+  },
+  {
+    "id": "lor_en_42",
+    "text": "Which event in 2006 was officially called 'technical works'?",
+    "answers": [
+      "The first explosion at the Chernobyl NPP.",
+      "The Second Catastrophe, when everything stopped for 72 hours.",
+      "The construction of the Sarcophagus.",
+      "The evacuation of Pripyat."
+    ],
+    "c": [1],
+    "tags": ["lore", "2006_catastrophe"]
+  },
+  {
+    "id": "lor_en_43",
+    "text": "What feeling did people at the Chernobyl NPP construction site in the 70s experience, according to the lore?",
+    "answers": [
+      "A feeling of euphoria.",
+      "A feeling of falling on level ground, even though no one fell.",
+      "Constant hunger.",
+      "Severe headache."
+    ],
+    "c": [1],
+    "tags": ["lore", "history"]
+  },
+  {
+    "id": "lor_en_44",
+    "text": "What is the 'Silence of the Vacuum' during the events of 2006?",
+    "answers": [
+      "Absence of sounds due to equipment failure.",
+      "A state when the Zone stopped emitting and started 'turning on in reverse'.",
+      "A special effect in the sky.",
+      "The name of one of the factions."
+    ],
+    "c": [1],
+    "tags": ["lore", "2006_catastrophe"]
+  },
+  {
+    "id": "lor_en_45",
+    "text": "Who are the 'Time Forgers' by their actions?",
+    "answers": [
+      "Physicist scientists.",
+      "Fanatics whose rituals can erase an hour or a day from people's memory.",
+      "Watch sellers.",
+      "Mutants who control time."
+    ],
+    "c": [1],
+    "tags": ["lore", "factions"]
+  },
+  {
+    "id": "lor_en_46",
+    "text": "What will happen in the 'Birth of Consciousness' scenario?",
+    "answers": [
+      "All stalkers will become geniuses.",
+      "Millions of personalities will merge into a new 'Self', whose body is the Zone itself.",
+      "The Zone will turn into an ordinary forest.",
+      "The Crystal will be destroyed."
+    ],
+    "c": [1],
+    "tags": ["lore", "future"]
+  },
+  {
+    "id": "lor_en_47",
+    "text": "What equipment do the 'Archivists' use to study dreams?",
+    "answers": [
+      "Microscopes.",
+      "'Capsules' — fragments of the past.",
+      "Telescopes.",
+      "Ordinary computers."
+    ],
+    "c": [1],
+    "tags": ["lore", "factions"]
+  },
+  {
+    "id": "lor_en_48",
+    "text": "According to the lore, what is the 'fuel' for the Crystal's awakening?",
+    "answers": [
+      "Uranium and plutonium.",
+      "Emotions, shots, and steps of stalkers.",
+      "Artifacts.",
+      "Electricity from the Chernobyl NPP."
+    ],
+    "c": [1],
+    "tags": ["lore", "crystal"]
+  },
+  {
+    "id": "lor_en_49",
+    "text": "What physical sensation appears to a stalker upon the first breath in the Zone in 2017?",
+    "answers": [
+      "Smell of burning.",
+      "A metallic taste on the tongue and someone else's settled fear.",
+      "Smell of flowers.",
+      "A feeling of cold."
+    ],
+    "c": [1],
+    "tags": ["lore", "spawn"]
+  },
+  {
+    "id": "lor_en_50",
+    "text": "According to the lore, what is in the center of the Chernobyl NPP in 2017?",
+    "answers": [
+      "An ordinary reactor.",
+      "A living core — the Crystal.",
+      "An empty hall.",
+      "A secret government laboratory."
+    ],
+    "c": [1],
+    "tags": ["lore", "crystal"]
+  },
+  {
+    "id": "rules_en_111",
+    "text": "What restriction does the 'Cosmic Master' rule (7.1.1) impose?",
+    "answers": [
+      "It is forbidden to use magic.",
+      "It is forbidden to carry an illogically large amount of weapons (e.g., 10 guns).",
+      "It is forbidden to communicate with space.",
+      "It is forbidden to play as scientist characters."
+    ],
+    "c": [1],
+    "tags": ["rules", "realism"]
+  },
+  {
+    "id": "rules_en_112",
+    "text": "Which of the following is a duty of the 'Renegades' according to rule 11.5?",
+    "answers": [
+      "Protecting scientists.",
+      "Survival, cunning, and reconnaissance.",
+      "Patrolling the Cordon.",
+      "Collecting artifacts for Duty."
+    ],
+    "c": [1],
+    "tags": ["rules", "factions"]
+  },
+  {
+    "id": "rules_en_113",
+    "text": "What is the base 'Stealth' perk for the 'Mercenaries' faction (11.2)?",
+    "answers": [
+      "15%",
+      "20%",
+      "25%",
+      "30%"
+    ],
+    "c": [2],
+    "tags": ["rules", "factions", "perks"]
+  },
+  {
+    "id": "rules_en_114",
+    "text": "What should a player do after death according to the NLR rule (4.1.1)?",
+    "answers": [
+      "Forget only the killer's name.",
+      "Forget all circumstances of death and the killers (complete amnesia).",
+      "Return and collect their items in 5 minutes.",
+      "Write a complaint in Discord about the killer."
+    ],
+    "c": [1],
+    "tags": ["rules", "nlr"]
+  },
+  {
+    "id": "rules_en_115",
+    "text": "Which captive behavior is PROHIBITED by rule 4.3.3?",
+    "answers": [
+      "Roleplaying fear.",
+      "Being silent or acting like an invulnerable hero.",
+      "Trying to negotiate for release.",
+      "Following the kidnappers' demands."
+    ],
+    "c": [1],
+    "tags": ["rules", "captivity"]
+  },
+  {
+    "id": "rules_en_116",
+    "text": "Which of the following is a violation of the 'Metagaming' rule (3.2.1)?",
+    "answers": [
+      "Using an in-game radio.",
+      "Using Discord for tactical coordination during combat.",
+      "A private conversation between two characters.",
+      "Sending a note through a courier."
+    ],
+    "c": [1],
+    "tags": ["rules", "metagaming"]
+  },
+  {
+    "id": "rules_en_117",
+    "text": "What is a player required to do during an 'Emission' in an open area (6.3.2)?",
+    "answers": [
+      "Run to the nearest artifact.",
+      "Roleplay death or mutations if they didn't find shelter.",
+      "Just stand still.",
+      "Shoot at the sky."
+    ],
+    "c": [1],
+    "tags": ["rules", "world_events"]
+  },
+  {
+    "id": "rules_en_118",
+    "text": "How should a faction base look according to rule 7.3.1?",
+    "answers": [
+      "Like an empty box.",
+      "Lived-in and thematic.",
+      "Like a weapon warehouse.",
+      "Like a modern office."
+    ],
+    "c": [1],
+    "tags": ["rules", "factions", "realism"]
+  },
+  {
+    "id": "rules_en_119",
+    "text": "What does rule 4.1.3 prohibit regarding NLR?",
+    "answers": [
+      "Creating a quenta.",
+      "Suicide or provocation to reset an RP situation.",
+      "Joining groups.",
+      "Communicating with the administration."
+    ],
+    "c": [1],
+    "tags": ["rules", "nlr"]
+  },
+  {
+    "id": "rules_en_120",
+    "text": "Which of the following is encouraged vocabulary (2.2)?",
+    "answers": [
+      "'Spawned an artifact'",
+      "'Emission', 'artifact', 'boars', 'blind dogs'",
+      "'Looted the base'",
+      "'Admin, help'"
+    ],
+    "c": [1],
+    "tags": ["rules", "language"]
+  },
+  {
+    "id": "rules_en_121",
+    "text": "What is the minimum time to stay in a 'green zone' after an injury (10.5.3)?",
+    "answers": [
+      "5 minutes",
+      "10 minutes",
+      "20 minutes",
+      "1 hour"
+    ],
+    "c": [2],
+    "tags": ["rules", "nlr", "injury"]
+  },
+  {
+    "id": "rules_en_122",
+    "text": "What is a faction required to do to ensure logistics (10.7.3)?",
+    "answers": [
+      "Nothing, logistics is not important.",
+      "Ensure supply, base protection, and resource distribution.",
+      "Request resources from the administration.",
+      "Buy resources on Discord."
+    ],
+    "c": [1],
+    "tags": ["rules", "factions", "territory"]
+  },
+  {
+    "id": "rules_en_123",
+    "text": "What does rule 10.9.6 prohibit regarding reconnaissance?",
+    "answers": [
+      "Using binoculars.",
+      "Using OOC/Discord information to make IC reconnaissance decisions.",
+      "Conducting reconnaissance alone.",
+      "Transmitting intelligence to the commander."
+    ],
+    "c": [1],
+    "tags": ["rules", "metagaming", "recon"]
+  },
+  {
+    "id": "rules_en_124",
+    "text": "What consequence does 'Reputation Decrease' have (10.8.2)?",
+    "answers": [
+      "Only a text message.",
+      "Restriction of access to key zones and artifacts.",
+      "Increased character damage.",
+      "Free khabar."
+    ],
+    "c": [1],
+    "tags": ["rules", "world_depth"]
+  },
+  {
+    "id": "rules_en_125",
+    "text": "Which of the following is a 'Scientists' duty (10.7.2)?",
+    "answers": [
+      "Assaulting Bandit bases.",
+      "Exploring northern zones and medical support.",
+      "Robbing stalkers.",
+      "Capturing Duty territories."
+    ],
+    "c": [1],
+    "tags": ["rules", "factions"]
+  },
+  {
+    "id": "rules_en_126",
+    "text": "How should the process of joining a group be roleplayed (9.2.1)?",
+    "answers": [
+      "Through a Discord invitation.",
+      "Exclusively through an IC process (introduction, check).",
+      "Automatically when entering the server.",
+      "Through buying a rank."
+    ],
+    "c": [1],
+    "tags": ["rules", "factions"]
+  },
+  {
+    "id": "rules_en_127",
+    "text": "What right do loners have regarding characteristics (11.2)?",
+    "answers": [
+      "They have all perks at 50%.",
+      "All their characteristics are set only by quenta (detailed biography).",
+      "They have no characteristics.",
+      "They can change perks every day."
+    ],
+    "c": [1],
+    "tags": ["rules", "factions", "perks"]
+  },
+  {
+    "id": "rules_en_128",
+    "text": "What are 'Temporary Radio Silence Zones' (11.3)?",
+    "answers": [
+      "Zones where it is forbidden to speak.",
+      "Locations where radios do not work and gestures/flashlights are used.",
+      "Time when voice chat cannot be used.",
+      "Rest areas."
+    ],
+    "c": [1],
+    "tags": ["rules", "communication"]
+  },
+  {
+    "id": "rules_en_129",
+    "text": "What is the role of the 'Monolith' faction on the server (11.14)?",
+    "answers": [
+      "Trading faction.",
+      "Dynamic Zone threat, stimulating player cooperation.",
+      "Faction for beginners.",
+      "Moderator group."
+    ],
+    "c": [1],
+    "tags": ["rules", "factions", "monolith"]
+  },
+  {
+    "id": "rules_en_130",
+    "text": "What does the 'No Gods or Admins' rule (2.1.1) mean?",
+    "answers": [
+      "Prohibition on mentioning administration in IC speech.",
+      "Prohibition on playing in a group.",
+      "Prohibition on using religion in RP.",
+      "Duty to obey administration in everything."
+    ],
+    "c": [0],
+    "tags": ["rules", "language"]
+  },
+  {
+    "id": "rules_en_131",
+    "text": "What condition is necessary for a CK due to personal conflict (5.2)?",
+    "answers": [
+      "The conflict must be long-term and RP-justified.",
+      "You just need to get angry at the player.",
+      "You need to win a knife duel.",
+      "You need to get permission from all faction members."
+    ],
+    "c": [0],
+    "tags": ["rules", "ck"]
+  },
+  {
+    "id": "rules_en_132",
+    "text": "What does rule 10.9.1 prohibit regarding invading enemy territory?",
+    "answers": [
+      "Invading without a weapon.",
+      "Invading without IC preparation and planning.",
+      "Invading alone.",
+      "Invading during the day."
+    ],
+    "c": [1],
+    "tags": ["rules", "stealth", "recon"]
+  },
+  {
+    "id": "rules_en_133",
+    "text": "Which behavior during an emission guarantees character death (6.3.2)?",
+    "answers": [
+      "Being in a basement.",
+      "Being in an open area.",
+      "Using a first aid kit.",
+      "Running towards the base."
+    ],
+    "c": [1],
+    "tags": ["rules", "world_events"]
+  },
+  {
+    "id": "rules_en_134",
+    "text": "What is the 'Duty' faction required to do according to rule 11.5?",
+    "answers": [
+      "Help bandits.",
+      "Clear mutants and help stalkers on the Cordon.",
+      "Explore anomalies in the north.",
+      "Conduct raids on Freedom's base without reason."
+    ],
+    "c": [1],
+    "tags": ["rules", "factions"]
+  },
+  {
+    "id": "rules_en_135",
+    "text": "Which statement about the AURORIA server rules is true?",
+    "answers": [
+      "Rules can be broken if no one sees.",
+      "The Zone sees everything, and every action has consequences.",
+      "The main thing in the game is PvP and loot.",
+      "Administration always interferes in the RP process."
+    ],
+    "c": [1],
+    "tags": ["rules", "philosophy"]
+  },
+  {
+    "id": "lor_en_51",
+    "text": "What is scratched with burned flesh in the old sewer (Part 7)?",
+    "answers": [
+      "'THERE IS NO EXIT HERE'",
+      "'HE HEARS THE FLOW'",
+      "'THE CRYSTAL IS ALIVE'",
+      "'BEWARE OF THE SHADOW'"
+    ],
+    "c": [1],
+    "tags": ["lore", "spawn"]
+  },
+  {
+    "id": "lor_en_52",
+    "text": "What, according to the lore, is a 'symptom' and not the cause of the events in Chernobyl?",
+    "answers": [
+      "Reactor explosion.",
+      "The place itself (Chernobyl).",
+      "Radiation.",
+      "Actions of the station personnel."
+    ],
+    "c": [1],
+    "tags": ["lore", "history"]
+  },
+  {
+    "id": "lor_en_53",
+    "text": "What happened to the Zone in 2006 for 72 hours?",
+    "answers": [
+      "It expanded twice.",
+      "Everything stopped, the Zone stopped emitting and 'turned on in reverse'.",
+      "A massive emission occurred.",
+      "All mutants disappeared."
+    ],
+    "c": [1],
+    "tags": ["lore", "2006_catastrophe"]
+  },
+  {
+    "id": "lor_en_54",
+    "text": "Who are the 'Shadows of the Dark'?",
+    "answers": [
+      "Special mutants.",
+      "Survivors in 2006 whose consciousness merged with the Crystal, they do not speak.",
+      "Secret agents.",
+      "Ghosts of the past."
+    ],
+    "c": [1],
+    "tags": ["lore", "factions"]
+  },
+  {
+    "id": "lor_en_55",
+    "text": "In which scenario will the Crystal start 'correcting' reality in cities?",
+    "answers": [
+      "Great Remembrance",
+      "Birth of Consciousness",
+      "Reverse Wave",
+      "Complete decay"
+    ],
+    "c": [2],
+    "tags": ["lore", "future"]
+  },
+  {
+    "id": "lor_en_56",
+    "text": "What, according to the lore, happens when you meet your past self?",
+    "answers": [
+      "Exchange of experience.",
+      "Annihilation and erasing.",
+      "Strengthening of abilities.",
+      "Movement in space."
+    ],
+    "c": [1],
+    "tags": ["lore", "anomalies"]
+  },
+  {
+    "id": "lor_en_57",
+    "text": "What currency do 'Archivists' accept for dreams?",
+    "answers": [
+      "Gold coins.",
+      "A can of stew or a pack of ammo.",
+      "Artifacts.",
+      "Rubles."
+    ],
+    "c": [1],
+    "tags": ["lore", "factions"]
+  },
+  {
+    "id": "lor_en_58",
+    "text": "What is 'Dark Faith'?",
+    "answers": [
+      "A religious organization.",
+      "A state of space where sound is turned off and logic is broken.",
+      "A type of anomaly-trap.",
+      "An artifact."
+    ],
+    "c": [1],
+    "tags": ["lore", "anomalies"]
+  },
+  {
+    "id": "lor_en_59",
+    "text": "What does a stalker hear while crawling through a pipe in the sewer (Part 7)?",
+    "answers": [
+      "Silence.",
+      "A child's laughter recorded in concrete and someone else's footsteps.",
+      "Sound of water.",
+      "Screeching of mutants."
+    ],
+    "c": [1],
+    "tags": ["lore", "spawn"]
+  },
+  {
+    "id": "lor_en_60",
+    "text": "What is the player's main role in the Zone in 2017 according to the lore?",
+    "answers": [
+      "Being a khabar hunter.",
+      "Being fuel for the Crystal or a tool for dialogue.",
+      "Being a soldier of one of the factions.",
+      "Being a scientist-researcher."
+    ],
+    "c": [1],
+    "tags": ["lore", "purpose"]
+  },
+  {
+    "id": "rules_en_136",
+    "text": "What does the 'NLR - Absolute' rule (4.1) prohibit?",
+    "answers": [
+      "Joining a faction.",
+      "Using information about death and killers for revenge.",
+      "Buying artifacts.",
+      "Chatting."
+    ],
+    "c": [1],
+    "tags": ["rules", "nlr"]
+  },
+  {
+    "id": "rules_en_137",
+    "text": "What is a captive required to do during an interrogation according to the 'Trust RP' rule (6.5)?",
+    "answers": [
+      "Always remain silent.",
+      "Respond qualitatively to the RP interaction, not ignore it.",
+      "Try to deceive in OOC.",
+      "Wait for the timer to end."
+    ],
+    "c": [1],
+    "tags": ["rules", "quality_rp"]
+  },
+  {
+    "id": "rules_en_138",
+    "text": "Which behavior during an emission is considered correct (6.3)?",
+    "answers": [
+      "Shooting at anomalies.",
+      "Roleplaying searching for shelter and staying in it.",
+      "Just standing at the base.",
+      "Collecting artifacts in the center of the anomaly."
+    ],
+    "c": [1],
+    "tags": ["rules", "world_events"]
+  },
+  {
+    "id": "rules_en_139",
+    "text": "What is a faction leader required to do according to the rules (9.5)?",
+    "answers": [
+      "Be responsible for the actions of their subordinates and for discipline.",
+      "Just be the strongest player.",
+      "Take all the loot for themselves.",
+      "Ignore the administration."
+    ],
+    "c": [0],
+    "tags": ["rules", "factions"]
+  },
+  {
+    "id": "rules_en_140",
+    "text": "What is the meaning of the game on the AURORIA server according to the final rules?",
+    "answers": [
+      "Accumulating khabar.",
+      "Creating legends and participating in the live history of the Zone.",
+      "Destroying all enemies.",
+      "Reaching the maximum level."
+    ],
+    "c": [1],
+    "tags": ["rules", "philosophy"]
+  }
+]

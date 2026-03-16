@@ -1,0 +1,1520 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Starfall Syndicate | Auroria</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Orbitron:wght@400;600&display=swap" rel="stylesheet">
+<link rel="icon" type="image/png" href="favicon.png">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+<style>
+:root{
+--orange:#ff7a18;
+--bg:#040404;
+--highlight:#ff7a18;
+}
+
+body{
+margin:0;
+background:var(--bg);
+color:#d0d0d0;
+font-family:'Share Tech Mono', monospace;
+overflow-x:hidden;
+min-height:100vh;
+display:flex;
+flex-direction:column;
+}
+
+/* HUD frame */
+body::after{
+content:"";
+position:fixed;
+inset:10px;
+border:1px solid rgba(255,122,24,.25);
+pointer-events:none;
+}
+
+/* noise overlay */
+.noise{
+position:fixed;
+inset:0;
+opacity:.05;
+pointer-events:none;
+background-image:url("https://grainy-gradients.vercel.app/noise.svg");
+}
+
+/* navbar */
+header{
+background:#070707;
+border-bottom:1px solid #1b1b1b;
+position:sticky;
+top:0;
+z-index:50;
+transform:none;
+opacity:1;
+transition:none;
+}
+
+nav{
+max-width:1200px;
+margin:auto;
+padding:16px;
+display:flex;
+justify-content:center;
+gap:40px;
+}
+
+nav a{
+color:var(--orange);
+text-decoration:none;
+letter-spacing:2px;
+font-size:14px;
+cursor:pointer;
+transition:.3s;
+display:inline-block;
+padding:10px 18px;
+border:1px solid #1b1b1b;
+border-radius:14px;
+}
+
+nav a:hover{
+color:#fff;
+text-shadow:0 0 8px var(--orange);
+border-color:#fff;
+}
+.active, nav a.active{color:#fff !important;border-color:#fff !important;text-shadow:0 0 8px var(--orange) !important}
+.header-controls{position:absolute;width:100%;top:12px;pointer-events:none;display:flex}
+#fxToggle{position:absolute;left:16px;pointer-events:auto}
+#langRu{position:absolute;right:72px;pointer-events:auto}
+#langEn{position:absolute;right:16px;pointer-events:auto}
+.lang-btn{color:var(--orange);background:transparent;border:1px solid #1b1b1b;border-radius:14px;padding:8px 12px;letter-spacing:2px;font-size:12px;cursor:pointer;transition:.3s}
+.lang-btn:hover,.lang-btn.active{color:#fff;border-color:#fff;text-shadow:0 0 8px var(--orange)}
+.fx-btn{color:var(--orange);background:transparent;border:1px solid #1b1b1b;border-radius:14px;padding:8px 12px;letter-spacing:2px;font-size:12px;cursor:pointer;transition:.3s}
+.fx-btn:hover,.fx-btn.active{color:#fff;border-color:#fff;text-shadow:0 0 8px var(--orange)}
+
+/* hero */
+.hero{
+height:520px;
+background:
+  linear-gradient(rgba(0,0,0,.80),rgba(0,0,0,.95)),
+  radial-gradient(140% 60% at 50% -20%, rgba(255,160,70,.22) 0%, rgba(255,122,24,.10) 35%, rgba(255,122,24,0) 60%),
+  url("https://images.unsplash.com/photo-1503435980610-a51f3ddfee50?auto=format&fit=crop&w=1800&q=80");
+background-size:cover;
+background-position:center;
+display:flex;
+flex-direction:column;
+justify-content:center;
+align-items:center;
+text-align:center;
+}
+
+.hero h1{
+  font-family:'Orbitron', sans-serif;
+  font-size:56px;
+  letter-spacing:6px;
+  color:var(--orange);
+  margin:0;
+  animation:titlePulse 3s ease-in-out infinite;
+  padding: 0 10px;
+  word-wrap: break-word;
+  }
+
+.hero p{
+opacity:.75;
+margin-top:10px;
+}
+.hero .cta{margin-top:18px}
+.btn-cta{display:inline-block;color:#fff;text-decoration:none;letter-spacing:2px;font-size:14px;padding:12px 20px;border:1px solid #1b1b1b;border-radius:14px;transition:.3s;cursor:pointer;background:linear-gradient(180deg,#0a0a0a,#0c0c0c)}
+.btn-cta:hover{border-color:#fff;text-shadow:0 0 8px var(--orange)}
+@keyframes titlePulse{
+0%,100%{text-shadow:0 0 0 rgba(255,122,24,0)}
+50%{text-shadow:0 0 18px rgba(255,122,24,.45)}
+}
+/* hero content fade-in to avoid layout jump */
+.hero-content-in{animation:heroContentIn .5s ease}
+@keyframes heroContentIn{
+0%{opacity:0;transform:translateY(10px)}
+100%{opacity:1;transform:translateY(0)}
+}
+/* minimal parallax effect on hero when switching to home */
+.hero.parallax-in{animation:heroParallax .6s ease}
+@keyframes heroParallax{
+0%{transform:translateY(14px) scale(1.015)}
+100%{transform:translateY(0) scale(1)}
+}
+
+.container{
+max-width:1100px;
+margin:auto;
+padding:60px 20px;
+}
+
+.page{display:none;opacity:0;transform:translateY(8px);transition:opacity .35s ease, transform .35s ease}
+.page.active{display:block;opacity:1;transform:translateY(0)}
+.page.leaving{display:block}
+.page.entering{animation:fadeIn .35s ease forwards}
+.page.leaving{animation:fadeOut .35s ease forwards}
+@keyframes fadeIn{
+from{opacity:0;transform:translateY(8px)}
+to{opacity:1;transform:translateY(0)}
+}
+@keyframes fadeOut{
+from{opacity:1;transform:translateY(0)}
+to{opacity:0;transform:translateY(8px)}
+}
+
+.card{
+background:#080808;
+border:1px solid #1d1d1d;
+padding:30px;
+margin-bottom:30px;
+}
+
+h2{
+color:var(--orange);
+letter-spacing:3px;
+}
+.page#links h2{ text-align:center; }
+/* unified glowing title */
+.synd-title{text-align:center;color:#fff;letter-spacing:3px;margin: -4px 0 12px}
+.synd-title::after{content:"";display:block;width:120px;height:2px;margin:8px auto 0;background:linear-gradient(90deg,transparent,rgba(255,122,24,.6),transparent)}
+ .manifest{background:#0a0a0a;border:1px solid rgba(255,122,24,.25);box-shadow:0 0 24px rgba(255,122,24,.06) inset}
+ .manifest-title{display:inline-block;padding:0;border:none;border-radius:0;color:#fff;letter-spacing:2px;margin:0 0 14px}
+ .manifest{text-align:center}
+ .manifest p{color:#d0d0d0;line-height:1.7}
+ .member-card{background:#0a0a0a;border:1px solid #222;text-align:center}
+ .member-card .badge{margin-bottom:8px}
+ /* enhanced links grid */
+ .links-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(360px,1fr));gap:18px}
+ .link-item{display:flex;align-items:center;gap:16px;padding:18px 20px;border-radius:12px;background:linear-gradient(180deg,#0a0a0a,#0c0c0c);border:1px solid #2a2a2a;box-shadow:0 0 0 1px rgba(255,122,24,.12) inset,0 8px 18px rgba(0,0,0,.35);text-decoration:none;color:#fff;transition:.2s}
+ .link-item:hover{border-color:#fff;transform:translateY(-1px);text-shadow:0 0 6px var(--orange)}
+ .link-icon{width:36px;height:36px;border-radius:8px;box-shadow:0 0 10px rgba(255,122,24,.12)}
+ .link-title{font-weight:700;letter-spacing:1px}
+ .link-desc{opacity:.8;font-size:14px;margin-top:2px}
+ .link-text{display:flex;flex-direction:column}
+ .link-icon--discord{background:linear-gradient(135deg,#5865f2,#7983ff)}
+ .link-icon--boosty{background:linear-gradient(135deg,#ff7a18,#ff3d00)}
+ .link-icon--youtube{background:linear-gradient(135deg,#ff0000,#ff4d4d)}
+ .link-icon--twitch{background:linear-gradient(135deg,#9146ff,#b082ff)}
+ .links{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:20px;place-items:center}
+ .links a{background:#0a0a0a;border:1px solid #2a2a2a;padding:18px 24px;text-align:center;border-radius:12px;font-weight:600;letter-spacing:1px;min-width:200px;color:#fff}
+.links a:hover{border-color:#fff;color:#fff;text-shadow:0 0 6px var(--orange);transform:translateY(-1px)}
+.links a{background:linear-gradient(180deg,#0a0a0a,#0c0c0c);box-shadow:0 0 0 1px rgba(255,122,24,.12) inset,0 8px 18px rgba(0,0,0,.35)}
+.links-card{backdrop-filter:blur(1.5px)}
+.lore-card{border:1px solid rgba(255,122,24,.35);padding:20px}
+ /* back-compat for old selector (kept consistent) */
+ #team h2.synd-title{margin: -4px 0 12px}
+ #team h2.synd-title::after{content:"";display:block;width:120px;height:2px;margin:8px auto 0;background:linear-gradient(90deg,transparent,rgba(255,122,24,.6),transparent)}
+ .links-card{border:1px solid rgba(255,122,24,.35)}
+ 
+ /* Exam readability */
+ #exam .card, #exam { color:#e6e6e6 }
+ #examAnswers .btn-cta{ text-shadow:none; color:#fff; background:linear-gradient(180deg,#0d0d0d,#101010); border-color:#2a2a2a }
+ #examAnswers .btn-cta:hover{ border-color:#fff }
+ #examAnswers .btn-cta.active{ border-color:#fff; box-shadow:0 0 8px rgba(255,122,24,.2) }
+
+/* Rules sidebar */
+.rules-container{
+display:flex;
+flex-wrap:nowrap;
+align-items:flex-start;
+}
+.rules-sidebar{
+flex:0 0 240px;
+margin-right:20px;
+border-right:1px solid #1d1d1d;
+padding-right:10px;
+position:sticky;
+top:100px;
+align-self:flex-start;
+height:max-content;
+}
+.rules-sidebar a{
+display:block;
+padding:8px 4px;
+margin-bottom:4px;
+color:var(--orange);
+cursor:pointer;
+transition:.3s;
+}
+.rules-sidebar a:hover{
+color:#fff;
+text-shadow:0 0 6px var(--orange);
+}
+.rules-sidebar a.active{
+animation:blink 0.6s 3;
+}
+
+@keyframes blink{
+0%,100%{color:var(--orange);}
+50%{color:#fff;text-shadow:0 0 6px var(--orange);}
+}
+
+.rules-content{
+flex:1;
+max-width:800px;
+}
+.rules-content p,.rules-content li,.rules-content td,.rules-content th,.rules-content span,.rules-content strong{ text-shadow:none !important; }
+
+.rules-section h3{
+color:var(--orange);
+letter-spacing:2px;
+margin-top:0;
+}
+.rules-section h3.flash{
+animation:headingBlink .6s 3;
+}
+@keyframes headingBlink{
+0%,100%{text-shadow:0 0 0 transparent;}
+50%{text-shadow:0 0 12px var(--orange);}
+}
+.rules-section ul{
+padding-left:18px;
+}
+.rules-section li{
+margin:6px 0;
+}
+.perks-table{
+width:100%;
+border-collapse:collapse;
+background:#0a0a0a;
+border:1px solid #1d1d1d;
+}
+.perks-table th,.perks-table td{
+padding:12px;
+border-bottom:1px solid #1d1d1d;
+}
+.perks-table th{
+color:#fff;
+text-align:left;
+letter-spacing:2px;
+background:linear-gradient(180deg,transparent,rgba(255,122,24,.08));
+}
+.perks-table tbody tr:hover{
+background:#0f0f0f;
+}
+.badge{
+display:inline-block;
+padding:4px 10px;
+border:1px solid #222;
+border-radius:12px;
+color:#fff;
+background:#0f0f0f;
+}
+.badge--orange{
+border-color:var(--orange);
+color:var(--orange);
+}
+
+/* Links */
+.links{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:20px;place-items:center}
+.links a{background:#0a0a0a;border:1px solid #2a2a2a;padding:18px 24px;text-decoration:none;color:#fff;transition:.3s;border-radius:12px;min-width:220px;letter-spacing:1px;box-shadow:0 0 24px rgba(255,122,24,.06) inset}
+.links a:link,.links a:visited{color:#fff}
+.links a:hover{border-color:#fff;color:#fff;text-shadow:0 0 6px var(--orange)}
+.video-16x9{position:relative;width:100%;padding-top:56.25%;background:#000;border:1px solid rgba(255,122,24,.35);border-radius:12px;box-shadow:0 0 24px rgba(255,122,24,.06) inset;overflow:hidden}
+.video-16x9 iframe{position:absolute;inset:-2px;width:calc(100% + 4px);height:calc(100% + 4px)}
+.video-16x9 .video-thumb{position:absolute;inset:0;background-size:cover;background-position:center;display:flex;align-items:center;justify-content:center}
+.video-16x9 .video-play{display:inline-block;padding:12px 18px;border:1px solid rgba(255,122,24,.6);border-radius:999px;color:#fff;text-decoration:none;letter-spacing:2px;background:rgba(0,0,0,.45);backdrop-filter:blur(2px);transition:.2s}
+.video-16x9 .video-play:hover{border-color:#fff;text-shadow:0 0 6px var(--orange)}
+
+/* Anomaly small decorative */
+.anomaly{
+position:fixed;
+width:120px;
+height:120px;
+border-radius:50%;
+background:radial-gradient(circle,rgba(255,122,24,.3),transparent 70%);
+filter:blur(15px);
+pointer-events:none;
+animation:anomalyMove 30s linear infinite;
+}
+
+@keyframes anomalyMove{
+0%{transform:translate(-5vw,60vh)}
+50%{transform:translate(70vw,25vh)}
+100%{transform:translate(-5vw,60vh)}
+}
+
+footer{
+background:#070707;
+padding:30px;
+text-align:center;
+border-top:1px solid #1c1c1c;
+margin-top:auto;
+}
+.header-show{transform:translateY(0);opacity:1}
+/* FX Canvas and toggle */
+.fx-canvas{position:fixed;inset:0;pointer-events:none;z-index:1}
+
+@media (max-width: 768px) {
+  
+    body{
+      padding:0;
+    }
+  
+    .container{
+      width:100%;
+      padding: 20px 10px;
+      box-sizing: border-box;
+      overflow-x: hidden;
+    }
+  
+    .hero{
+      height: 320px;
+    }
+  
+    .hero h1{
+      font-size: 36px !important;
+      letter-spacing: 2px !important;
+    }
+  
+    nav{
+      gap: 8px;
+      padding: 10px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+  
+    nav a{
+      font-size: 11px;
+      padding: 6px 10px;
+      border-radius: 10px;
+    }
+  
+    .header-controls{
+      position: static;
+      display: flex;
+      justify-content: center;
+      gap: 12px;
+      width: 100%;
+      margin-top: 5px;
+      padding-bottom: 10px;
+      pointer-events: auto;
+    }
+    #langRu, #langEn, #fxToggle{
+      position: static;
+    }
+  
+    header{
+      position: static;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+  
+    .rules-container{
+      flex-direction: column;
+      width: 100%;
+    }
+  
+    .rules-sidebar{
+      position: static;
+      width: 100%;
+      border-right: none;
+      border-bottom: 1px solid #1d1d1d;
+      margin-bottom: 20px;
+      padding-right: 0;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 5px;
+      justify-content: center;
+    }
+  
+    .rules-sidebar a{
+      font-size: 12px;
+      padding: 5px 10px;
+      border: 1px solid #1d1d1d;
+      border-radius: 8px;
+      margin-bottom: 0;
+    }
+  
+    .rules-content{
+      width: 100%;
+      overflow-x: hidden;
+    }
+  
+    .rules-section{
+      word-wrap: break-word;
+      overflow-wrap: break-word;
+    }
+  
+    .perks-table{
+      display: block;
+      overflow-x: auto;
+      width: 100%;
+    }
+  
+    .links-grid{
+      grid-template-columns: 1fr;
+    }
+  
+    p{
+      font-size:16px;
+      line-height: 1.5;
+    }
+  
+    iframe{
+      width:100%;
+      height:220px;
+    }
+  
+    .button{
+      width:100%;
+      margin-bottom:10px;
+    }
+  
+  }
+  
+</style>
+</head>
+
+<body>
+<div class="noise"></div>
+<div class="anomaly" id="anomaly"></div>
+<div class="rain"></div>
+<div class="dust"></div>
+<canvas id="fxCanvas" class="fx-canvas"></canvas>
+<style>
+.team-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:20px;align-items:start}
+.member-card h3{color:#fff;letter-spacing:2px;margin-top:0}
+.member-card-link{display:block;text-decoration:none;color:#d0d0d0}
+.member-card-link:link{color:#d0d0d0}
+.member-card-link:visited{color:#d0d0d0}
+.member-card-link p{color:#d0d0d0}
+.member-card-link .member-card{transition:.3s}
+.member-card-link:hover .member-card{border-color:#fff;color:#fff;text-shadow:0 0 6px var(--orange);cursor:pointer}
+/* global atmospheric effects */
+.rain{position:fixed;inset:0;pointer-events:none;opacity:.05;background:repeating-linear-gradient(to bottom, rgba(255,122,24,.06) 0 2px, transparent 2px 6px);animation:rainFall 10s linear infinite;z-index:0}
+@keyframes rainFall{0%{transform:translateY(-10px)}100%{transform:translateY(10px)}}
+.dust{position:fixed;inset:0;pointer-events:none;opacity:.06;background-image:radial-gradient(rgba(255,122,24,.08) 2px, transparent 2px);background-size:6px 6px;animation:dustDrift 22s linear infinite;z-index:0}
+@keyframes dustDrift{0%{transform:translateY(0)}100%{transform:translateY(30px)}}
+
+</style>
+<header>
+<nav>
+<a onclick="showPage('home')" data-i18n="nav_home">Главная</a>
+<a onclick="showPage('rules')" data-i18n="nav_rules">Правила</a>
+<a onclick="showPage('team')" data-i18n="nav_team">Синдикат</a>
+<a onclick="showPage('links')" data-i18n="nav_links">Ссылки</a>
+</nav>
+<div class="header-controls">
+<button id="langRu" class="lang-btn active" data-lang="ru">RU</button>
+<button id="fxToggle" class="fx-btn">FX</button>
+<button id="langEn" class="lang-btn" data-lang="en">EN</button>
+</div>
+</header>
+
+<section class="hero">
+<div class="hero-content">
+<h1>STARFALL SYNDICATE</h1>
+<p>AURORIA</p>
+<div class="cta"><a class="btn-cta" onclick="showPage('exam')" data-i18n="cta_exam">Войти в Зону</a></div>
+</div>
+</section>
+
+<div class="container">
+<div class="page active" id="home">
+<div class="card manifest">
+<div class="manifest-title synd-title" data-i18n="manifest_title">От создателей</div>
+<p data-i18n="manifest_text">Auroria это мир, где каждая история создаётся игроками. Зона не прощает ошибок и не забывает поступков. Здесь каждое слово, каждое решение и каждая пуля оставляют след. На нашем сервере вы не просто играете — вы становитесь частью живой истории. Мы предоставляем вам инструменты для создания настоящего RolePlay: персонажи, конфликты, союзы, легенды и трагедии. Не ищите лёгкой выгоды. Создавайте истории, которые будут помнить другие сталкеры. Зона наблюдает. И каждое действие имеет последствия.</p>
+</div>
+<div class="card lore-card">
+<h2 class="synd-title" data-i18n="lore_title">Видео‑лор: Падающая Звезда</h2>
+<div class="video-16x9"><div class="yt-lazy" data-video-id="GDXO10ue5cM" data-start="90"></div></div>
+</div>
+</div>
+
+<div class="page" id="rules">
+<div class="rules-container">
+<div class="rules-sidebar" id="rulesSidebar">
+<a onclick="scrollToSection('law1')" data-i18n="sb_law1">1.0 Главный закон — РП</a>
+<a onclick="scrollToSection('language2')" data-i18n="sb_language2">2.0 Язык Зоны</a>
+<a onclick="scrollToSection('metagaming3')" data-i18n="sb_metagaming3">3.0 Метагейминг</a>
+<a onclick="scrollToSection('conflict4')" data-i18n="sb_conflict4">4.0 Конфликты</a>
+<a onclick="scrollToSection('rpk5')" data-i18n="sb_rpk5">5.0 РПК: Последнее слово</a>
+<a onclick="scrollToSection('unique6')" data-i18n="sb_unique6">6.0 Уникальные механики</a>
+<a onclick="scrollToSection('realism7')" data-i18n="sb_realism7">7.0 Реализм Зоны</a>
+<a onclick="scrollToSection('newbies8')" data-i18n="sb_newbies8">8.0 Новички и нарушения</a>
+<a onclick="scrollToSection('factions9')" data-i18n="sb_factions9">9.0 Фракции и вступление</a>
+<a onclick="scrollToSection('unique10')" data-i18n="sb_unique10">10.0 Глубина мира</a>
+<a onclick="scrollToSection('final11')" data-i18n="sb_final11">11.0 Финальные правила фракций</a>
+</div>
+<div class="rules-content" id="rulesContent">
+<div id="law1" class="rules-section"><h3>1.0. ГЛАВНЫЙ ЗАКОН — РОЛЕВАЯ ИГРА (RP)</h3><p>1.1. Вы — ваш персонаж. Всегда и везде. Разговоры «от себя» («ООС») запрещены в игровом голосовом чате, за исключением критических технических проблем.</p><p>1.2. Знание персонажа = знание игрока. Если вы чего-то не видели и не слышали лично в игре своим персонажем — вы этого не знаете.</p><p>1.3. Павергейминг — смерть РП. Запрещено навязывать другим действия, не оставляя им возможности для отыгрыша.</p><p>НЕЛЬЗЯ: «Я быстро убиваю тебя ножом». МОЖНО: «Я с тихим лязгом извлекаю нож и делаю шаг в твою сторону...»</p></div>
+<div id="language2" class="rules-section"><h3>2.0. ЯЗЫК ЗОНЫ: ЛЕКСИКА И РЕАЛИЗМ</h3><p>2.1. Запрещённые OOC‑понятия в IC‑речи:</p><ul><li>2.1.1. Никаких «Богов», «Админов», «СК» (скрипт) и прочих отсылок к управлению сервером.</li><li>2.1.2. Не существует «Большой Земли». Говорите прямо: «Контрабандисты говорят, из Москвы / Киева пришел груз».</li><li>2.1.3. Запрещены OOC‑названия: «лут», «спавн», «респ», «фарм».</li></ul><p>ВМЕСТО: «Здесь хороший хабарик», «Нашёл прикоп», «Пойду пошарить...»</p><p>2.2. Поощряемая лексика: Используйте сталкерский сленг: «выброс», «радиацы», «артяк», «долг», «кабаны», «слепые псы», «грави», «электра».</p></div>
+<div id="metagaming3" class="rules-section"><h3>3.0. МЕТАГЕЙМИНГ: ЖЕСТКИЙ ЗАПРЕТ</h3><p>3.1. Использование OOC‑информации для IC‑выгоды — главное преступление.</p><p>3.2. Конкретные запреты:</p><ul><li>3.2.1. Голосовой чат Discord/рации вне игры для тактики запрещён. Ваш персонаж их не слышит.</li><li>3.2.2. Стримы и скриншоты для слежки — пермабан.</li><li>3.2.3. Знание через смерть. После возрождения вы не помните убийц и место смерти.</li><li>3.2.4. OOC‑обсуждения IC‑событий в реальном времени («Нас грабят в Ростове!» в Discord) запрещены.</li></ul></div>
+<div id="conflict4" class="rules-section"><h3>4.0. КРОВЬ И СТАЛЬ: ПРАВИЛА КОНФЛИКТА</h3><p>4.1. New Life Rule (NLR) — Абсолют:</p><ul><li>4.1.1. После смерти — полная амнезия об обстоятельствах гибели и убийцах.</li><li>4.1.2. Возврат на место смерти запрещен на 2 игровых дня.</li><li>4.1.3. Самоубийство/провокация для сброса RP‑ситуации карается баном.</li></ul><p>4.2. Путь к насилию:</p><ul><li>4.2.1. Каждая пуля должна быть RP‑оправдана.</li><li>4.2.2. Обязательный вербальный контакт перед открытием огня (если это не бесшумная засада).</li><li>4.2.3. Отыгрыш ранений обязателен (хромота, крик боли).</li></ul><p>4.3. Искусство плена (Киднеппинг):</p><ul><li>4.3.1. Цель плена — не лут, а слом воли, информация, RP.</li><li>4.3.2. Обеспечьте пленному осмысленный RP и шанс на спасение.</li><li>4.3.3. Пленный обязан отыгрывать свой статус (запрещено молчать или вести себя как неуязвимый герой).</li></ul></div>
+<div id="rpk5" class="rules-section"><h3>5.0. РОЛЕВОЕ УБИЙСТВО ПЕРСОНАЖА (РПК): ПРАВИЛО ПОСЛЕДНЕГО СЛОВА</h3>
+<p>5.1. РПК — это осмысленная смерть как кульминация истории, а не результат случайной перестрелки.</p>
+<p>5.2. Когда РПК разрешен:</p>
+<ul>
+<li>Итог длительного личного конфликта.</li>
+<li>Казнь по решению фракции за тяжкие проступки.</li>
+<li>По взаимному OOC‑согласию игроков.</li>
+</ul>
+<p>5.3. КАК ПРОВОДИТЬ РПК (ОБЯЗАТЕЛЬНО):</p>
+<ul>
+<li>5.3.1. Перед смертельным действием вы обязаны дать жертве возможность высказать последнее слово.</li>
+<li>5.3.2. Пример нарушения: «Ты вор. Умри» (выстрел).</li>
+<li>5.3.3. Пример правильно: «Ты вор. Что скажешь в своё оправдание?» (диалог) → «Твоё оправдание ничтожно» (выстрел).</li>
+</ul>
+</div>
+<div id="unique6" class="rules-section"><h3>6.0. УНИКАЛЬНЫЕ ПРАВИЛА И МЕХАНИКИ</h3>
+<p>6.1. ЗАКОН ВЗАИМНОСТИ (QUALITY RP RESPONSE):</p>
+<ul>
+<li>6.1.1. На качественный, глубокий RP вы обязаны отвечать соответствующим уровнем отыгрыша.</li>
+<li>6.1.2. Запрещено «сливать» взаимодействие односложными ответами, быстрым убийством или игнорированием.</li>
+</ul>
+<p>6.2. ЗАКОН ВОЗВРАЩЕНИЯ (для мода на Квенту):</p>
+<ul>
+<li>6.2.1. Каждая пятая смерть — обязательный финальный РПК. Активирует «Возвращение Квенты».</li>
+<li>6.2.2. После этого вы обязаны создать НОВОГО персонажа с другой биографией, именем, внешностью.</li>
+<li>6.2.3. Новая детальная биография должна быть одобрена в Discord до выхода в Зону.</li>
+</ul>
+<p>6.3. ПРАВИЛО АНОМАЛЬНОЙ АКТИВНОСТИ (Выброс):</p>
+<ul>
+<li>6.3.1. При выбросе обязателен отыгрыш поиска укрытия.</li>
+<li>6.3.2. Нахождение на открытой местности гарантированно приводит к смерти/мутациям (отыгрыш обязателен).</li>
+</ul>
+<p>6.4. ПРАВИЛО «ЖИВОГО МИРА»:</p>
+<p>Поощряется влияние на мир: записки, знаки, мемориалы, изменение локаций. Захваченную базу нужно переосвятить (сменить символику), а не просто очистить.</p>
+<p>6.5. ПРАВИЛО «ДОВЕРИЯ К ИГРОКУ» (Trust RP):</p>
+<p>Если противник ведёт качественный RP (допрос в плену), вы обязаны отвечать тем же, а не молчать.</p>
+</div>
+<div id="realism7" class="rules-section"><h3>7.0. РЕАЛИЗМ ЗОНЫ</h3>
+<p>7.1. Логика и здравый смысл:</p>
+<ul>
+<li>7.1.1. «Космический магистр» (ношение 10 стволов) запрещен.</li>
+<li>7.1.2. Лут должен находиться логично.</li>
+<li>7.1.3. Уникальный лут должен иметь историю.</li>
+</ul>
+<p>7.2. Фракции — идеология, а не банда:</p>
+<ul>
+<li>7.2.1. Создание согласуется с Администрацией (нужны: идеология, цели, иерархия).</li>
+<li>7.2.2. Война фракций — за контроль и идеи, а не за лута.</li>
+<li>7.2.3. Измена внутри фракции — сложное RP‑событие, должно быть отыграно.</li>
+</ul>
+<p>7.3. Убежища:</p>
+<p>База должна выглядеть жилой и тематической. Нападение на базу должно нести RP‑послание (знак, записка).</p>
+</div>
+<div id="newbies8" class="rules-section"><h3>8.0. ДЛЯ НОВИЧКОВ И НАРУШИТЕЛЕЙ</h3>
+<p>8.1. Нулевая терпимость к Non‑RP (NRP):</p>
+<p>Игнорирование RP (бегство от диалога, стрельба без слов) — тяжелое нарушение.</p>
+<p>Наказание: Доставка в КПЗ, обязательная RP‑беседа, наказание в рамках мира.</p>
+<p>8.2. Все вопросы — в Дискорд:</p>
+<p>Все споры и вопросы строго через тикет‑систему в Discord. В игре нет «админов».</p>
+<p>ОТ СОЗДАТЕЛЕЙ: Мы строим не сервер, а легенду. Здесь каждый выстрел — часть саги. Зона жива, пока живы ваши истории. Цените чужой отыгрыш и отвечайте тем же. Помните о Последнем Слове. Чтите Возвращение. И бойтесь Выброса.</p>
+<p>Удачи, сталкер. Ты её найдёшь</p>
+</div>
+<div id="factions9" class="rules-section"><h3>9.0. ПРАВИЛА ДЛЯ ФРАКЦИЙ (ГРУППИРОВОК — ГП) И ВСТУПЛЕНИЯ</h3>
+<p>9.1. Создание и статус фракции</p>
+<p>9.1.1. Любая организованная группа от 4‑х человек считается фракцией и должна быть официально зарегистрирована через заявку в Discord.</p>
+<p>9.1.2. В заявке указываются:</p>
+<ul>
+<li>название</li>
+<li>идеология/цели</li>
+<li>лидер (игровой и Discord аккаунт)</li>
+<li>список членов</li>
+<li>примерная территория влияния</li>
+<li>правила приёма (IC)</li>
+</ul>
+<p>9.1.3. Только зарегистрированные фракции имеют право на:</p>
+<ul>
+<li>защиту территории (базы)</li>
+<li>объявление войн</li>
+<li>проведение казней от имени группировки</li>
+<li>особые права (патрулирование, контроль ресурсов)</li>
+</ul>
+<p>9.2. Вступление в фракцию (IC‑процесс)</p>
+<p>9.2.1. Нет мгновенного вступления через Discord. Даже если четыре человека договорились создать «Братву», они должны отыграть процесс знакомства, проверки и принятия в игре.</p>
+<p>9.2.2. Общие принципы:</p>
+<p>Бандиты/Братва: новичок должен доказать «полезность» — принести «дань» (оружие, медикаменты), выполнить задание, пройти посвящение.</p>
+<p>Военные/«Долг»: сталкер приходит на КПП/базу, проходит допрос, проверку на знание устава, получает первое задание (патруль, зачистка территории).</p>
+<p>Учёные/«Экологи»: нужно показать знания о аномалиях, умении обращаться с артефактами, предоставить исследовательские данные.</p>
+<p>«Свобода»: подтверждает разделение идеологии и боевые/полезные навыки.</p>
+<p>«Монолит»: вступление через ритуал или «прозрение» после контакта с Излучателем/артефактами — невозможно просто объявить себя членом.</p>
+<p>9.2.3. Роль администрации: администрация не телепортирует и не добавляет игроков автоматически. Админ фиксирует состав в Discord только после IC‑вступления.</p>
+<p>9.3. Конфликты и войны</p>
+<p>9.3.1. Война объявляется официально через лидеров в присутствии свидетелей или через записку на базе с причинами/посланием от фракции.</p>
+<p>9.3.2. Запрещён «космический генштаб». Координация должна вестись IC (рации, гонцы, встречи).</p>
+<p>9.3.3. Фракция‑победитель получает RP‑ресурсы и контроль над территорией, но не может уничтожать врага полностью без согласования с администрацией.</p>
+<p>9.4. Наказания и пленение</p>
+<p>9.4.1. Фракция вправе судить своих членов по внутренним законам (штраф, изгнание, казнь — РПК). Администрация желательно информируется о серьёзных наказаниях.</p>
+<p>9.4.2. Пленные — ценный RP‑актив. Нельзя просто убивать их для «очистки» базы:</p>
+<ul>
+<li>обмен на своих или ресурсы</li>
+<li>допрос о планах врага</li>
+<li>публичная казнь (по правилу РПК 5.0)</li>
+<li>попытка перевербовать (длительный RP)</li>
+</ul>
+<p>9.4.3. Военные («Долг») могут конвоировать пленных в тюрьму, но это должно быть полноценным опасным RP, а не телепортацией.</p>
+<p>9.5. Распад фракции</p>
+<p>Если фракция теряет более 70% состава или лидера (финальный РПК), она считается еще не распущенной. Оставшиеся члены становятся либо одиночками или могут попытаться вступить в другие ГП, заново отыграв процесс IC‑вступления.</p>
+<p>ВАЖНО: игрокам нужно дать время найти людей или лидера. Игроки не должны терять шанс на участие из‑за отсутствия лидера. Оставшиеся участники ГП могут выбрать нового лидера и отыгрывать свою ГП дальше.</p>
+<p>ОТ СОЗДАТЕЛЕЙ (Дополнение): Фракция — это не просто список ников в Discord. Это — легенда, дисциплина и ответственность. Лидер отвечает за своих подчинённых. Создавайте не просто банду, а живую силу Зоны со своей историей, врагами и честью.</p>
+<p>9.6. ПРАВИЛО «ЦЕННОСТИ ЖИЗНИ» (ПРАВИЛО БЕСПОЛЕЗНОГО ПЛЕННОГО)</p>
+<p>9.6.1. Любой пленный, даже бесполезный тактически, является источником RP, а не обузой.</p>
+<p>9.6.2. Запрещено убивать пленного просто «для очистки» базы.</p>
+<p>9.6.3. Пленных можно использовать для создания долгосрочного RP‑сюжета:</p>
+<ul>
+<li>Рабский труд: готовка, чистка оружия, сортировка патронов, ремонт одежды, сбор дров</li>
+<li>Гуманитарная роль: заложник для переговоров, живой щит, подопытный для проверки артефактов</li>
+<li>Психологическая игра: допросы, перевербовывание, тренировка новичков</li>
+</ul>
+<p>9.6.4. Освобождение только по итогам RP: побег, выкуп, обмен, успешное перевербовывание или крайняя необходимость (тяжёлое ранение, эпидемия). Убийство — крайняя мера, когда пленный реально угрожает жизни хозяев.</p>
+<p>9.6.5. Все взаимодействия с пленными должны отыгрываться IC не менее 1–2 часов непрерывно, при сложных RP‑сюжетах (допросы, перевербовывание, ритуалы) — до 4 часов, разбивая процесс на сцены. Это необходимо для сохранения значимости пленных как RP‑ресурса и создания реалистичной атмосферы Зоны.</p>
+</div>
+<div id="unique10" class="rules-section"><h3>10.0. УНИКАЛЬНЫЕ ПРАВИЛА ГЛУБИНЫ МИРА</h3><p>10.1. «Хроники Зоны» (ведение дневника): Каждая фракция обязана вести IC‑дневник в игре (записки, документы), фиксируя ключевые события: вступление новых членов, столкновения, находки, смерти, изменения устава. Администрация использует дневники для еженедельных сводок «Голос Зоны», создавая живой лор.</p><p>10.2. «Разрушаемый лут»: Победители штурма базы могут забирать ресурсы и целенаправленно портить то, что не могут унести.</p><p>10.3. «Старые шрамы» (правило памяти мира): Если персонажа узнают по прошлым событиям, это отыгрывается через смутное узнавание, дежавю, беспокойство.</p><p>10.4. «Цена слова» (договоры и клятвы): IC‑торжественное обещание или клятва считается священной. Нарушение клятвы без IC‑оснований — тяжкий RP‑проступок. Нарушившего могут объявить клятвопреступником; другие фракции получают IC‑повод не доверять ему.</p><p>10.5. Правило NLR (No‑Looting‑Remembrance / память персонажа):</p><ul><li>10.5.1. Персонаж, получивший тяжёлое ранение или умерший, теряет память о последних 6 реальных часах.</li><li>10.5.2. Игрок помнит события до 6 часов назад, но не точные обстоятельства смерти и нападавших.</li><li>Пример: «Помню зелёный камуфляж… не знаю, кто это был, но явно военные».</li><li>10.5.3. После тяжёлого ранения — минимум 20 минут в «зелёной зоне» (базы фракций, Кордон, Чернобыль‑4, Янов, Затон, Бар и т.д.).</li><li>10.5.4. В этот период нельзя активно участвовать в опасных событиях, требуется IC‑восстановление.</li></ul><p>10.6. Запрет на мета‑игру:</p><ul><li>10.6.1. Мета‑игра строго запрещена. Никаких OOC/Discord знаний для IC‑действий.</li><li>10.6.2. Внеигровые чаты не влияют на события и координацию.</li><li>10.6.3. Все решения и взаимодействия — исключительно через IC‑каналы: внутриигровые рации, личные встречи, гонцы, записки, сигналы.</li><li>10.6.4. Discord — только для OOC, когда персонаж не в активном RP.</li><li>10.6.5. При любом RP‑взаимодействии — Discord закрыт, всё происходит IC.</li></ul><p>10.7. Контроль территории, патрули и логистика:</p><ul><li>10.7.1. Каждая фракция обязана выходить с базы и контролировать территорию в соответствии со своими RP‑целями.</li><li>10.7.2. Примеры обязанностей: Военные — патруль/зачистки/штурмы; Военные сталкеры и Учёные — исследование северных зон и аномалий; Долг — очищение от мутантов, помощь сталкерам, контроль блокпостов; Братва — укрепление блокпостов, исследование окрестностей, RP‑события.</li><li>10.7.3. Обеспечение логистики: снабжение, охрана базы, распределение ресурсов, патрулирование.</li></ul><p>10.8. Система морального выбора и последствий:</p><ul><li>10.8.1. Все действия имеют IC‑последствия.</li><li>10.8.2. Последствия: потеря доверия, ограничение доступа к ресурсам и зонам, снижение репутации в «Голосе Зоны».</li><li>10.8.3. Примеры: спасти или оставить пленных; жестокое обращение; сотрудничество/предательство; игнор обязанностей.</li><li>10.8.4. Последствия отыгрываются IC, нельзя «починить» их через Discord.</li></ul><p>10.9. Правило «Скрытности и разведки»:</p><ul><li>10.9.1. Обязательная разведка перед вторжением/исследованием/штурмом.</li><li>10.9.2. Методы разведки: наблюдение; гонцы; сбор слухов и данных; игровое оборудование; подслушивание по IC‑рации (без Discord).</li><li>10.9.3. Без разведки — IC‑ошибка, потери и репутационные риски.</li><li>10.9.4. Скрытность в боях: техники скрытности, обоснование громких действий.</li><li>10.9.5. Фиксация разведданных IC: записи, отчёты, заметки.</li><li>10.9.6. Любая OOC‑информация не используется в IC‑решениях.</li></ul></div>
+<div id="final11" class="rules-section"><h3>11.0. Общие принципы для всех фракций</h3>
+<p>IC‑передвижение и контроль территорий:</p>
+<p>Каждая фракция обязана контролировать свои базы и территорию влияния. Игроки должны выходить на патрули, проверять блокпосты и обеспечивать безопасность зоны.</p>
+<p>Примеры:</p>
+<ul>
+<li>Долг — патрулирует Кордон, чистит мутантов, помогает сталкерам.</li>
+<li>Братва — укрепляет южные блокпосты, исследует окрестности.</li>
+<li>Военные сталкеры — продвигаются на север, собирают артефакты.</li>
+</ul>
+<p>Запрет на OOC/Discord‑мета:</p>
+<p>Любая информация о действиях фракции, нападениях, патрулях или RP‑событиях не может передаваться через Discord, OOC‑чаты или внешние каналы. Все координации должны происходить IC: рации, гонцы, встречи, сигналы, записки. Нарушение карается RP‑потерей доверия, репутации, ресурсов и прав фракции.</p>
+<p>Переодевание и маскировка:</p>
+<p>Разрешено переодеваться в одежду других фракций или использовать их символику. IC‑реакции на такое переодевание законны. Если фракция атакует персонажа по причине маскировки — это часть RP.</p>
+<p>Передвижение по RP:</p>
+<p>Любое перемещение через враждебные территории должно отыгрываться RP: скрытность, разведка, встречи. Минимальные правила взаимодействия: тихие проходы, наблюдение, шифровки через гонцов, использование местных укрытий.</p>
+<p>Минимальное время на отыгрыш сложных RP‑сюжетов (например, допрос, перевербовка) — 1–2 часа, максимум 4 часа с разбивкой на сцены.</p>
+</div>
+<div id="perks112" class="rules-section"><h3>11.2 Перки и навыки фракций</h3>
+<table class="perks-table">
+<thead>
+<tr>
+<th>Фракция</th>
+<th>Боевка</th>
+<th>Медицина</th>
+<th>Разведка/Скрытность</th>
+<th>Квента‑коррекция</th>
+</tr>
+</thead>
+<tbody>
+<tr><td>Долг</td><td><span class="badge badge--orange">25%</span></td><td><span class="badge">20%</span></td><td><span class="badge">15%</span></td><td>Индивидуально по RP (медик, снайпер)</td></tr>
+<tr><td>Свобода</td><td><span class="badge">15%</span></td><td><span class="badge">15%</span></td><td><span class="badge badge--orange">20%</span></td><td>Коррекция по RP (разведчик, медик)</td></tr>
+<tr><td>Братва</td><td><span class="badge">10%</span></td><td><span class="badge">5%</span></td><td><span class="badge badge--orange">25%</span></td><td>Индивидуально (боевка, хитрость)</td></tr>
+<tr><td>Военные сталкеры</td><td><span class="badge">20%</span></td><td><span class="badge">15%</span></td><td><span class="badge">20%</span></td><td>Перки корректируются по RP</td></tr>
+<tr><td>Учёные</td><td><span class="badge">0%</span></td><td><span class="badge badge--orange">25%</span></td><td><span class="badge">15%</span></td><td>Усиление медицины или исследований</td></tr>
+<tr><td>Ренегаты</td><td><span class="badge">15%</span></td><td><span class="badge">10%</span></td><td><span class="badge">20%</span></td><td>Корректировка по RP</td></tr>
+<tr><td>Наёмники / Мерки</td><td><span class="badge badge--orange">30%</span></td><td><span class="badge">15%</span></td><td><span class="badge">25%</span></td><td>Перки по контрактной роли</td></tr>
+<tr><td>Сталкеры‑одиночки</td><td><span class="badge">0%</span></td><td><span class="badge">0%</span></td><td><span class="badge">0%</span></td><td>Характеристики только по квенте</td></tr>
+</tbody>
+</table>
+</div>
+<div id="move113" class="rules-section"><h3>11.3. Передвижение и скрытность</h3><p>Все RP‑передвижения должны отыгрываться IC. Скрытность и разведка: маскировка, тихое движение, наблюдение. Зоны временного «Radio Silence»: на определённых локациях рации не работают — используйте жесты, фонарики, записки.</p></div>
+<div id="injury114" class="rules-section"><h3>11.4. RP‑передвижение после тяжёлых ранений</h3><p>После тяжёлого ранении персонаж теряет память последних 6 часов (NLR). Персонаж помнит только общие детали (форма, экипировка, цвет камуфляжа), но не конкретные фракции. Минимальное нахождение в «зелёной зоне» после тяжёлого ранения — 20 минут. Примеры зелёных зон: базы Долга, Свободы, Чернобыль 4, Бар, Янов, Затон.</p></div>
+<div id="gp115" class="rules-section"><h3>11.5. RP‑передвижение группировок</h3><ul><li>Долг: Кордон, зачистка мутантов, помощь сталкерам.</li><li>Свобода: Разведка и исследование северных зон.</li><li>Братва: Укрепление южных блокпостов, RP‑ограбления.</li><li>Военные сталкеры: Северные миссии, зачистка аномалий.</li><li>Учёные: Медицинская и исследовательская поддержка.</li><li>Ренегаты: Выживание, хитрость и разведка.</li><li>Наёмники / Мерки: Штурмы, охрана, контракты.</li><li>Сталкеры‑одиночки: RP по квенте.</li></ul></div>
+<div id="morals116" class="rules-section"><h3>11.6. Система морали и последствий</h3><p>Нарушение правил RP (Discord, OOC‑мета, территории, переодевание) лишает репутации, доверия, ресурсов и доступа к фракции. Поступки фиксируются IC‑сводками и влияют на дальнейшую историю персонажа и фракции.</p></div>
+<div id="logistics117" class="rules-section"><h3>11.7. Передвижение и логистика фракции</h3><p>Фракции обязаны выходить с базы для патрулей и контроля периметра. Игроки поддерживают логистику: артефакты, ресурсы, медикаменты, обеспечение баз. RP‑поездки должны отыгрываться непрерывно и с соблюдением всех RP‑правил.</p></div>
+<div id="stealth118" class="rules-section"><h3>11.8. Скрытность и разведка</h3><p>Игроки могут использовать маскировку, разведку, шпионаж, засады, скрытное наблюдение, гонцов. Нарушение территории без RP‑повода — нарушение RP с потерей ресурсов/репутации или даже РПК.</p></div>
+<div id="qventa119" class="rules-section"><h3>11.9. Механика квенты и индивидуальных перков</h3><p>Каждая фракция имеет базовые стандартные перки (см. таблицу). Игроки прокачивают навыки только через RP или квенту. Медики получают + к медицине, снайперы + к боевке и т.д. Сталкеры‑одиночки полностью зависят от RP‑квенты.</p></div>
+<div id="monolith1110" class="rules-section"><h3>11.10. Группировка «Монолит»</h3></div>
+<div id="monolithStatus1111" class="rules-section"><h3>11.11. Статус</h3><p>«Монолит» — особая фракция Зоны, не отыгрывается игроками; функционирует как NPC/боты. Администрация управляет их действиями, контроль игрокам не раскрывается.</p></div>
+<div id="monolithBehavior1112" class="rules-section"><h3>11.12. Поведение</h3><p>Члены «Монолита» стреляют по всем без предупреждения, строго по лору «Тени Чернобыля». Любая встреча смертельно опасна, переговоры отсутствуют.</p></div>
+<div id="monolithInteract1113" class="rules-section"><h3>11.13. Взаимодействие с игроками</h3><p>Игроки не могут вступать в «Монолит», взаимодействие с ними запрещено; использовать их для RP‑выгод нельзя.</p></div>
+<div id="monolithMeaning1114" class="rules-section"><h3>11.14. RP‑значение</h3><p>«Монолит» создаёт динамическую угрозу Зоны, стимулируя игроков кооперативно исследовать территорию, планировать маршруты и избегать прямых столкновений.</p></div>
+<div id="monolithExceptions1115" class="rules-section"><h3>11.15. Исключения</h3><p>Администрация может использовать «Монолит» для RP‑сценариев и событий (рейды, засады), детали действий игрокам не раскрываются.</p></div>
+</div>
+</div>
+</div>
+
+<div class="page" id="team">
+<div class="card">
+<h2 class="synd-title" data-i18n="team_title">Синдикат</h2>
+<div class="team-grid">
+<div class="card member-card">
+<p><span class="badge badge--orange" data-i18n="role_founder">Создатель</span></p>
+<p><span data-i18n="label_nick">Псевдоним</span>: DMT</p>
+<p data-i18n="founder_desc">Создатель проекта. Отвечаю за лор и концепцию, развитие сервера, организацию процессов и коммуникации, медиаприсутствие.</p>
+</div>
+<a class="member-card-link" href="https://mrrastik.netlify.app" target="_blank" rel="noopener"><div class="card member-card">
+<p><span class="badge badge--orange" data-i18n="role_lore">Диктор лора</span></p>
+<p><span data-i18n="label_nick">Псевдоним</span>: MrRastik</p>
+<p data-i18n="lore_desc">Диктор лора проекта. Голос сюжетов и хроник «Аврории». Озвучка материалов, помощь в продакшне YouTube и Twitch.</p>
+</div></a>
+<div class="card member-card">
+<p><span class="badge badge--orange" data-i18n="role_server_manager">Управляющий сервером</span></p>
+<p><span data-i18n="label_nick">Псевдоним</span>: —</p>
+<p data-i18n="forming">В процессе формирования.</p>
+</div>
+<div class="card member-card">
+<p><span class="badge badge--orange" data-i18n="role_admins">Администраторы</span></p>
+<p><span data-i18n="label_team">Состав</span>: —</p>
+<p data-i18n="forming">В процессе формирования.</p>
+</div>
+<div class="card member-card">
+<p><span class="badge badge--orange" data-i18n="role_rp_curators">RP‑кураторы</span></p>
+<p><span data-i18n="label_team">Состав</span>: —</p>
+<p data-i18n="forming">В процессе формирования.</p>
+</div>
+<div class="card member-card">
+<p><span class="badge badge--orange" data-i18n="role_lore_master">Лор‑мастер</span></p>
+<p><span data-i18n="label_team">Состав</span>: —</p>
+<p data-i18n="forming">В процессе формирования.</p>
+</div>
+</div>
+</div>
+</div>
+
+<div class="page" id="links">
+<div class="card links-card">
+<h2 class="synd-title" data-i18n="links_title">Сообщество</h2>
+<div class="links-grid">
+<a class="link-item" href="https://discord.gg/8JP97EFV5v" target="_blank" rel="noopener">
+  <div class="link-icon link-icon--discord"></div>
+  <div class="link-text"><div class="link-title">Discord</div><div class="link-desc" data-i18n="links_discord_desc">Вступайте в сообщество AURORIA: новости, роли, тикеты, события.</div></div>
+</a>
+<a class="link-item" href="https://boosty.to/dmtauroria" target="_blank" rel="noopener">
+  <div class="link-icon link-icon--boosty"></div>
+  <div class="link-text"><div class="link-title">Boosty</div><div class="link-desc" data-i18n="links_boosty_desc">Поддержите проект. Каждый вклад — в качество лора и ивентов.</div></div>
+</a>
+<a class="link-item" href="https://www.youtube.com/@xAURORIAx" target="_blank" rel="noopener">
+  <div class="link-icon link-icon--youtube"></div>
+  <div class="link-text"><div class="link-title">YouTube</div><div class="link-desc" data-i18n="links_youtube_desc">Хроники Аврории: трейлеры, лор‑ролики, подборки событий.</div></div>
+</a>
+<a class="link-item" href="https://www.twitch.tv/xauroriax" target="_blank" rel="noopener">
+  <div class="link-icon link-icon--twitch"></div>
+  <div class="link-text"><div class="link-title">Twitch</div><div class="link-desc" data-i18n="links_twitch_desc">Живые трансляции и атмосферные стримы по миру Аврории.</div></div>
+</a>
+</div>
+</div>
+</div>
+
+<div class="page" id="exam">
+<div class="card">
+<h2 class="synd-title" data-i18n="exam_title">Экзамен по правилам</h2>
+<div id="examIntro">
+<p data-i18n="exam_intro">Перед входом в Зону пройдите тест из 20 вопросов (12 минут). Проходной балл — 18.</p>
+<div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center">
+<input id="steamIdInput" type="text" placeholder="SteamID64" style="flex:1;min-width:220px;padding:10px 12px;background:#0a0a0a;border:1px solid #222;border-radius:12px;color:#fff"/>
+<button id="startExamBtn" class="btn-cta" style="border-color:#2a2a2a" data-i18n="exam_start">Начать</button>
+</div>
+</div>
+<div id="examRun" style="display:none">
+<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+<div id="examProgress">1/20</div>
+<div id="examTimer">12:00</div>
+</div>
+<div id="examQuestion" style="margin-bottom:12px;color:#e8e8e8;text-shadow:none"></div>
+<div id="examAnswers" style="display:grid;gap:10px"></div>
+<div style="display:flex;justify-content:space-between;margin-top:14px">
+<button id="prevQ" class="btn-cta" style="border-color:#2a2a2a" data-i18n="exam_prev">Назад</button>
+<button id="nextQ" class="btn-cta" style="border-color:#2a2a2a" data-i18n="exam_next">Далее</button>
+<button id="finishQ" class="btn-cta" style="border-color:#2a2a2a;display:none" data-i18n="exam_finish">Завершить</button>
+</div>
+</div>
+<div id="examResult" style="display:none">
+<h3 id="examStatus"></h3>
+<p id="examScore"></p>
+<div style="display:flex;gap:10px;flex-wrap:wrap">
+<button id="retryExam" class="btn-cta" style="border-color:#2a2a2a" data-i18n="exam_retry">Повторить</button>
+<button class="btn-cta" onclick="showPage('home')" style="border-color:#2a2a2a" data-i18n="exam_home">На главную</button>
+</div>
+</div>
+</div>
+</div>
+
+</div>
+
+<footer>
+STARFALL SYNDICATE | AURORIA
+</footer>
+
+<script>
+/* navigation */
+function showPage(id){
+let pages=document.querySelectorAll('.page');
+let current=document.querySelector('.page.active');
+let next=document.getElementById(id);
+if(current===next) return;
+if(current){
+current.classList.add('leaving');
+setTimeout(()=>{current.classList.remove('active');current.classList.remove('leaving');},350);
+}
+if(next){
+next.classList.add('active');
+next.classList.add('entering');
+setTimeout(()=>{next.classList.remove('entering');},350);
+}
+// nav active highlight
+let navLinks=Array.from(document.querySelectorAll('header nav a'));
+navLinks.forEach(a=>a.classList.remove('active'));
+let activeNav=navLinks.find(a=>a.getAttribute('onclick')?.includes(id));
+if(activeNav){activeNav.classList.add('active');}
+}
+
+/* smooth scroll to rules section */
+function scrollToSection(id){
+let section=document.getElementById(id);
+if(!section) return;
+let headerHeight=(document.querySelector('header')?.offsetHeight)||0;
+if(id==='law1'){
+  let top=section.offsetTop - headerHeight - 20;
+  if(top<0) top=0;
+  window.scrollTo({top:top,behavior:'smooth'});
+}else{
+  let headEl=section.querySelector('h3')||section;
+  let rect=headEl.getBoundingClientRect();
+  let target=rect.top + window.scrollY - (window.innerHeight/2 - headEl.offsetHeight/2) - headerHeight;
+  if(target<0) target=0;
+  window.scrollTo({top:target,behavior:'smooth'});
+}
+let heading=section.querySelector('h3');
+if(heading){
+heading.classList.add('flash');
+setTimeout(()=>heading.classList.remove('flash'),1800);
+}
+let links=document.querySelectorAll('#rulesSidebar a');
+links.forEach(l=>l.classList.remove('active'));
+let activeLink=Array.from(links).find(l=>l.getAttribute('onclick').includes(id));
+if(activeLink){
+  activeLink.classList.remove('active');
+  void activeLink.offsetWidth;
+  activeLink.classList.add('active');
+}
+highlightFreezeUntil=Date.now()+400;
+}
+
+/* auto highlight sidebar by scroll (main sections only) */
+const mainSectionIds=['law1','language2','metagaming3','conflict4','rpk5','unique6','realism7','newbies8','factions9','unique10','final11'];
+let highlightFreezeUntil=0;
+function setActiveSidebar(id){
+  let links=document.querySelectorAll('#rulesSidebar a');
+  links.forEach(l=>l.classList.remove('active'));
+  let link=Array.from(links).find(l=>l.getAttribute('onclick').includes(id));
+  if(link){
+    link.classList.remove('active');
+    void link.offsetWidth;
+    link.classList.add('active');
+  }
+}
+function updateActiveLink(){
+  if(Date.now()<highlightFreezeUntil) return;
+  const centerY=window.innerHeight/2;
+  let activeId=mainSectionIds[0];
+  for(let id of mainSectionIds){
+    let sec=document.getElementById(id);
+    if(!sec) continue;
+    let h3=sec.querySelector('h3')||sec;
+    let rect=h3.getBoundingClientRect();
+    if(rect.top<=centerY){
+      activeId=id;
+    }else{
+      break;
+    }
+  }
+  if(activeId) setActiveSidebar(activeId);
+}
+let rafId=0;
+window.addEventListener('scroll',()=>{
+  if(rafId) return;
+  rafId=requestAnimationFrame(()=>{rafId=0;updateActiveLink();});
+});
+
+/* boot overlay once on load */
+window.addEventListener('load',()=>{
+const savedLang=localStorage.getItem('lang')||'ru';
+applyI18n(savedLang);
+const hdr=document.querySelector('header');
+const first=document.querySelector('.page.active');
+if(hdr){hdr.classList.add('header-show');}
+if(first){first.classList.add('entering');setTimeout(()=>{first.classList.remove('entering');},350);}
+initFX();
+initVideoEmbeds();
+});
+document.addEventListener('click',e=>{
+let btn=e.target.closest('.lang-btn');
+if(!btn) return;
+applyI18n(btn.dataset.lang);
+});
+// explicit bindings in case delegation is interfered
+document.getElementById('langRu')?.addEventListener('click',()=>applyI18n('ru'));
+document.getElementById('langEn')?.addEventListener('click',()=>applyI18n('en'));
+
+const i18n={
+ru:{
+nav_home:"Главная",
+nav_rules:"Правила",
+nav_team:"Синдикат",
+nav_links:"Ссылки",
+team_title:"Синдикат",
+links_title:"Сообщество",
+manifest_title:"От создателей",
+manifest_text:"Auroria это мир, где каждая история создаётся игроками. Зона не прощает ошибок и не забывает поступков. Здесь каждое слово, каждое решение и каждая пуля оставляют след. На нашем сервере вы не просто играете — вы становитесь частью живой истории. Мы предоставляем вам инструменты для создания настоящего RolePlay: персонажи, конфликты, союзы, легенды и трагедии. Не ищите лёгкой выгоды. Создавайте истории, которые будут помнить другие сталкеры. Зона наблюдает. И каждое действие имеет последствия.",
+lore_title:"Падающая звезда",
+watch_yt:"Смотреть в YouTube",
+role_lore_master:"Лор‑мастер",
+cta_exam:"Войти в Зону",
+exam_title:"Экзамен по правилам",
+exam_intro:"Перед входом в Зону пройдите тест из 20 вопросов (12 минут). Проходной балл — 18.",
+exam_start:"Начать",
+exam_prev:"Назад",
+exam_next:"Далее",
+exam_finish:"Завершить",
+exam_retry:"Повторить",
+exam_home:"На главную",
+role_founder:"Создатель",
+role_lore:"Диктор лора",
+role_server_manager:"Управляющий сервером",
+role_admins:"Администраторы",
+role_rp_curators:"RP‑кураторы",
+label_nick:"Псевдоним",
+label_team:"Состав",
+forming:"В процессе формирования.",
+links_discord_desc:"Вступайте в сообщество AURORIA: новости, роли, тикеты, события.",
+links_boosty_desc:"Поддержите проект. Каждый вклад — в качество лора и ивентов.",
+links_youtube_desc:"Хроники Аврории: трейлеры, лор‑ролики, подборки событий.",
+links_twitch_desc:"Живые трансляции и атмосферные стримы по миру Аврории.",
+sb_law1:"1.0 Главный закон — РП",
+sb_language2:"2.0 Язык Зоны",
+sb_metagaming3:"3.0 Метагейминг",
+sb_conflict4:"4.0 Конфликты",
+sb_rpk5:"5.0 РПК: Последнее слово",
+sb_unique6:"6.0 Уникальные механики",
+sb_realism7:"7.0 Реализм Зоны",
+sb_newbies8:"8.0 Новички и нарушения",
+sb_factions9:"9.0 Фракции и вступление",
+sb_unique10:"10.0 Глубина мира",
+sb_final11:"11.0 Финальные правила фракций",
+founder_desc:"Создатель проекта. Отвечаю за лор и концепцию, развитие сервера, организацию процессов и коммуникации, медиаприсутствие.",
+lore_desc:"Диктор лора проекта. Голос сюжетов и хроник «Аврории». Озвучка материалов, помощь в продакшне YouTube и Twitch."
+},
+en:{
+nav_home:"Home",
+nav_rules:"Rules",
+nav_team:"Syndicate",
+nav_links:"Links",
+team_title:"Syndicate",
+links_title:"Community",
+manifest_title:"From the Creators",
+manifest_text:"Our server is woven from your actions, words and decisions. A useless prisoner is a chance for story. A broken rifle is the trace of war. A broken oath stains your reputation. We give you tools to craft a saga. Don’t spend them on short‑term gain. Create legends. Fear the Emission. The Zone sees everything.",
+lore_title:"Falling Star",
+watch_yt:"Watch on YouTube",
+role_lore_master:"Lore Master",
+cta_exam:"Enter the Zone",
+exam_title:"Rules Exam",
+exam_intro:"Answer 20 questions in 12 minutes. Passing score — 18.",
+exam_start:"Start",
+exam_prev:"Back",
+exam_next:"Next",
+exam_finish:"Finish",
+exam_retry:"Retry",
+exam_home:"Home",
+role_founder:"Founder",
+role_lore:"Lore Narrator",
+role_server_manager:"Server Manager",
+role_admins:"Administrators",
+role_rp_curators:"RP Curators",
+label_nick:"Nickname",
+label_team:"Roster",
+forming:"In progress.",
+links_discord_desc:"Join AURORIA community: news, roles, tickets, events.",
+links_boosty_desc:"Support the project. Every contribution powers lore and events.",
+links_youtube_desc:"Auroria chronicles: trailers, lore videos, event highlights.",
+links_twitch_desc:"Live streams from the world of Auroria.",
+sb_law1:"1.0 Core Law — Roleplay",
+sb_language2:"2.0 Language of the Zone",
+sb_metagaming3:"3.0 Metagaming",
+sb_conflict4:"4.0 Conflict Rules",
+sb_rpk5:"5.0 Character Kill: Last Word",
+sb_unique6:"6.0 Unique Mechanics",
+sb_realism7:"7.0 Zone Realism",
+sb_newbies8:"8.0 Newcomers and Violations",
+sb_factions9:"9.0 Factions and Joining",
+sb_unique10:"10.0 World Depth",
+sb_final11:"11.0 General Principles for Factions",
+founder_desc:"Project founder. Oversees lore and concept, server development, operations and communications, media presence.",
+lore_desc:"Project lore narrator. The voice of Auroria stories and chronicles. Voice‑over and production support for YouTube and Twitch.",
+    rules_html:`<div id="law1" class="rules-section"><h3>1.0. CORE LAW — ROLEPLAY (RP)</h3>
+<p>1.1. You are your character. Always and everywhere. OOC talk in voice is forbidden, except for critical technical issues.</p>
+<p>1.2. Character knowledge = player knowledge. If you haven’t seen or heard it in‑game as your character — you don’t know it.</p>
+<p>1.3. Powergaming kills RP. Forcing actions on others without giving them room to roleplay is forbidden.</p>
+<p>DON’T: “I quickly kill you with a knife.” DO: “With a faint clank I draw a knife and step toward you...”</p></div>
+<div id="language2" class="rules-section"><h3>2.0. LANGUAGE OF THE ZONE: LEXICON AND REALISM</h3>
+<p>2.1. Forbidden OOC terms in IC speech:</p>
+<ul>
+<li>2.1.1. No “Gods”, “Admins”, “SC” (script) or other references to server control.</li>
+<li>2.1.2. There is no “Big Earth”. Speak diegetically: “Smugglers say a shipment arrived from Moscow / Kyiv.”</li>
+<li>2.1.3. No gamey words: “loot”, “spawn”, “respawn”, “farm”.</li>
+</ul>
+<p>INSTEAD: “Good stash here”, “Found a cache”, “I’ll go scavenge…”</p>
+<p>2.2. Encouraged lexicon: stalker slang — “emission”, “radiation”, “artifact”, “Duty”, “boars”, “blind dogs”, “gravi”, “electra”.</p></div>
+<div id="metagaming3" class="rules-section"><h3>3.0. METAGAMING: STRICT BAN</h3>
+<p>3.1. Using OOC information for IC benefit is the prime offense.</p>
+<p>3.2. Concrete bans:</p>
+<ul>
+<li>3.2.1. Discord voice/radios outside the game for tactics are forbidden. Your character cannot hear them.</li>
+<li>3.2.2. Using streams or screenshots for tracking = permaban.</li>
+<li>3.2.3. Knowledge through death. After respawn you don’t remember the killers or the place of death.</li>
+<li>3.2.4. OOC discussion of IC events in real time (“We’re being robbed at Rostov!” in Discord) is forbidden.</li>
+</ul></div>
+<div id="conflict4" class="rules-section"><h3>4.0. BLOOD AND STEEL: CONFLICT RULES</h3>
+<p>4.1. New Life Rule (NLR) — Absolute:</p>
+<ul>
+<li>4.1.1. After death — complete amnesia about the circumstances and the killers.</li>
+<li>4.1.2. Return to the place of death is forbidden for 2 in‑game days.</li>
+<li>4.1.3. Suicide/provocation to reset an RP situation is punishable by ban.</li>
+</ul>
+<p>4.2. The path to violence:</p>
+<ul>
+<li>4.2.1. Every bullet must be RP‑justified.</li>
+<li>4.2.2. Verbal contact is required before opening fire (unless it’s a truly silent ambush).</li>
+<li>4.2.3. Injury roleplay is mandatory (limping, cries of pain).</li>
+</ul>
+<p>4.3. The art of captivity (kidnapping):</p>
+<ul>
+<li>4.3.1. The goal is not loot, but breaking will, information, RP.</li>
+<li>4.3.2. Provide the captive with meaningful RP and a chance at rescue.</li>
+<li>4.3.3. The captive must roleplay their status (no silence or “invincible hero” behavior).</li>
+</ul></div>
+<div id="rpk5" class="rules-section"><h3>5.0. CHARACTER KILL (CK): LAST WORD RULE</h3>
+<p>5.1. CK is a meaningful death as a story culmination, not the result of a random shootout.</p>
+<p>5.2. When CK is allowed:</p>
+<ul>
+<li>The outcome of a prolonged personal conflict.</li>
+<li>Execution by faction decision for grave offenses.</li>
+<li>By mutual OOC consent of the players.</li>
+<li></li>
+</ul>
+<p>5.3. HOW TO PERFORM CK (REQUIRED):</p>
+<ul>
+<li>5.3.1. Before a lethal act, you must give the victim a chance to speak their Last Word.</li>
+<li>5.3.2. Wrong: “You’re a thief. Die.” (shot).</li>
+<li>5.3.3. Right: “You’re a thief. What do you say in your defense?” (dialogue) → “Your defense is worthless.” (shot).</li>
+</ul></div>
+<div id="unique6" class="rules-section"><h3>6.0. UNIQUE RULES AND MECHANICS</h3>
+<p>6.1. LAW OF RECIPROCITY (QUALITY RP RESPONSE):</p>
+<ul>
+<li>6.1.1. You must respond to high‑quality, deep RP at an equivalent level.</li>
+<li>6.1.2. It is forbidden to “dump” an interaction with one‑word replies, quick murder, or ignoring.</li>
+</ul>
+<p>6.2. LAW OF RETURN (for the “Quenta” mod):</p>
+<ul>
+<li>6.2.1. Every fifth death — mandatory final CK. Triggers “Return of the Quenta”.</li>
+<li>6.2.2. After that you must create a NEW character with a different biography, name, appearance.</li>
+<li>6.2.3. The new detailed biography must be approved in Discord before entering the Zone.</li>
+</ul>
+<p>6.3. LAW OF ANOMALOUS ACTIVITY (Emission):</p>
+<ul>
+<li>6.3.1. During an emission, roleplaying a search for shelter is mandatory.</li>
+<li>6.3.2. Staying in the open guarantees death/mutations (must be roleplayed).</li>
+</ul>
+<p>6.4. “LIVING WORLD” RULE:</p>
+<p>Influence on the world is encouraged: notes, signs, memorials, changing locations. A captured base must be reconsecrated (change symbols), not just cleared.</p>
+<p>6.5. “TRUST THE PLAYER” RULE:</p>
+<p>If an opponent delivers quality RP (interrogation of a captive), you must respond in kind, not with silence.</p></div>
+<div id="realism7" class="rules-section"><h3>7.0. REALISM OF THE ZONE</h3>
+<p>7.1. Logic and common sense:</p>
+<ul>
+<li>7.1.1. “Cosmic quartermaster” (carrying 10 guns) is forbidden.</li>
+<li>7.1.2. Loot must be found logically.</li>
+<li>7.1.3. Unique loot must have a story.</li>
+</ul>
+<p>7.2. Factions — ideology, not a gang:</p>
+<ul>
+<li>7.2.1. Creation is approved by Administration (need: ideology, goals, hierarchy).</li>
+<li>7.2.2. War of factions is for control and ideas, not for loot.</li>
+<li>7.2.3. Treason within a faction is a complex RP event and must be roleplayed.</li>
+</ul>
+<p>7.3. Hideouts:</p>
+<p>A base must look lived‑in and thematic. An attack on a base must carry an RP message (a sign, a note).</p></div>
+<div id="newbies8" class="rules-section"><h3>8.0. FOR NEWCOMERS AND OFFENDERS</h3>
+<p>8.1. Zero tolerance for Non‑RP (NRP):</p>
+<p>Ignoring RP (running from dialogue, shooting without words) is a grave offense.</p>
+<p>Punishment: Delivery to a detention cell, mandatory RP talk, punishment within the world.</p>
+<p>8.2. All questions — to Discord:</p>
+<p>All disputes strictly via the Discord ticket system. There are no “admins” in the game.</p>
+<p>FROM THE CREATORS: We’re building not a server, but a legend. Every shot here is part of a saga. The Zone lives while your stories live. Appreciate others’ roleplay and answer in kind. Remember the Last Word. Honor the Return. And fear the Emission.</p>
+<p>Good luck, stalker. You’ll find it.</p></div>
+<div id="factions9" class="rules-section"><h3>9.0. RULES FOR FACTIONS (GROUPS) AND JOINING</h3>
+<p>9.1. Creating and status of a faction</p>
+<p>9.1.1. Any organized group of 4+ people is a faction and must be officially registered via a Discord application.</p>
+<p>9.1.2. The application must include:</p>
+<ul>
+<li>name</li>
+<li>ideology/goals</li>
+<li>leader (in‑game and Discord account)</li>
+<li>member list</li>
+<li>approximate territory of influence</li>
+<li>admission rules (IC)</li>
+</ul>
+<p>9.1.3. Only registered factions have the right to:</p>
+<ul>
+<li>defend territory (bases)</li>
+<li>declare wars</li>
+<li>conduct executions on behalf of the group</li>
+<li>special rights (patrolling, resource control)</li>
+</ul>
+<p>9.2. Joining a faction (IC process)</p>
+<p>9.2.1. No instant joining via Discord. Even if four people agree to create a “Brotherhood”, they must roleplay the process of acquaintance, vetting and acceptance in‑game.</p>
+<p>9.2.2. General principles:</p>
+<p>Bandits/Brotherhood: the newcomer must prove “usefulness” — bring “tribute” (weapons, meds), complete a task, pass initiation.</p>
+<p>Military/“Duty”: a stalker comes to the checkpoint/base, undergoes questioning, a charter knowledge check, receives the first task (patrol, area cleanup).</p>
+<p>Scientists/“Ecologists”: show knowledge of anomalies, ability to handle artifacts, provide research data.</p>
+<p>“Freedom”: confirm shared ideology and combat/useful skills.</p>
+<p>“Monolith”: entry through a ritual or “revelation” after contact with the Emitter/artifacts — you cannot simply declare yourself a member.</p>
+<p>9.2.3. Role of administration: admins do not teleport or add players automatically. An admin records the roster in Discord only after IC joining.</p>
+<p>9.3. Conflicts and wars</p>
+<p>9.3.1. War is officially declared through leaders in the presence of witnesses or via a note on a base with reasons/message from the faction.</p>
+<p>9.3.2. “Cosmic headquarters” is forbidden. Coordination must be IC (radios, couriers, meetings).</p>
+<p>9.3.3. The winning faction receives RP resources and control of territory, but cannot annihilate the enemy completely without admin approval.</p>
+<p>9.4. Punishments and captivity</p>
+<p>9.4.1. A faction may judge its members by internal laws (fine, exile, execution — CK). Admins should be informed about serious punishments.</p>
+<p>9.4.2. Prisoners are a valuable RP asset. You cannot simply kill them to “clear” a base:</p>
+<ul>
+<li>exchange for your own or for resources</li>
+<li>interrogations about enemy plans</li>
+<li>public execution (by CK rule 5.0)</li>
+<li>attempt at re‑recruitment (long‑term RP)</li>
+</ul>
+<p>9.4.3. Military (“Duty”) may convoy prisoners to prison, but it must be a full dangerous RP, not teleportation.</p>
+<p>9.5. Dissolution of a faction</p>
+<p>If a faction loses over 70% of its roster or its leader (final CK), it is not considered dissolved automatically. Remaining members become loners or may try to join other groups by re‑roleplaying the IC admission process.</p>
+<p>IMPORTANT: players must be given time to find people or a leader. Players shouldn’t lose a chance to participate due to absence of a leader. Remaining members may choose a new leader and continue RP as their faction.</p>
+<p>FROM THE CREATORS (Addendum): A faction is not just a Discord list of nicknames. It is legend, discipline and responsibility. A leader is responsible for subordinates. Build not just a gang, but a living force of the Zone with its own history, enemies and honor.</p>
+<p>9.6. “VALUE OF LIFE” RULE (USELESS PRISONER RULE)</p>
+<p>9.6.1. Any prisoner, even tactically “useless”, is a source of RP, not dead weight.</p>
+<p>9.6.2. It is forbidden to kill a prisoner just to “clear” a base.</p>
+<p>9.6.3. Prisoners can be used to create long‑term RP plots:</p>
+<ul>
+<li>Slave labor: cooking, cleaning weapons, sorting ammo, mending clothes, collecting firewood</li>
+<li>Humanitarian role: hostage for negotiations, human shield, test subject for artifact checks</li>
+<li>Psychological game: interrogations, re‑recruitment, training newcomers</li>
+</ul>
+<p>9.6.4. Release only by RP outcome: escape, ransom, exchange, successful re‑recruitment or extreme necessity (severe injury, epidemic). Killing is a last resort when the prisoner really threatens the captors’ lives.</p>
+<p>9.6.5. All interactions with prisoners must be roleplayed IC for at least 1–2 hours continuously; for complex RP plots (interrogations, re‑recruitment, rituals) — up to 4 hours, splitting into scenes. This preserves the value of prisoners as an RP resource and creates a realistic atmosphere of the Zone.</p></div>
+<div id="unique10" class="rules-section"><h3>10.0. UNIQUE RULES OF WORLD DEPTH</h3>
+<p>10.1. “Chronicles of the Zone” (journaling): Each faction must keep an IC journal in‑game (notes, documents) recording key events: new members, clashes, finds, deaths, statute changes. Administration uses journals for weekly “Voice of the Zone” digests, creating living lore.</p>
+<p>10.2. “Destructible loot”: Base assault winners may take resources and deliberately damage what they cannot carry.</p>
+<p>10.3. “Old scars” (world memory rule): If a character is recognized from past events, roleplay it as vague recognition, déjà vu, unease.</p>
+<p>10.4. “Price of a word” (oaths and vows): An IC solemn promise or oath is sacred. Breaking an oath without IC grounds is a grave RP offense. The breaker may be named an oath‑breaker; other factions gain an IC reason to distrust them.</p>
+<p>10.5. NLR (No‑Looting‑Remembrance / character memory):</p>
+<ul>
+<li>10.5.1. A character who suffered severe injury or died loses memory of the last 6 real‑time hours.</li>
+<li>10.5.2. The player remembers events up to 6 hours ago, but not exact death circumstances or attackers.</li>
+<li>Example: “I remember green camo… don’t know who it was, but likely military.”</li>
+<li>10.5.3. After severe injury — minimum 20 minutes in a “green zone” (faction bases, Chernobyl‑4, Yanov, Zaton, Bar, etc.).</li>
+<li>10.5.4. During this period you cannot engage in dangerous events; IC recovery is required.</li>
+</ul>
+<p>10.6. Ban on meta‑play:</p>
+<ul>
+<li>10.6.1. Meta‑play is strictly forbidden. No OOC/Discord knowledge for IC actions.</li>
+<li>10.6.2. Out‑of‑game chats do not affect events and coordination.</li>
+<li>10.6.3. All decisions and interactions — only through IC channels: in‑game radios, meetings, couriers, notes, signals.</li>
+<li>10.6.4. Discord — OOC only, when the character is not in active RP.</li>
+<li>10.6.5. При любом RP‑взаимодейств[... 1618 chars omitted ...]</li>
+</ul></div>
+<div id="final11" class="rules-section"><h3>11.0. GENERAL PRINCIPLES FOR ALL FACTIONS</h3>
+<p>IC movement and territorial control:</p>
+<p>Each faction must control its bases and territory of influence. Players should go on patrols, check checkpoints and ensure zone security.</p>
+<p>Examples:</p>
+<ul>
+<li>Duty — patrols the Cordon, clears mutants, helps stalkers.</li>
+<li>Brotherhood — strengthens southern checkpoints, explores surroundings.</li>
+<li>Military stalkers — move north, collect artifacts.</li>
+</ul>
+<p>Ban on OOC/Discord meta:</p>
+<p>Any info about faction actions, attacks, patrols or RP events cannot be transmitted via Discord, OOC chats or external channels. All coordination must be IC: radios, couriers, meetings, signals, notes. Violations lead to RP loss of trust, reputation, resources and faction rights.</p>
+<p>Disguise and impersonation:</p>
+<p>It is allowed to disguise as other factions or use their symbols. IC reactions are lawful. If a faction attacks due to disguise — it’s part of RP.</p>
+<p>Movement by RP:</p>
+<p>Any movement through hostile territories must be roleplayed: stealth, reconnaissance, meetings. Minimum interaction rules: quiet passes, observation, ciphers via couriers, using local cover.</p>
+<p>Minimum time for complex RP plots (e.g., interrogation, re‑recruitment) — 1–2 hours, maximum 4 hours with scene breaks.</p></div>
+<div id="perks112" class="rules-section"><h3>11.2 Faction perks and skills</h3>
+<table class="perks-table"><thead><tr><th>Faction</th><th>Combat</th><th>Medicine</th><th>Recon/Stealth</th><th>Quenta‑correction</th></tr></thead><tbody>
+<tr><td>Duty</td><td><span class="badge badge--orange">25%</span></td><td><span class="badge">20%</span></td><td><span class="badge">15%</span></td><td>Individually by RP (medic, sniper)</td></tr>
+<tr><td>Freedom</td><td><span class="badge">15%</span></td><td><span class="badge">15%</span></td><td><span class="badge badge--orange">20%</span></td><td>Correction by RP (scout, medic)</td></tr>
+<tr><td>Brotherhood</td><td><span class="badge">10%</span></td><td><span class="badge">5%</span></td><td><span class="badge badge--orange">25%</span></td><td>Individual (combat, cunning)</td></tr>
+<tr><td>Military Stalkers</td><td><span class="badge">20%</span></td><td><span class="badge">15%</span></td><td><span class="badge">20%</span></td><td>Perks adjusted by RP</td></tr>
+<tr><td>Scientists</td><td><span class="badge">0%</span></td><td><span class="badge badge--orange">25%</span></td><td><span class="badge">15%</span></td><td>Enhanced medicine or research</td></tr>
+<tr><td>Renegades</td><td><span class="badge">15%</span></td><td><span class="badge">10%</span></td><td><span class="badge">20%</span></td><td>Correction by RP</td></tr>
+<tr><td>Mercenaries</td><td><span class="badge badge--orange">30%</span></td><td><span class="badge">15%</span></td><td><span class="badge">25%</span></td><td>Perks by contract role</td></tr>
+<tr><td>Loners</td><td><span class="badge">0%</span></td><td><span class="badge">0%</span></td><td><span class="badge">0%</span></td><td>Stats only by quenta</td></tr>
+</tbody></table></div>
+<div id="move113" class="rules-section"><h3>11.3. Movement and stealth</h3><p>All RP movement must be IC. Stealth and recon: disguise, quiet movement, observation. Temporary Radio Silence zones: on certain locations radios do not work — use gestures, flashlights, notes.</p></div>
+<div id="injury114" class="rules-section"><h3>11.4. RP movement after severe injuries</h3><p>After a severe injury the character loses memory of the last 6 hours (NLR). Only general details remain (uniform, gear, camo color), not specific factions. Minimum stay in a “green zone” after severe injury — 20 minutes. Examples: Duty base, Freedom base, Chernobyl‑4, Bar, Yanov, Zaton.</p></div>
+<div id="gp115" class="rules-section"><h3>11.5. RP movement of factions</h3><ul><li>Duty: Cordon, mutant cleansing, helping stalkers.</li><li>Freedom: Recon and research of northern zones.</li><li>Brotherhood: Strengthening southern checkpoints, RP robberies.</li><li>Military Stalkers: Northern missions, anomaly cleanup.</li><li>Scientists: Medical and research support.</li><li>Renegades: Survival, cunning and recon.</li><li>Mercenaries: Assaults, security, contracts.</li><li>Loners: RP per quenta.</li></ul></div>
+<div id="morals116" class="rules-section"><h3>11.6. Morality and consequences</h3><p>Breaking RP rules (Discord, OOC meta, territories, disguise) leads to loss of reputation, trust, resources and faction access. Actions are recorded in IC digests and affect further stories of the character and faction.</p></div>
+<div id="logistics117" class="rules-section"><h3>11.7. Faction movement and logistics</h3><p>Factions must leave bases for patrols and perimeter control. Players maintain logistics: artifacts, resources, meds, base supplies. RP trips must be continuous and follow all RP rules.</p></div>
+<div id="stealth118" class="rules-section"><h3>11.8. Stealth and recon</h3><p>Players may use disguise, recon, espionage, ambushes, covert observation, couriers. Trespassing without an RP reason is an RP violation with loss of resources/reputation or CK.</p></div>
+<div id="qventa119" class="rules-section"><h3>11.9. Quenta and individual perks</h3><p>Each faction has base standard perks (see table). Players advance skills only through RP or quenta. Medics gain +medicine, snipers +combat, etc. Loners rely entirely on RP quenta.</p></div>
+<div id="monolith1110" class="rules-section"><h3>11.10. The “Monolith” group</h3></div>
+<div id="monolithStatus1111" class="rules-section"><h3>11.11. Status</h3><p>“Monolith” is a special Zone faction, not roleplayed by players; it functions as NPC/bots. Administration controls their actions; details are not disclosed to players.</p></div>
+<div id="monolithBehavior1112" class="rules-section"><h3>11.12. Behavior</h3><p>“Monolith” members shoot everyone without warning, strictly per “Shadow of Chernobyl” lore. Any encounter is deadly; no negotiations.</p></div>
+<div id="monolithInteract1113" class="rules-section"><h3>11.13. Interaction with players</h3><p>Players cannot join “Monolith”; interaction with them is forbidden; no using them for RP advantages.</p></div>
+<div id="monolithMeaning1114" class="rules-section"><h3>11.14. RP significance</h3><p>“Monolith” creates a dynamic threat in the Zone, pushing players to cooperate, plan routes and avoid direct clashes.</p></div>
+<div id="monolithExceptions1115" class="rules-section"><h3>11.15. Exceptions</h3><p>Administration may use “Monolith” for RP scenarios and events (raids, ambushes); action details are not disclosed to players.</p></div>`
+}
+};
+function applyI18n(lang){
+document.querySelectorAll('[data-i18n]').forEach(el=>{
+let key=el.getAttribute('data-i18n');
+let val=i18n[lang]&&i18n[lang][key];
+if(val){el.textContent=val;}
+});
+if(!window.__rulesHTML){window.__rulesHTML=document.getElementById('rulesContent')?.innerHTML||'';}
+if(lang==='en' && i18n.en.rules_html){
+let rc=document.getElementById('rulesContent'); if(rc){rc.innerHTML=i18n.en.rules_html;}
+}else{
+let rc=document.getElementById('rulesContent'); if(rc && window.__rulesHTML){rc.innerHTML=window.__rulesHTML;}
+}
+document.querySelectorAll('.lang-btn').forEach(b=>b.classList.toggle('active',b.dataset.lang===lang));
+localStorage.setItem('lang',lang);
+}
+/* FX: orbs, shockwaves, gel-press, toggle */
+function initFX(){
+  const canvas=document.getElementById('fxCanvas'); if(!canvas) return;
+  const ctx=canvas.getContext('2d');
+  let w=canvas.width=window.innerWidth, h=canvas.height=window.innerHeight;
+  const prefersReduce=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  let enabled = JSON.parse(localStorage.getItem('fx_enabled')|| (prefersReduce? 'false' : 'true'));
+  const toggle=document.getElementById('fxToggle');
+  function setEnabled(v){
+    enabled=!!v;
+    localStorage.setItem('fx_enabled',JSON.stringify(enabled));
+    canvas.style.display=enabled?'block':'none';
+    const an=document.getElementById('anomaly'); if(an){an.style.display=enabled?'none':'';}
+    if(toggle){toggle.classList.toggle('active',enabled);}
+  }
+  setEnabled(enabled);
+  toggle && toggle.addEventListener('click',()=>setEnabled(!enabled));
+  window.addEventListener('resize',()=>{w=canvas.width=window.innerWidth;h=canvas.height=window.innerHeight;});
+  const orbs=[]; const waves=[]; const ORB_COUNT=10;
+  function rnd(a,b){return Math.random()*(b-a)+a}
+  for(let i=0;i<ORB_COUNT;i++){
+    orbs.push({x:rnd(0,w),y:rnd(0,h),vx:rnd(-0.2,0.2),vy:rnd(-0.2,0.2),r:rnd(60,120),t:0,alpha:rnd(0.05,0.12),flash:0,cool:0});
+  }
+  let mouse={x:w/2,y:h/2,has:false};
+  window.addEventListener('mousemove',e=>{mouse={x:e.clientX,y:e.clientY,has:true}});
+  window.addEventListener('mouseleave',()=>{mouse.has=false});
+  // click microreaction: flash + ring (cooldown per orb)
+  window.addEventListener('click',e=>{
+    if(!enabled) return;
+    const mx=e.clientX,my=e.clientY;
+    let nearest=null, minD=180;
+    for(const o of orbs){
+      const d=Math.hypot(o.x-mx,o.y-my);
+      if(d<minD){minD=d; nearest=o;}
+    }
+    const now=performance.now();
+    if(nearest && now>nearest.cool){
+      nearest.flash=1.0;
+      nearest.cool=now+400;
+      waves.push({x:nearest.x,y:nearest.y,r:0,alpha:0.45});
+    }
+  });
+  function step(dt){
+    // update orbs
+    for(const o of orbs){
+      o.t+=dt;
+      // gentle random walk
+      o.vx += rnd(-0.02,0.02);
+      o.vy += rnd(-0.02,0.02);
+      o.vx*=0.98; o.vy*=0.98;
+      // decay flash
+      if(o.flash>0) o.flash*=0.86;
+      // repel from mouse
+      if(mouse.has){
+        const dx=o.x-mouse.x, dy=o.y-mouse.y, d=Math.hypot(dx,dy)+0.001;
+        const force= (o.r*0.6)/ (d*d);
+        o.vx += (dx/d)*force;
+        o.vy += (dy/d)*force;
+      }
+      o.x+=o.vx; o.y+=o.vy;
+      // wrap
+      if(o.x<-o.r) o.x=w+o.r; if(o.x>w+o.r) o.x=-o.r;
+      if(o.y<-o.r) o.y=h+o.r; if(o.y>h+o.r) o.y=-o.r;
+      // occasional wave
+      if(Math.random()<0.002){
+        waves.push({x:o.x,y:o.y,r:0,alpha:0.25});
+      }
+    }
+    // update waves
+    for(const wv of waves){ wv.r+=60*dt; wv.alpha*=0.97; }
+    while(waves.length && waves[0].alpha<0.02) waves.shift();
+  }
+  function drawGel(){
+    if(!mouse.has) return;
+    const g=ctx.createRadialGradient(mouse.x,mouse.y,0,mouse.x,mouse.y,140);
+    g.addColorStop(0,'rgba(255,122,24,0.06)');
+    g.addColorStop(0.5,'rgba(0,0,0,0.08)');
+    g.addColorStop(1,'rgba(0,0,0,0.22)');
+    ctx.fillStyle=g;
+    ctx.beginPath(); ctx.rect(0,0,w,h); ctx.fill();
+  }
+  let last=performance.now();
+  (function loop(t){
+    requestAnimationFrame(loop);
+    const dt=Math.min(0.033,(t-last)/1000); last=t;
+    if(!enabled){return;}
+    step(dt);
+    ctx.clearRect(0,0,w,h);
+    // draw orbs
+    for(const o of orbs){
+      const grad=ctx.createRadialGradient(o.x,o.y,o.r*0.2,o.x,o.y,o.r);
+      grad.addColorStop(0,`rgba(255,122,24,${o.alpha + o.flash*0.6})`);
+      grad.addColorStop(1,'rgba(0,0,0,0)');
+      ctx.fillStyle=grad;
+      ctx.beginPath(); ctx.arc(o.x,o.y,o.r,0,Math.PI*2); ctx.fill();
+      if(o.flash>0.05){
+        ctx.fillStyle=`rgba(255,180,120,${o.flash*0.5})`;
+        ctx.beginPath(); ctx.arc(o.x,o.y,o.r*0.25,0,Math.PI*2); ctx.fill();
+      }
+    }
+    // draw waves
+    for(const wv of waves){
+      ctx.strokeStyle=`rgba(255,122,24,${wv.alpha})`;
+      ctx.lineWidth=2;
+      ctx.beginPath(); ctx.arc(wv.x,wv.y,wv.r,0,Math.PI*2); ctx.stroke();
+    }
+    // gel press under cursor
+    drawGel();
+  })(last);
+}
+function initVideoEmbeds(){
+  const items=document.querySelectorAll('.yt-lazy');
+  items.forEach(el=>{
+    const id=el.dataset.videoId;
+    const start=parseInt(el.dataset.start||'0',10)||0;
+    const curLang=localStorage.getItem('lang')||'ru';
+    const label=(i18n[curLang]&&i18n[curLang].watch_yt)||'Watch on YouTube';
+    if(location.protocol==='file:'){
+      el.classList.add('video-thumb');
+      el.style.backgroundImage=`url(https://i.ytimg.com/vi/${id}/hqdefault.jpg)`;
+      const a=document.createElement('a');
+      a.href=`https://youtu.be/${id}?t=${start}`;
+      a.target='_blank'; a.rel='noopener';
+      a.className='video-play';
+      a.textContent=label;
+      el.appendChild(a);
+    }else{
+      const iframe=document.createElement('iframe');
+      iframe.src=`https://www.youtube-nocookie.com/embed/${id}?start=${start}&rel=0&autoplay=1&mute=1&playsinline=1&modestbranding=1`;
+      iframe.loading='lazy';
+      iframe.allow='autoplay; accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share';
+      iframe.referrerPolicy='strict-origin-when-cross-origin';
+      iframe.allowFullscreen=true;
+      el.parentElement && el.parentElement.replaceChild(iframe, el);
+    }
+  });
+}
+const QUIZ={ru:[{q:"Разрешены ли разговоры OOC в голосе?",a:["Всегда","Никогда","Только при критических техпроблемах","Только в бою"],c:[2]},{q:"Что такое метагейминг в наших правилах?",a:["Использование устава","Использование OOC-инфо для IC-выгоды","Использование сленга","Запись дневника"],c:[1]},{q:"После смерти персонаж помнит…",a:["Кто убил и где","Только точное место","Ничего за последние 6 часов","Все события дня"],c:[2]},{q:"Можно ли вернуться на место смерти?",a:["Да, сразу","Через 10 минут","Запрещено 2 игровых дня","Только с напарником"],c:[2]},{q:"Перед открытием огня требуется…",a:["Вербальный контакт, если не настоящая засада","Всегда молчать","Сначала стрелять","Сигнал в Discord"],c:[0]},{q:"Отыгрыш ранений…",a:["Не обязателен","Обязателен","Только при CK","Только для новичков"],c:[1]},{q:"Главная цель пленения…",a:["Лут","Информация и RP","Телепорт","Смена фракции"],c:[1]},{q:"Перед РПК необходимо…",a:["Ничего","Спросить у Админа","Дать Последнее Слово","Выслать скриншот"],c:[2]},{q:"Какие слова запрещены в IC‑речи?",a:["Хабар, прикоп","Лут, спавн, фарм","Выброс, артефакт","Кабан, псы"],c:[1]},{q:"Качественный RP другого игрока…",a:["Игнорируется","Требует ответа тем же уровнем","Наказуем","Ведёт к бану"],c:[1]},{q:"Поведение при выбросе:",a:["Игнорировать","Искать укрытие и отыгрывать","Идти на аномалии","Перезайти в игру"],c:[1]},{q:"Носить 10 стволов…",a:["Разрешено","Запрещено","Только сталкерам","Только военным"],c:[1]},{q:"Создание фракции требует…",a:["Случайную заявку","Идеологию, цели, иерархию","Только название","Денежный взнос"],c:[1]},{q:"Координация войны должна быть…",a:["Через Discord","Только IC‑каналы","В чате YouTube","Через стрим"],c:[1]},{q:"Пленных можно…",a:["Убивать для чистки","Использовать для долгого сюжета","Сразу отпускать","Телепортировать"],c:[1]},{q:"Споры и вопросы…",a:["В игровом голосе","Через Discord‑тикеты","В локальном чате","На форуме в любой теме"],c:[1]},{q:"NLR: память теряется за…",a:["1 час","3 часа","6 часов","12 часов"],c:[2]},{q:"База фракции должна…",a:["Быть пустой","Выглядеть жилой и тематической","Меняться раз в день","Не иметь символики"],c:[1]},{q:"Вступление во фракцию…",a:["Через Discord мгновенно","Отыгрывается в игре","Через администратора","Через донат"],c:[1]},{q:"OOC/Discord‑мета…",a:["Допустима для разведки","Не влияет на события","Строго запрещена","Только для лидеров"],c:[2]},{q:"Перемещение по враждебным территориям…",a:["Без RP","Только телепорт","Должно отыгрываться","Только ночью"],c:[2]},{q:"CK — это…",a:["Случайная перестрелка","Кульминация истории","Админское наказание","Смена ника"],c:[1]},{q:"Передача информации о нападении…",a:["Через Discord‑чат","Через IC‑каналы","В любой чат","Через стрим"],c:[1]},{q:"Реакция на маскировку под фракцию…",a:["Запрещена","Без RP","Это часть RP","Только после тикета"],c:[2]}],en:[{q:"Are OOC voice talks allowed?",a:["Always","Never","Only for critical tech issues","Only in combat"],c:[2]},{q:"Metagaming here is…",a:["Using the charter","Using OOC info for IC advantage","Using slang","Writing a diary"],c:[1]},{q:"After death the character remembers…",a:["Killers and place","Exact place only","Nothing from the last 6 hours","Everything of the day"],c:[2]},{q:"Can you return to the death place?",a:["Yes, immediately","After 10 minutes","Forbidden for 2 in‑game days","Only with a friend"],c:[2]},{q:"Before opening fire you should…",a:["Make verbal contact unless true ambush","Always be silent","Shoot first","Signal in Discord"],c:[0]},{q:"Injury roleplay is…",a:["Optional","Mandatory","Only for CK","Only for newcomers"],c:[1]},{q:"Main goal of captivity is…",a:["Loot","Information and RP","Teleport","Faction change"],c:[1]},{q:"Before CK you must…",a:["Nothing","Ask an admin","Give the Last Word","Send a screenshot"],c:[2]},{q:"Forbidden IC words are…",a:["Stash, cache","Loot, spawn, farm","Emission, artifact","Boars, dogs"],c:[1]},{q:"Quality RP from others should be…",a:["Ignored","Answered in kind","Punished","Banned"],c:[1]},{q:"During emission you should…",a:["Ignore it","Find shelter and roleplay it","Go to anomalies","Relog"],c:[1]},{q:"Carrying 10 guns is…",a:["Allowed","Forbidden","Only stalkers","Only military"],c:[1]},{q:"Creating a faction requires…",a:["Random app","Ideology, goals, hierarchy","Only a name","A fee"],c:[1]},{q:"War coordination must be…",a:["Through Discord","IC channels only","YouTube chat","Via stream"],c:[1]},{q:"Prisoners can be…",a:["Killed to clear base","Used for long‑term plot","Always freed","Teleported"],c:[1]},{q:"Disputes and questions go…",a:["In voice chat","Through Discord tickets","Local chat","Any forum thread"],c:[1]},{q:"NLR memory loss is…",a:["1 hour","3 hours","6 hours","12 hours"],c:[2]},{q:"Faction base should…",a:["Be empty","Look lived‑in and thematic","Change daily","Have no symbols"],c:[1]},{q:"Joining a faction…",a:["Instant via Discord","Is roleplayed in‑game","Through admin","Via donation"],c:[1]},{q:"OOC/Discord meta…",a:["Allowed for recon","Does not affect events","Strictly forbidden","For leaders only"],c:[2]},{q:"Moving through hostile areas…",a:["Without RP","Teleport only","Must be roleplayed","Only at night"],c:[2]},{q:"CK is…",a:["Random shootout","Story culmination","Admin punishment","Nick change"],c:[1]},{q:"Informing about attacks…",a:["Discord chat","IC channels","Any chat","Stream"],c:[1]},{q:"Reaction to disguise as a faction…",a:["Forbidden","Without RP","It is part of RP","Only after a ticket"],c:[2]}]};
+async function loadQuizFromFiles(lang){
+  const base= lang==='en' ? 'data/quiz-en.json' : 'data/quiz-ru.json';
+  try{
+    const res= await fetch(`${base}?v=${Date.now()}`,{cache:'no-store'});
+    if(!res.ok) throw new Error('fetch failed');
+    const arr= await res.json();
+    return Array.isArray(arr)?arr:[];
+  }catch(e){
+    console.error('Quiz load error:', e);
+    // fallback to embedded constant (first 30 questions)
+    return (lang==='en'?QUIZ.en:QUIZ.ru);
+  }
+}
+function pickRandom(arr, n){
+  if(!arr || arr.length === 0) return [];
+  const a=[...arr];
+  // Fisher-Yates shuffle
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a.slice(0, Math.min(n, a.length));
+}
+async function startExam(lang){
+  const bank= await loadQuizFromFiles(lang);
+  console.log(`Loaded ${bank.length} questions for ${lang}`);
+  return pickRandom(bank,20);
+}
+async function runExam(){
+  const lang=localStorage.getItem('lang')||'ru';
+  const steam=document.getElementById('steamIdInput').value.trim();
+  const intro=document.getElementById('examIntro');
+  const run=document.getElementById('examRun');
+  const res=document.getElementById('examResult');
+  const qEl=document.getElementById('examQuestion');
+  const aEl=document.getElementById('examAnswers');
+  const prog=document.getElementById('examProgress');
+  const timerEl=document.getElementById('examTimer');
+  let questions= await startExam(lang);
+  if(!questions || questions.length === 0){
+    alert(lang==='en'?'Failed to load quiz data.':'Не удалось загрузить вопросы.');
+    return;
+  }
+  questions=questions.map(q=>({q:q.text||q.q,a:q.answers||q.a,c:Array.isArray(q.c)?q.c:(q.correctIndex!=null?[q.correctIndex]:[])}));
+  let answers=new Array(questions.length).fill(null).map(()=>[]);
+  let idx=0;
+  let left=12*60;
+  intro.style.display='none'; run.style.display='block'; res.style.display='none';
+  const t=setInterval(()=>{
+    left--; 
+    if(left<0){finish(); clearInterval(t); return;} 
+    const m=Math.floor(left/60).toString().padStart(2,'0'); 
+    const s=(left%60).toString().padStart(2,'0'); 
+    timerEl.textContent=`${m}:${s}`;
+  },1000);
+  function render(){
+    const q=questions[idx];
+    prog.textContent=`${idx+1}/${questions.length}`;
+    qEl.textContent=q.q;
+    aEl.innerHTML='';
+    q.a.forEach((text,i)=>{
+      const btn=document.createElement('button');
+      btn.className='btn-cta';
+      btn.style.borderColor='#2a2a2a';
+      btn.textContent=text;
+      if(answers[idx].includes(i)){btn.classList.add('active');}
+      btn.onclick=()=>{
+        const selected=answers[idx];
+        if(q.c.length > 1){ // multiple choice
+          const pos=selected.indexOf(i);
+          if(pos===-1){ selected.push(i); }
+          else{ selected.splice(pos,1); }
+        } else { // single choice
+          answers[idx] = [i];
+        }
+        render(); // re-render to show selection changes
+      };
+      aEl.appendChild(btn);
+    });
+    toggleFinish();
+  }
+  function toggleFinish(){
+    const fin=document.getElementById('finishQ');
+    // Show finish button if every question has at least one answer
+    fin.style.display = answers.every(x=>x.length > 0)?'inline-block':'none';
+  }
+  document.getElementById('prevQ').onclick=()=>{if(idx>0){idx--;render();}};
+  document.getElementById('nextQ').onclick=()=>{if(idx<questions.length-1){idx++;render();}};
+  document.getElementById('finishQ').onclick=finish;
+  function finish(){
+    clearInterval(t);
+    run.style.display='none'; res.style.display='block';
+    let score=0;
+    for(let i=0;i<questions.length;i++){
+      const correct=questions[i].c.sort().toString();
+      const given=answers[i].sort().toString();
+      if(correct === given) score++;
+    }
+    const pass=score>=18;
+    const status=document.getElementById('examStatus');
+    const scoreEl=document.getElementById('examScore');
+    status.textContent= pass ? (lang==='en'?'Passed':'Сдано') : (lang==='en'?'Failed':'Провален');
+    scoreEl.textContent = (lang==='en'?`Score: ${score}/20`:`Результат: ${score}/20`) + (steam? (lang==='en'?` | SteamID: ${steam}`:` | SteamID: ${steam}`):'');
+    localStorage.setItem('last_exam',JSON.stringify({t:Date.now(),score,steam,lang}));
+  }
+  render();
+}
+document.getElementById('startExamBtn')?.addEventListener('click',()=>runExam());
+document.getElementById('retryExam')?.addEventListener('click',()=>{document.getElementById('examIntro').style.display='block';document.getElementById('examRun').style.display='none';document.getElementById('examResult').style.display='none';});
+</script>
+
+</body>
+</html>
