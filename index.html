@@ -338,10 +338,10 @@ to{opacity:0;transform:translateY(8px)}
 }
 
 .card{
-background:#080808;
-border:1px solid #1d1d1d;
-padding:30px;
-margin-bottom:30px;
+  background:#080808;
+  border:1px solid #1d1d1d;
+  padding:30px;
+  margin-bottom:30px;
 }
 
 h2{
@@ -1040,8 +1040,8 @@ header nav a:hover, header nav a.active {
 }
 
 .quenta-card{
-  background:#050505 !important;
-  border:1px solid #1d1d1d !important;
+  background:transparent !important;
+  border:none !important;
   box-shadow:none !important;
   background-image:none !important;
 }
@@ -1332,60 +1332,49 @@ header nav a:hover, header nav a.active {
 
       <div id="quentaFields" style="display:none; margin-top:16px;">
         <div class="quenta-step" data-step="1">
-          <label>Имя персонажа</label>
-          <input id="qName" type="text">
+          <input id="qName" type="text" placeholder="Имя персонажа">
         </div>
 
         <div class="quenta-step" data-step="2">
-          <label>Позывной</label>
-          <input id="qCallsign" type="text">
+          <input id="qCallsign" type="text" placeholder="Позывной">
         </div>
 
         <div class="quenta-step" data-step="3">
-          <label>Возраст</label>
-          <input id="qAge" type="text" placeholder="Например: 27">
+          <input id="qAge" type="text" placeholder="Возраст (например: 27)">
         </div>
 
         <div class="quenta-step" data-step="4">
-          <label>Место рождения</label>
-          <input id="qBirthplace" type="text" placeholder="Город / регион">
+          <input id="qBirthplace" type="text" placeholder="Место рождения">
         </div>
 
         <div class="quenta-step" data-step="5">
-          <label>Национальность</label>
-          <input id="qNationality" type="text">
+          <input id="qNationality" type="text" placeholder="Национальность">
         </div>
 
         <div class="quenta-step" data-step="6">
-          <label>Бывшая профессия</label>
-          <input id="qProfession" type="text">
+          <input id="qProfession" type="text" placeholder="Бывшая профессия">
         </div>
 
         <div class="quenta-step" data-step="7">
-          <label>Discord</label>
-          <input id="qDiscord" type="text" placeholder="ник в Discord">
+          <input id="qDiscord" type="text" placeholder="Discord (ник)">
         </div>
 
         <div class="quenta-step" data-step="8">
-          <label>Характер персонажа</label>
-          <textarea id="qTraits" rows="4"></textarea>
+          <textarea id="qTraits" rows="4" placeholder="Характер персонажа"></textarea>
         </div>
 
         <div class="quenta-step" data-step="9">
-          <label>Навыки персонажа</label>
-          <textarea id="qSkills" rows="4"></textarea>
+          <textarea id="qSkills" rows="4" placeholder="Навыки персонажа"></textarea>
         </div>
 
         <div class="quenta-step" data-step="10">
-          <label>Биография персонажа (не менее 800 слов)</label>
-          <textarea id="qBio" rows="10"></textarea>
+          <textarea id="qBio" rows="10" placeholder="Биография персонажа (не менее 800 слов)"></textarea>
           <div id="qBioCounter" class="quenta-counter">0 слов из 800</div>
           <div id="qBioError" class="quenta-error"></div>
         </div>
 
         <div class="quenta-step" data-step="11">
-          <label>Мотивация и причины попадания в Зону</label>
-          <textarea id="qMotivation" rows="4"></textarea>
+          <textarea id="qMotivation" rows="4" placeholder="Мотивация и причины попадания в Зону"></textarea>
         </div>
 
         <div class="quenta-step" data-step="12">
