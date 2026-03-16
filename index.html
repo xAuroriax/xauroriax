@@ -1080,7 +1080,8 @@ header nav a:hover, header nav a.active {
 .quenta-actions{
   margin-top:14px;
   display:flex;
-  justify-content:flex-end;
+  justify-content:center;
+  gap: 15px;
 }
 
 .quenta-card{
@@ -1434,7 +1435,7 @@ header nav a:hover, header nav a.active {
 
         <div class="trace-container" id="qNextWrap" style="display:inline-block">
           <div class="trace-line"><svg><rect class="comet-1"></rect><rect class="comet-2"></rect></svg></div>
-          <button class="btn-cta btn-cta-inner" type="button" id="qNextBtn" onclick="quentaNextOrSubmit()">Далее</button>
+          <button class="btn-cta btn-cta-inner" type="button" id="qNextBtn" onclick="quentaNextOrSubmit()">Начать</button>
         </div>
       </div>
 
@@ -1873,6 +1874,21 @@ STARFALL SYNDICATE | AURORIA
 <script>
 /* navigation */
 function showPage(id){
+// Manage real-time quenta status polling
+if (id === 'profile') {
+  const savedUser = JSON.parse(localStorage.getItem('steam_user'));
+  if (savedUser && !statusCheckInterval) {
+    // Start polling every 5 seconds when entering profile
+    statusCheckInterval = setInterval(() => checkQuentaStatus(savedUser.id), 5000);
+  }
+} else {
+  // Stop polling when leaving profile
+  if (statusCheckInterval) {
+    clearInterval(statusCheckInterval);
+    statusCheckInterval = null;
+  }
+}
+
 if(id==='quenta'){
   const savedUser=JSON.parse(localStorage.getItem('steam_user'));
   if(!savedUser){
@@ -2880,21 +2896,46 @@ window.addEventListener('DOMContentLoaded', () => {
     updateSteamUI();
   }
 
+  let statusCheckInterval = null;
+
   async function checkQuentaStatus(steamId) {
     if (!steamId) return;
     try {
-      // Endpoint where worker returns quenta status from KV
       const response = await fetch(`https://discordwebhookurl.statkevichyt.workers.dev/get-quenta-status?steamId=${steamId}`);
       if (response.ok) {
         const data = await response.json();
         if (data.status) {
+          const oldStatus = localStorage.getItem(`quenta_status_${steamId}`);
           localStorage.setItem(`quenta_status_${steamId}`, data.status);
-          // The recursive call that caused the freeze has been removed.
-          // The UI will now update the next time the profile is viewed.
+          
+          // Only update UI if status actually changed to avoid unnecessary flicker
+          if (oldStatus !== data.status) {
+            renderQuentaStatus(data.status);
+          }
         }
       }
     } catch (e) {
       console.warn('Could not fetch quenta status:', e);
+    }
+  }
+
+  function renderQuentaStatus(status) {
+    const statusValue = document.getElementById('quentaStatusValue');
+    if (!statusValue) return;
+
+    statusValue.classList.remove('status-pending', 'status-approved', 'status-rejected');
+    
+    if (status === 'pending') {
+      statusValue.textContent = 'Ожидание рассмотрения';
+      statusValue.classList.add('status-pending');
+    } else if (status === 'approved') {
+      statusValue.textContent = 'Квента одобрена';
+      statusValue.classList.add('status-approved');
+    } else if (status === 'rejected') {
+      statusValue.textContent = 'Квента отклонена';
+      statusValue.classList.add('status-rejected');
+    } else {
+      statusValue.textContent = 'Не подана';
     }
   }
 
@@ -2931,25 +2972,9 @@ window.addEventListener('DOMContentLoaded', () => {
       if (roleEl) roleEl.textContent = role.name;
       if (roleDescEl) roleDescEl.textContent = role.desc;
 
-      // Update quenta status
-      const statusValue = document.getElementById('quentaStatusValue');
-      if (statusValue) {
-        const savedStatus = localStorage.getItem(`quenta_status_${savedUser.id}`);
-        statusValue.classList.remove('status-pending', 'status-approved', 'status-rejected');
-        
-        if (savedStatus === 'pending') {
-          statusValue.textContent = 'Ожидание рассмотрения';
-          statusValue.classList.add('status-pending');
-        } else if (savedStatus === 'approved') {
-          statusValue.textContent = 'Квента одобрена';
-          statusValue.classList.add('status-approved');
-        } else if (savedStatus === 'rejected') {
-          statusValue.textContent = 'Квента отклонена';
-          statusValue.classList.add('status-rejected');
-        } else {
-          statusValue.textContent = 'Не подана';
-        }
-      }
+      // Update quenta status using the shared render function
+      const savedStatus = localStorage.getItem(`quenta_status_${savedUser.id}`);
+      renderQuentaStatus(savedStatus);
 
       // Update result page stats if present
       const resP = document.getElementById('resStatsPassed');
@@ -3114,7 +3139,7 @@ window.addEventListener('DOMContentLoaded', () => {
       if(text) text.style.display = 'block';
       if(fieldsWrap) fieldsWrap.style.display = 'none';
       if(backWrap) backWrap.style.display = 'none';
-      if(nextBtn) nextBtn.textContent = 'Далее';
+      if(nextBtn) nextBtn.textContent = 'Начать';
     } else {
       if(title) title.textContent = titles[step] || 'Квента';
       if(text) text.style.display = 'none';
