@@ -976,6 +976,7 @@ header nav a:hover, header nav a.active {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  flex-wrap: wrap; /* Added to support actions below */
   text-align: left;
   color: #fff;
 }
@@ -1133,11 +1134,13 @@ header nav a:hover, header nav a.active {
   font-size:12px;
   color:#ff4b4b;
 }
-.quenta-actions{
-  margin-top:14px;
-  display:flex;
-  justify-content:center;
-  gap: 15px;
+.quenta-actions {
+  margin-top: 25px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 20px;
+  width: 100%;
 }
 
 .quenta-card{
@@ -1744,8 +1747,8 @@ header nav a:hover, header nav a.active {
           <div class="stat-card">
             <span>Статус квенты</span>
             <span id="quentaStatusValue" class="stat-value">—</span>
-            <div id="quentaActions" style="display:none; margin-top:5px; text-align: right;">
-               <button class="quenta-edit-btn" onclick="editQuenta()" title="Изменить квенту">✏️</button>
+            <div id="profileQuentaActions" style="display:none; margin-top:10px; width: 100%; text-align: right;">
+               <button class="quenta-edit-btn" onclick="editQuenta()" title="Изменить квенту">✏️ Изменить</button>
                <button class="quenta-delete-btn" onclick="deleteQuenta()" title="Удалить квенту">Удалить квенту</button>
             </div>
           </div>
@@ -2982,13 +2985,13 @@ window.addEventListener('DOMContentLoaded', () => {
 
   function renderQuentaStatus(status) {
     const statusValue = document.getElementById('quentaStatusValue');
-    const quentaActions = document.getElementById('quentaActions');
+    const profileActions = document.getElementById('profileQuentaActions');
     if (!statusValue) return;
 
     statusValue.classList.remove('status-pending', 'status-approved', 'status-rejected');
     
-    if (quentaActions) {
-      quentaActions.style.display = (status && status !== 'none') ? 'block' : 'none';
+    if (profileActions) {
+      profileActions.style.display = (status && status !== 'none') ? 'block' : 'none';
     }
 
     if (status === 'pending') {
