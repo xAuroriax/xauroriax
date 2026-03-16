@@ -1003,6 +1003,9 @@ header nav a:hover, header nav a.active {
 }
 .quenta-field{
   margin-bottom:16px;
+  display:flex;
+  flex-direction:column;
+  gap:6px;
 }
 #quentaCard input,
 #quentaCard textarea{
@@ -1013,6 +1016,12 @@ header nav a:hover, header nav a.active {
   background:#090909 !important;
   color:#fff !important;
   resize:vertical;
+}
+
+#quentaCard label{
+  font-size:12px;
+  color:#dddddd;
+  opacity:.85;
 }
 .quenta-counter{
   margin-top:6px;
@@ -1319,11 +1328,7 @@ header nav a:hover, header nav a.active {
   <div class="container">
     <div class="card quenta-card" id="quentaCard">
       <h2 class="synd-title" id="quentaTitle">Подача квенты</h2>
-      <p id="quentaText">
-        Перед подачей квенты убедитесь, что внимательно прочитали правила и лор проекта.
-        Биография персонажа должна содержать не менее 800 слов и описывать его жизнь,
-        характер, навыки и мотивацию.
-      </p>
+      <p id="quентаText"></p>
 
       <div id="quentaFields" style="display:none; margin-top:16px;">
         <div class="quenta-step" data-step="1">
@@ -1384,7 +1389,6 @@ header nav a:hover, header nav a.active {
         </div>
 
         <div class="quenta-step" data-step="12">
-          <p>Вы почти готовы отправить квенту. Проверьте ещё раз все данные ниже и нажмите «Отправить квенту», если всё верно.</p>
           <div id="qPreview" class="quenta-preview"></div>
         </div>
       </div>
