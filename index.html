@@ -986,6 +986,7 @@ header nav a:hover, header nav a.active {
   font-family: 'Orbitron', sans-serif;
   margin-top: 0;
   text-shadow: 0 0 10px rgba(255,122,24,0.3);
+  margin-left: 15px; /* Added spacing from label */
 }
 
 /* Quenta Status Styles */
@@ -1003,22 +1004,29 @@ header nav a:hover, header nav a.active {
   }
 
   .quenta-edit-btn {
-    background: none;
-    border: none;
+    background: rgba(255, 255, 255, 0.05); /* Added subtle background */
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 4px;
     color: var(--orange);
     cursor: pointer;
     font-size: 16px;
-    padding: 4px 8px;
+    padding: 6px 10px; /* Increased padding */
     transition: all 0.3s ease;
-    opacity: 0.7;
-    margin-left: 8px;
+    opacity: 0.9;
+    margin-left: 12px;
     vertical-align: middle;
   }
   
   .quenta-edit-btn:hover {
     opacity: 1;
     transform: scale(1.1);
+    background: rgba(255, 255, 255, 0.1);
     text-shadow: 0 0 8px var(--orange);
+  }
+
+  #quentaSuccessMsg.error {
+    background: rgba(220, 38, 38, 0.9);
+    border-color: rgba(220, 38, 38, 0.4);
   }
 
   .quenta-delete-btn {
@@ -2974,10 +2982,15 @@ window.addEventListener('DOMContentLoaded', () => {
 
   function renderQuentaStatus(status) {
     const statusValue = document.getElementById('quentaStatusValue');
+    const quentaActions = document.getElementById('quentaActions');
     if (!statusValue) return;
 
     statusValue.classList.remove('status-pending', 'status-approved', 'status-rejected');
     
+    if (quentaActions) {
+      quentaActions.style.display = (status && status !== 'none') ? 'block' : 'none';
+    }
+
     if (status === 'pending') {
       statusValue.textContent = 'Ожидание рассмотрения';
       statusValue.classList.add('status-pending');
@@ -2997,7 +3010,7 @@ window.addEventListener('DOMContentLoaded', () => {
     const loginContainer = document.querySelector('.steam-login-container');
     
     if (savedUser && loginContainer) {
-      // Fetch current status from worker
+      // Instant check with worker on UI update
       checkQuentaStatus(savedUser.id);
 
       loginContainer.innerHTML = `
@@ -3142,17 +3155,13 @@ window.addEventListener('DOMContentLoaded', () => {
         return false;
       }
     } else if(step === 10){
-      const words = bio.split(/\s+/).filter(Boolean);
-      const counter = document.getElementById('qBioCounter');
-      if(counter) counter.textContent = `${words.length} слов из 800`;
-      if(words.length < 800){
-        bioError.textContent = `Минимальный объём — 800 слов. Сейчас: ${words.length}.`;
+      if(!validateTextContent(bio, 800)){
+        showToast('Биография должна быть осмысленной (мин. 800 слов).', 'error');
         return false;
       }
     } else if(step === 11){
-      const words = motivation.split(/\s+/).filter(Boolean);
-      if(words.length < 15 || hasBadWord(motivation)){
-        formError.textContent = 'Мотивация должна быть осмысленной, без мата и не короче 15 слов.';
+      if(!validateTextContent(motivation, 15)){
+        showToast('Мотивация должна быть осмысленной (мин. 15 слов).', 'error');
         return false;
       }
     }
@@ -3274,14 +3283,13 @@ ${motivation}`;
       if (response.ok) {
         localStorage.removeItem(`quenta_status_${savedUser.id}`);
         renderQuentaStatus(null);
-        alert('Квента удалена. Теперь вы можете подать новую.');
-        showPage('quenta'); 
+        showToast('Квента успешно удалена', 'success');
+        showPage('home'); 
       } else {
-        alert('Ошибка при удалении квенты. Попробуйте позже.');
+        showToast('Ошибка при удалении квенты', 'error');
       }
     } catch (e) {
-      console.error(e);
-      alert('Ошибка соединения.');
+      showToast('Ошибка соединения', 'error');
     }
   }
 
@@ -3307,16 +3315,47 @@ ${motivation}`;
                 document.getElementById('qBio').value = data.character.biography || '';
                 document.getElementById('qMotivation').value = data.character.motivation || '';
                 
-                quentaStep = 0;
+                quentaCurrentStep = 0;
                 setQuentaStep(0);
              }, 100);
         } else {
-            alert('Не удалось загрузить данные квенты.');
+            showToast('Не удалось загрузить данные квенты', 'error');
         }
       })
       .catch(() => {
-          alert('Ошибка загрузки данных.');
+          showToast('Ошибка загрузки данных', 'error');
       });
+  }
+
+  function showToast(message, type = 'success') {
+    const toast = document.getElementById('quentaSuccessMsg');
+    if (toast) {
+      toast.textContent = message;
+      if (type === 'error') {
+        toast.classList.add('error');
+      } else {
+        toast.classList.remove('error');
+      }
+      toast.classList.add('show');
+      setTimeout(() => toast.classList.remove('show'), 5000);
+    }
+  }
+
+  function validateTextContent(text, minWords = 15) {
+    // 1. Check for spam (repeated sequences)
+    if(/(.+)\1{4,}/.test(text)) return false; // "apapapapap"
+    
+    // 2. Normalize and split into words
+    const words = text.trim().split(/\s+/).filter(w => w.length > 1); // Filter out single letters
+    
+    // 3. Check word count
+    if(words.length < minWords) return false;
+    
+    // 4. Check unique words ratio (to prevent "bla bla bla bla")
+    const uniqueWords = new Set(words.map(w => w.toLowerCase()));
+    if(uniqueWords.size < words.length * 0.5) return false; // At least 50% unique words
+    
+    return true;
   }
 
   function quentaNextOrSubmit(){
@@ -3327,18 +3366,16 @@ ${motivation}`;
 
       const savedUser = JSON.parse(localStorage.getItem('steam_user'));
       if(savedUser){
+         // Instant check with worker before showing start step
+         checkQuentaStatus(savedUser.id);
+         
          const status = localStorage.getItem(`quenta_status_${savedUser.id}`);
          if(status === 'pending') {
-             const successMsg = document.getElementById('quentaSuccessMsg');
-             if (successMsg) {
-                successMsg.textContent = 'Вы уже подали заявку, ждите решения администрации';
-                successMsg.classList.add('show');
-                setTimeout(() => successMsg.classList.remove('show'), 5000);
-             }
+             showToast('Вы уже подали заявку, ждите решения администрации', 'success');
              return;
          }
          if(status === 'approved') {
-             alert('У вас уже имеется одобренная квента. Чтобы подать новую, удалите текущую в профиле.');
+             showToast('У вас уже имеется одобренная квента. Удалите её в профиле, чтобы подать новую.', 'error');
              return;
          }
       }
