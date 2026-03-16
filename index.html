@@ -1031,11 +1031,14 @@ header nav a:hover, header nav a.active {
 }
 
 .quenta-card{
-  background:#050505;
-  border:1px solid #1d1d1d;
+  background:#050505 !important;
+  border:1px solid #1d1d1d !important;
+  box-shadow:none !important;
+  background-image:none !important;
 }
-.quenta-card::before{
-  display:none !important;
+.quenta-card::before,
+.quenta-card::after{
+  content:none !important;
 }
 .quenta-step{
   display:none;
@@ -1053,6 +1056,9 @@ header nav a:hover, header nav a.active {
   font-size:14px;
   line-height:1.5;
   white-space:pre-wrap;
+  background:#090909 !important;
+  border-radius:8px;
+  padding:10px 12px;
 }
 
 .logout-container {
@@ -3128,6 +3134,11 @@ ${motivation}`;
     if(counter) counter.textContent = `${words.length} слов из 800`;
     if (words.length < 800) {
       bioError.textContent = `Минимальный объём — 800 слов. Сейчас: ${words.length}.`;
+      return;
+    }
+
+    if (hasBadWord(name) || hasBadWord(callsign) || hasBadWord(profession) || Number(age) < 18) {
+      formError.textContent = 'Квента содержит недопустимые данные (имя, позывной, профессия или возраст). Исправьте их.';
       return;
     }
 
