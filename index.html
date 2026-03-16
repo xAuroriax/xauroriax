@@ -2889,7 +2889,8 @@ window.addEventListener('DOMContentLoaded', () => {
         const data = await response.json();
         if (data.status) {
           localStorage.setItem(`quenta_status_${steamId}`, data.status);
-          updateSteamUI();
+          // The recursive call that caused the freeze has been removed.
+          // The UI will now update the next time the profile is viewed.
         }
       }
     } catch (e) {
