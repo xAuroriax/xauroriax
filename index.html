@@ -1004,8 +1004,8 @@ header nav a:hover, header nav a.active {
 .quenta-field{
   margin-bottom:16px;
 }
-.quenta-field input,
-.quenta-field textarea{
+#quentaCard input,
+#quentaCard textarea{
   width:100%;
   padding:10px 12px;
   border-radius:8px;
@@ -1041,15 +1041,18 @@ header nav a:hover, header nav a.active {
   content:none !important;
 }
 .quenta-step{
-  display:none;
   opacity:0;
   transform:translateY(10px);
-  transition:opacity .25s ease,transform .25s ease;
+  max-height:0;
+  overflow:hidden;
+  pointer-events:none;
+  transition:opacity .25s ease,transform .25s ease,max-height .25s ease;
 }
 .quenta-step.active{
-  display:block;
   opacity:1;
   transform:translateY(0);
+  max-height:1000px;
+  pointer-events:auto;
 }
 .quenta-preview{
   margin-top:10px;
