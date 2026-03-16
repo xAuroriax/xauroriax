@@ -1473,8 +1473,8 @@ header nav a:hover, header nav a.active {
         </div>
 
         <div class="quenta-step" data-step="10">
-          <textarea id="qBio" rows="10" placeholder="Биография персонажа (не менее 800 слов)"></textarea>
-          <div id="qBioCounter" class="quenta-counter">0 слов из 800</div>
+          <textarea id="qBio" rows="10" placeholder="Биография персонажа (не менее 600 слов)" oninput="updateBioCounter()"></textarea>
+          <div id="qBioCounter" class="quenta-counter">0 слов из 600</div>
           <div id="qBioError" class="quenta-error"></div>
         </div>
 
@@ -3094,6 +3094,16 @@ window.addEventListener('DOMContentLoaded', () => {
     return bad.some(w => lower.includes(w));
   }
 
+  function updateBioCounter() {
+    const bio = document.getElementById('qBio').value.trim();
+    const words = bio.split(/\s+/).filter(w => w.length > 0);
+    const counter = document.getElementById('qBioCounter');
+    if (counter) {
+      counter.textContent = `${words.length} слов из 600`;
+      counter.style.color = words.length >= 600 ? '#4ade80' : '#888';
+    }
+  }
+
   function validateQuentaStep(step){
     const formError = document.getElementById('qFormError');
     const bioError = document.getElementById('qBioError');
@@ -3158,8 +3168,8 @@ window.addEventListener('DOMContentLoaded', () => {
         return false;
       }
     } else if(step === 10){
-      if(!validateTextContent(bio, 800)){
-        showToast('Биография должна быть осмысленной (мин. 800 слов).', 'error');
+      if(!validateTextContent(bio, 600)){
+        showToast('Биография должна быть осмысленной (мин. 600 слов).', 'error');
         return false;
       }
     } else if(step === 11){
@@ -3345,20 +3355,23 @@ ${motivation}`;
   }
 
   function validateTextContent(text, minWords = 15) {
-    // 1. Check for spam (repeated sequences)
-    if(/(.+)\1{4,}/.test(text)) return false; // "apapapapap"
+    const cleanText = text.trim();
+    if (!cleanText) return false;
+
+    // Split into words (all words > 0 chars)
+    const words = cleanText.split(/\s+/).filter(w => w.length > 0);
+    if (words.length < minWords) return false;
+
+    // Simple spam check (char repeat)
+    if (/(.)\1{10,}/.test(cleanText)) return false; 
+
+    // Unique words check
+    const uniqueWords = new Set(words.map(w => w.toLowerCase().replace(/[^а-яёa-z]/g, '')));
+    const ratio = uniqueWords.size / words.length;
     
-    // 2. Normalize and split into words
-    const words = text.trim().split(/\s+/).filter(w => w.length > 1); // Filter out single letters
-    
-    // 3. Check word count
-    if(words.length < minWords) return false;
-    
-    // 4. Check unique words ratio (to prevent "bla bla bla bla")
-    const uniqueWords = new Set(words.map(w => w.toLowerCase()));
-    if(uniqueWords.size < words.length * 0.5) return false; // At least 50% unique words
-    
-    return true;
+    // For bio (min 800), 20% unique is plenty. For short (15), 50% needed.
+    const threshold = minWords > 100 ? 0.20 : 0.50;
+    return ratio >= threshold;
   }
 
   function quentaNextOrSubmit(){
@@ -3415,13 +3428,6 @@ ${motivation}`;
     formError.textContent = '';
     bioError.textContent = '';
 
-    const words = bio.split(/\s+/).filter(Boolean);
-    const counter = document.getElementById('qBioCounter');
-    if(counter) counter.textContent = `${words.length} слов из 800`;
-    if (words.length < 800) {
-      bioError.textContent = `Минимальный объём — 800 слов. Сейчас: ${words.length}.`;
-      return;
-    }
 
     if (hasBadWord(name) || hasBadWord(callsign) || hasBadWord(profession) || Number(age) < 18) {
       formError.textContent = 'Квента содержит недопустимые данные (имя, позывной, профессия или возраст). Исправьте их.';
