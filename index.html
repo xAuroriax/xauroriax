@@ -692,6 +692,20 @@ margin-top:auto;
     </div>
   </div>
 </div>
+
+<div id="notifModal" class="modal-overlay" style="display:none;">
+  <div class="modal-content notif-modal-content">
+    <div id="notifModalHeader" class="notif-modal-header">Уведомление</div>
+    <div id="notifModalBody" class="notif-modal-body">Текст уведомления</div>
+    <div class="notif-modal-footer">
+      <span id="notifModalFrom">От: Администрация</span>
+      <span id="notifModalTime">Сегодня</span>
+    </div>
+    <div class="modal-actions">
+      <button onclick="closeNotifModal()" class="btn-cta">Закрыть</button>
+    </div>
+  </div>
+</div>
 <div id="quentaSuccessMsg" data-i18n="quenta_submitted">Вы успешно подали квенту, ждите подтверждения</div>
 <div id="authToast"></div>
 <div class="noise"></div>
@@ -899,6 +913,178 @@ header nav a:hover, header nav a.active {
   top: 30px;
   right: 40px;
   z-index: 1002;
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+/* Notification Bell */
+.notification-bell-container {
+  position: relative;
+  cursor: pointer;
+  transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px;
+  background: rgba(10,10,10,0.8);
+  border-radius: 12px;
+  border: 1px solid rgba(255,122,24,0.2);
+}
+
+.notification-bell-container:hover {
+  transform: scale(1.1);
+  border-color: var(--orange);
+  box-shadow: 0 0 15px rgba(255,122,24,0.2);
+}
+
+.notification-bell-container i {
+  font-size: 20px;
+  color: var(--orange);
+}
+
+.notification-badge {
+  position: absolute;
+  top: -5px;
+  right: -5px;
+  background: #ff4b4b;
+  color: white;
+  border-radius: 50%;
+  width: 18px;
+  height: 18px;
+  font-size: 11px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Orbitron', sans-serif;
+  font-weight: bold;
+  box-shadow: 0 0 10px rgba(255,75,75,0.5);
+  display: none; /* Hidden by default */
+}
+
+/* Notification Popup */
+.notification-popup {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  margin-top: 15px;
+  width: 300px;
+  background: rgba(10,10,10,0.98);
+  border: 1px solid rgba(255,122,24,0.3);
+  border-radius: 12px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.8);
+  display: none;
+  z-index: 1003;
+  overflow: hidden;
+  animation: popupFadeIn 0.3s ease;
+}
+
+@keyframes popupFadeIn {
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.notification-popup.active {
+  display: block;
+}
+
+.notification-header {
+  padding: 12px 15px;
+  border-bottom: 1px solid rgba(255,122,24,0.1);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.notification-header h4 {
+  margin: 0;
+  font-size: 14px;
+  color: var(--orange);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.notification-list {
+  max-height: 350px;
+  overflow-y: auto;
+}
+
+.notification-item {
+  padding: 15px;
+  border-bottom: 1px solid rgba(255,255,255,0.05);
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.notification-item:hover {
+  background: rgba(255,122,24,0.05);
+}
+
+.notification-item.unread {
+  background: rgba(255,122,24,0.03);
+  border-left: 2px solid var(--orange);
+}
+
+.notification-item-title {
+  font-weight: bold;
+  font-size: 13px;
+  margin-bottom: 5px;
+  color: #fff;
+}
+
+.notification-item-text {
+  font-size: 12px;
+  color: #aaa;
+  line-height: 1.4;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.notification-item-time {
+  font-size: 10px;
+  color: #666;
+  margin-top: 8px;
+}
+
+.notification-empty {
+  padding: 30px 20px;
+  text-align: center;
+  color: #666;
+  font-size: 13px;
+}
+
+/* Notification Full View Modal */
+.notif-modal-content {
+  max-width: 500px;
+  text-align: left;
+}
+
+.notif-modal-header {
+  color: var(--orange);
+  font-family: 'Orbitron', sans-serif;
+  font-size: 18px;
+  margin-bottom: 15px;
+  border-bottom: 1px solid rgba(255,122,24,0.3);
+  padding-bottom: 10px;
+}
+
+.notif-modal-body {
+  font-size: 15px;
+  line-height: 1.6;
+  color: #d0d0d0;
+  margin-bottom: 20px;
+  white-space: pre-wrap;
+}
+
+.notif-modal-footer {
+  font-size: 12px;
+  color: #666;
+  border-top: 1px solid rgba(255,255,255,0.05);
+  padding-top: 10px;
+  display: flex;
+  justify-content: space-between;
 }
 
 .steam-login-btn {
@@ -1457,6 +1643,23 @@ header nav a:hover, header nav a.active {
 <button id="navToggleBtn" onclick="toggleMobileNav()"><i class="fas fa-chevron-left"></i></button>
 
 <div class="steam-login-container">
+  <!-- Notification Bell -->
+  <div id="notifBell" class="notification-bell-container" style="display:none;" onclick="toggleNotifPopup(event)">
+    <i class="fas fa-bell"></i>
+    <div id="notifBadge" class="notification-badge">0</div>
+    
+    <!-- Notification Popup -->
+    <div id="notifPopup" class="notification-popup">
+      <div class="notification-header">
+        <h4>Уведомления</h4>
+      </div>
+      <div id="notifList" class="notification-list">
+        <!-- Notifications will be injected here -->
+        <div class="notification-empty">Нет новых уведомлений</div>
+      </div>
+    </div>
+  </div>
+
   <div class="trace-container">
     <div class="trace-line"><svg><rect class="comet-1"></rect><rect class="comet-2"></rect></svg></div>
     <a id="steamLoginBtn" href="https://steamcommunity.com/openid/login?openid.ns=http://specs.openid.net/auth/2.0&openid.mode=checkid_setup&openid.return_to=https://xauroriax.statkevichyt.workers.dev/steam-callback&openid.realm=https://xauroriax.statkevichyt.workers.dev/&openid.identity=http://specs.openid.net/auth/2.0/identifier_select&openid.claimed_id=http://specs.openid.net/auth/2.0/identifier_select" class="steam-login-btn">
@@ -1546,18 +1749,18 @@ header nav a:hover, header nav a.active {
         </div>
 
         <div class="quenta-step" data-step="12">
-          <div id="qPreview" class="quenta-preview"></div>
+          <div id="qPreview" class="quenta-preview-content"></div>
         </div>
       </div>
 
       <div class="quenta-actions" id="quentaActions">
-        <div class="trace-container" id="qBackWrap" style="display:none">
-          <div class="trace-line"><svg><rect class="comet-1"></rect><rect class="comet-2"></rect></svg></div>
-          <button class="btn-cta btn-cta-inner" type="button" id="qBackBtn" onclick="quentaPrev()">Назад</button>
-        </div>
         <div class="trace-container" id="qCancelWrap" style="display:none">
           <div class="trace-line"><svg><rect class="comet-1"></rect><rect class="comet-2"></rect></svg></div>
           <button class="btn-cta btn-cta-inner btn-secondary" type="button" id="qCancelBtn" onclick="showPage('profile')">Отмена</button>
+        </div>
+        <div class="trace-container" id="qBackWrap" style="display:none">
+          <div class="trace-line"><svg><rect class="comet-1"></rect><rect class="comet-2"></rect></svg></div>
+          <button class="btn-cta btn-cta-inner" type="button" id="qBackBtn" onclick="quentaPrev()">Назад</button>
         </div>
         <div class="trace-container" id="qNextWrap" style="display:inline-block">
           <div class="trace-line"><svg><rect class="comet-1"></rect><rect class="comet-2"></rect></svg></div>
@@ -3028,6 +3231,116 @@ window.addEventListener('DOMContentLoaded', () => {
 
   let statusCheckInterval = null;
 
+  function toggleNotifPopup(e) {
+    if (e) e.stopPropagation();
+    const popup = document.getElementById('notifPopup');
+    popup.classList.toggle('active');
+  }
+
+  // Close popup when clicking outside
+  document.addEventListener('click', () => {
+    const popup = document.getElementById('notifPopup');
+    if (popup) popup.classList.remove('active');
+  });
+
+  async function fetchNotifications(steamId) {
+    if (!steamId) return;
+    try {
+      const response = await fetch(`https://discordwebhookurl.statkevichyt.workers.dev/get-notifications?steamId=${steamId}`);
+      if (response.ok) {
+        const notifications = await response.json();
+        renderNotifications(notifications);
+      }
+    } catch (e) {
+      console.warn('Failed to fetch notifications:', e);
+    }
+  }
+
+  function renderNotifications(notifs) {
+    const list = document.getElementById('notifList');
+    const badge = document.getElementById('notifBadge');
+    const bell = document.getElementById('notifBell');
+    
+    if (!list || !badge || !bell) return;
+
+    if (!notifs || notifs.length === 0) {
+      list.innerHTML = '<div class="notification-empty">Нет новых уведомлений</div>';
+      badge.style.display = 'none';
+      return;
+    }
+
+    bell.style.display = 'flex';
+    
+    // Count unread
+    const unreadCount = notifs.filter(n => !n.read).length;
+    if (unreadCount > 0) {
+      badge.textContent = unreadCount;
+      badge.style.display = 'flex';
+    } else {
+      badge.style.display = 'none';
+    }
+
+    list.innerHTML = '';
+    notifs.forEach(n => {
+      const item = document.createElement('div');
+      item.className = `notification-item ${n.read ? '' : 'unread'}`;
+      
+      const date = new Date(n.timestamp).toLocaleString('ru-RU', { 
+        day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' 
+      });
+
+      item.innerHTML = `
+        <div class="notification-item-title">${n.title || 'Уведомление'}</div>
+        <div class="notification-item-text">${n.message}</div>
+        <div class="notification-item-time">${date}</div>
+      `;
+      
+      item.onclick = (e) => {
+        e.stopPropagation();
+        showNotifDetail(n);
+        markAsRead(n.id);
+      };
+      
+      list.appendChild(item);
+    });
+  }
+
+  function showNotifDetail(n) {
+    const modal = document.getElementById('notifModal');
+    const header = document.getElementById('notifModalHeader');
+    const body = document.getElementById('notifModalBody');
+    const from = document.getElementById('notifModalFrom');
+    const time = document.getElementById('notifModalTime');
+    
+    header.textContent = n.title || 'Уведомление';
+    body.textContent = n.message;
+    from.textContent = `От: ${n.from || 'Администрация'}`;
+    time.textContent = new Date(n.timestamp).toLocaleString('ru-RU');
+    
+    modal.style.display = 'flex';
+  }
+
+  function closeNotifModal() {
+    document.getElementById('notifModal').style.display = 'none';
+  }
+
+  async function markAsRead(notifId) {
+    const savedUser = JSON.parse(localStorage.getItem('steam_user'));
+    if (!savedUser) return;
+    
+    try {
+      await fetch('https://discordwebhookurl.statkevichyt.workers.dev/mark-notif-read', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ steamId: savedUser.id, notifId })
+      });
+      // Refresh list
+      fetchNotifications(savedUser.id);
+    } catch (e) {
+      console.warn('Failed to mark notification as read:', e);
+    }
+  }
+
   async function checkQuentaStatus(steamId) {
     if (!steamId) return;
     try {
@@ -3081,8 +3394,26 @@ window.addEventListener('DOMContentLoaded', () => {
     if (savedUser && loginContainer) {
       // Instant check with worker on UI update
       checkQuentaStatus(savedUser.id);
+      fetchNotifications(savedUser.id); // Also fetch notifications
 
+      // Re-inject HTML to keep notification bell and login button
       loginContainer.innerHTML = `
+        <!-- Notification Bell -->
+        <div id="notifBell" class="notification-bell-container" style="display:none;" onclick="toggleNotifPopup(event)">
+          <i class="fas fa-bell"></i>
+          <div id="notifBadge" class="notification-badge">0</div>
+          
+          <!-- Notification Popup -->
+          <div id="notifPopup" class="notification-popup">
+            <div class="notification-header">
+              <h4>Уведомления</h4>
+            </div>
+            <div id="notifList" class="notification-list">
+              <div class="notification-empty">Нет новых уведомлений</div>
+            </div>
+          </div>
+        </div>
+
         <div class="trace-container" onclick="showPage('profile')">
           <div class="trace-line"><svg><rect class="comet-1"></rect><rect class="comet-2"></rect></svg></div>
           <div class="steam-login-btn">
@@ -3261,7 +3592,8 @@ window.addEventListener('DOMContentLoaded', () => {
     if(formError) formError.textContent = '';
     if(bioError) bioError.textContent = '';
 
-    if(isEditing) {
+    // Cancel button should be visible on ALL steps if editing OR if we started filling
+    if(isEditing || step > 0) {
       if(cancelWrap) cancelWrap.style.display = 'inline-block';
     } else {
       if(cancelWrap) cancelWrap.style.display = 'none';
