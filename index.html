@@ -348,17 +348,49 @@ margin-top:auto;
 @media (max-width: 768px) {
 
   body{
-    padding:10px;
+    padding:0;
   }
 
   .container{
     width:100%;
-    padding:10px;
+    padding: 20px 10px;
+  }
+
+  .hero{
+    height: 320px;
   }
 
   h1{
     font-size:28px;
     text-align:center;
+  }
+
+  nav{
+    gap: 10px;
+    padding: 10px;
+    flex-wrap: wrap;
+  }
+
+  nav a{
+    font-size: 12px;
+    padding: 8px 12px;
+  }
+
+  .rules-container{
+    flex-direction: column;
+  }
+
+  .rules-sidebar{
+    position: static;
+    width: 100%;
+    border-right: none;
+    border-bottom: 1px solid #1d1d1d;
+    margin-bottom: 20px;
+    padding-right: 0;
+  }
+
+  .links-grid{
+    grid-template-columns: 1fr;
   }
 
   p{
@@ -702,7 +734,7 @@ margin-top:auto;
 <div class="card">
 <h2 class="synd-title" data-i18n="exam_title">Экзамен по правилам</h2>
 <div id="examIntro">
-<p data-i18n="exam_intro">Перед входом в Зону пройдите тест из 12 вопросов (5 минут). Проходной балл — 11.</p>
+<p data-i18n="exam_intro">Перед входом в Зону пройдите тест из 20 вопросов (12 минут). Проходной балл — 18.</p>
 <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center">
 <input id="steamIdInput" type="text" placeholder="SteamID64" style="flex:1;min-width:220px;padding:10px 12px;background:#0a0a0a;border:1px solid #222;border-radius:12px;color:#fff"/>
 <button id="startExamBtn" class="btn-cta" style="border-color:#2a2a2a" data-i18n="exam_start">Начать</button>
@@ -710,8 +742,8 @@ margin-top:auto;
 </div>
 <div id="examRun" style="display:none">
 <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
-<div id="examProgress">1/12</div>
-<div id="examTimer">05:00</div>
+<div id="examProgress">1/20</div>
+<div id="examTimer">12:00</div>
 </div>
 <div id="examQuestion" style="margin-bottom:12px;color:#e8e8e8;text-shadow:none"></div>
 <div id="examAnswers" style="display:grid;gap:10px"></div>
@@ -864,7 +896,7 @@ watch_yt:"Смотреть в YouTube",
 role_lore_master:"Лор‑мастер",
 cta_exam:"Войти в Зону",
 exam_title:"Экзамен по правилам",
-exam_intro:"Перед входом в Зону пройдите тест из 12 вопросов (5 минут). Проходной балл — 11.",
+exam_intro:"Перед входом в Зону пройдите тест из 20 вопросов (12 минут). Проходной балл — 18.",
 exam_start:"Начать",
 exam_prev:"Назад",
 exam_next:"Далее",
@@ -911,7 +943,7 @@ watch_yt:"Watch on YouTube",
 role_lore_master:"Lore Master",
 cta_exam:"Enter the Zone",
 exam_title:"Rules Exam",
-exam_intro:"Answer 12 questions in 5 minutes. Passing score — 11.",
+exam_intro:"Answer 20 questions in 12 minutes. Passing score — 18.",
 exam_start:"Start",
 exam_prev:"Back",
 exam_next:"Next",
@@ -1325,21 +1357,25 @@ async function loadQuizFromFiles(lang){
     const arr= await res.json();
     return Array.isArray(arr)?arr:[];
   }catch(e){
-    // fallback to embedded constant
+    console.error('Quiz load error:', e);
+    // fallback to embedded constant (first 30 questions)
     return (lang==='en'?QUIZ.en:QUIZ.ru);
   }
 }
 function pickRandom(arr, n){
-  const a=arr.slice();
-  const out=[];
-  while(out.length<n && a.length){
-    out.push(a.splice(Math.floor(Math.random()*a.length),1)[0]);
+  if(!arr || arr.length === 0) return [];
+  const a=[...arr];
+  // Fisher-Yates shuffle
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
   }
-  return out;
+  return a.slice(0, Math.min(n, a.length));
 }
 async function startExam(lang){
   const bank= await loadQuizFromFiles(lang);
-  return pickRandom(bank,12);
+  console.log(`Loaded ${bank.length} questions for ${lang}`);
+  return pickRandom(bank,20);
 }
 async function runExam(){
   const lang=localStorage.getItem('lang')||'ru';
@@ -1352,13 +1388,22 @@ async function runExam(){
   const prog=document.getElementById('examProgress');
   const timerEl=document.getElementById('examTimer');
   let questions= await startExam(lang);
-  // normalize schema if loaded from files
-  questions=questions.map(q=>({q:q.text||q.q,a:q.answers||q.a,c:Array.isArray(q.c)?q.c:[(q.correctIndex!=null?q.correctIndex:0)]}));
-  let answers=new Array(questions.length).fill(null);
+  if(!questions || questions.length === 0){
+    alert(lang==='en'?'Failed to load quiz data.':'Не удалось загрузить вопросы.');
+    return;
+  }
+  questions=questions.map(q=>({q:q.text||q.q,a:q.answers||q.a,c:Array.isArray(q.c)?q.c:(q.correctIndex!=null?[q.correctIndex]:[])}));
+  let answers=new Array(questions.length).fill(null).map(()=>[]);
   let idx=0;
-  let left=5*60;
+  let left=12*60;
   intro.style.display='none'; run.style.display='block'; res.style.display='none';
-  const t=setInterval(()=>{left--; if(left<0){finish(); clearInterval(t); return;} const m=Math.floor(left/60).toString().padStart(2,'0'); const s=(left%60).toString().padStart(2,'0'); timerEl.textContent=`${m}:${s}`;},1000);
+  const t=setInterval(()=>{
+    left--; 
+    if(left<0){finish(); clearInterval(t); return;} 
+    const m=Math.floor(left/60).toString().padStart(2,'0'); 
+    const s=(left%60).toString().padStart(2,'0'); 
+    timerEl.textContent=`${m}:${s}`;
+  },1000);
   function render(){
     const q=questions[idx];
     prog.textContent=`${idx+1}/${questions.length}`;
@@ -1369,15 +1414,26 @@ async function runExam(){
       btn.className='btn-cta';
       btn.style.borderColor='#2a2a2a';
       btn.textContent=text;
-      if(answers[idx]===i){btn.classList.add('active');}
-      btn.onclick=()=>{answers[idx]=i; document.querySelectorAll('#examAnswers .btn-cta').forEach(b=>b.classList.remove('active')); btn.classList.add('active'); toggleFinish();};
+      if(answers[idx].includes(i)){btn.classList.add('active');}
+      btn.onclick=()=>{
+        const selected=answers[idx];
+        if(q.c.length > 1){ // multiple choice
+          const pos=selected.indexOf(i);
+          if(pos===-1){ selected.push(i); }
+          else{ selected.splice(pos,1); }
+        } else { // single choice
+          answers[idx] = [i];
+        }
+        render(); // re-render to show selection changes
+      };
       aEl.appendChild(btn);
     });
     toggleFinish();
   }
   function toggleFinish(){
     const fin=document.getElementById('finishQ');
-    fin.style.display = answers.every(x=>x!==null)?'inline-block':'none';
+    // Show finish button if every question has at least one answer
+    fin.style.display = answers.every(x=>x.length > 0)?'inline-block':'none';
   }
   document.getElementById('prevQ').onclick=()=>{if(idx>0){idx--;render();}};
   document.getElementById('nextQ').onclick=()=>{if(idx<questions.length-1){idx++;render();}};
@@ -1386,12 +1442,16 @@ async function runExam(){
     clearInterval(t);
     run.style.display='none'; res.style.display='block';
     let score=0;
-    for(let i=0;i<questions.length;i++){ if(questions[i].c.includes(answers[i])) score++; }
-    const pass=score>=11;
+    for(let i=0;i<questions.length;i++){
+      const correct=questions[i].c.sort().toString();
+      const given=answers[i].sort().toString();
+      if(correct === given) score++;
+    }
+    const pass=score>=18;
     const status=document.getElementById('examStatus');
     const scoreEl=document.getElementById('examScore');
     status.textContent= pass ? (lang==='en'?'Passed':'Сдано') : (lang==='en'?'Failed':'Провален');
-    scoreEl.textContent = (lang==='en'?`Score: ${score}/12`:`Результат: ${score}/12`) + (steam? (lang==='en'?` | SteamID: ${steam}`:` | SteamID: ${steam}`):'');
+    scoreEl.textContent = (lang==='en'?`Score: ${score}/20`:`Результат: ${score}/20`) + (steam? (lang==='en'?` | SteamID: ${steam}`:` | SteamID: ${steam}`):'');
     localStorage.setItem('last_exam',JSON.stringify({t:Date.now(),score,steam,lang}));
   }
   render();
