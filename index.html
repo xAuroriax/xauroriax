@@ -1514,9 +1514,142 @@ header nav a:hover, .rules-trigger-btn:hover, .blackmarket-trigger-btn:hover {
   color: #fff;
 }
 
-@keyframes cooldownPulse {
-  0%, 100% { opacity: 0.8; }
+/* Стили для слотов */
+.slots-game {
+  padding: 20px;
+}
+
+.slots-betting {
+  background: rgba(20,20,20,0.6);
+  border: 1px solid rgba(255,122,24,0.2);
+  border-radius: 12px;
+  padding: 20px;
+  margin-bottom: 30px;
+  text-align: center;
+}
+
+.slots-container {
+  margin: 40px 0;
+  position: relative;
+}
+
+.slots-machine {
+  background: rgba(10,10,10,0.8);
+  border: 2px solid rgba(255,122,24,0.3);
+  border-radius: 15px;
+  padding: 30px;
+  position: relative;
+  box-shadow: 0 0 30px rgba(255,122,24,0.2);
+}
+
+.slots-reels {
+  display: flex;
+  gap: 15px;
+  justify-content: center;
+  position: relative;
+  z-index: 2;
+}
+
+.slot-reel {
+  width: 120px;
+  height: 150px;
+  background: rgba(5,5,5,0.9);
+  border: 2px solid rgba(255,122,24,0.4);
+  border-radius: 10px;
+  overflow: hidden;
+  position: relative;
+}
+
+.reel-symbols {
+  position: absolute;
+  width: 100%;
+  transition: transform 0.1s linear;
+}
+
+.reel-symbol {
+  height: 150px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 60px;
+  background: rgba(20,20,20,0.8);
+}
+
+.slots-glow {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  border-radius: 15px;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+}
+
+.slots-glow.win {
+  background: radial-gradient(circle, rgba(100,200,100,0.3) 0%, transparent 70%);
+  opacity: 1;
+  animation: slotsGlowPulse 2s ease-in-out;
+}
+
+@keyframes slotsGlowPulse {
+  0%, 100% { opacity: 0.5; }
   50% { opacity: 1; }
+}
+
+.slots-info {
+  background: rgba(20,20,20,0.6);
+  border: 1px solid rgba(255,122,24,0.2);
+  border-radius: 12px;
+  padding: 20px;
+  margin-top: 30px;
+}
+
+.slots-info h3 {
+  color: rgba(255,255,255,0.9);
+  margin-bottom: 15px;
+  text-align: center;
+}
+
+.symbols-list {
+  display: flex;
+  justify-content: space-around;
+  flex-wrap: wrap;
+  gap: 15px;
+}
+
+.symbol-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px;
+  background: rgba(10,10,10,0.5);
+  border: 1px solid rgba(255,122,24,0.2);
+  border-radius: 8px;
+  min-width: 150px;
+}
+
+.symbol-icon {
+  font-size: 30px;
+  width: 50px;
+  text-align: center;
+}
+
+.symbol-info {
+  flex: 1;
+}
+
+.symbol-name {
+  color: rgba(255,255,255,0.8);
+  font-weight: 500;
+  margin-bottom: 2px;
+}
+
+.symbol-chance {
+  color: rgba(255,122,24,0.8);
+  font-size: 12px;
+  font-family: 'Orbitron', monospace;
 }
 
 .roulette-result {
@@ -3272,16 +3405,91 @@ input, textarea, select {
   <div class="container">
     <div class="card">
       <h2 class="synd-title" data-i18n="blackmarket_slots">Слоты</h2>
-      <div class="blackmarket-content">
-        <p>Зоновские автоматы с уникальными символами.</p>
-        <div class="slot-machines">
-          <div class="slot-machine">
-            <div class="slot-reels">
-              <div class="reel"></div>
-              <div class="reel"></div>
-              <div class="reel"></div>
+      <div class="slots-game">
+        <!-- Блок для ставки -->
+        <div class="slots-betting">
+          <div class="balance-display">
+            <span class="balance-label">Ваш баланс:</span>
+            <span id="slotsBalance" class="balance-amount">0</span>
+          </div>
+          <div class="bet-input-group">
+            <label for="slotsBetAmount" class="bet-label">Ставка:</label>
+            <input type="number" id="slotsBetAmount" class="bet-input" min="1" placeholder="Введите ставку">
+            <span class="bet-souls">Souls</span>
+          </div>
+          <button id="slotsSpinButton" class="spin-button" onclick="startSlotsSpin()">
+            <i class="fas fa-dice"></i>
+            <span>КРУТИТЬ</span>
+          </button>
+          <div id="slotsCooldown" class="spin-cooldown" style="display: none;">
+            <i class="fas fa-clock"></i>
+            <span id="slotsCooldownTimer">0</span>с
+          </div>
+        </div>
+
+        <!-- Блок для результатов -->
+        <div class="slots-result" id="slotsResult" style="display: none;">
+          <div class="result-message" id="slotsResultMessage"></div>
+          <div class="result-amount" id="slotsResultAmount"></div>
+        </div>
+
+        <!-- Игровые катушки -->
+        <div class="slots-container">
+          <div class="slots-machine">
+            <div class="slots-reels">
+              <div class="slot-reel" id="reel1">
+                <div class="reel-symbols"></div>
+              </div>
+              <div class="slot-reel" id="reel2">
+                <div class="reel-symbols"></div>
+              </div>
+              <div class="slot-reel" id="reel3">
+                <div class="reel-symbols"></div>
+              </div>
             </div>
-            <div class="slot-lever"></div>
+            <div class="slots-glow" id="slotsGlow"></div>
+          </div>
+        </div>
+
+        <!-- Информация о символах -->
+        <div class="slots-info">
+          <h3>Символы и коэффициенты</h3>
+          <div class="symbols-list">
+            <div class="symbol-item">
+              <div class="symbol-icon skull">💀</div>
+              <div class="symbol-info">
+                <div class="symbol-name">Череп</div>
+                <div class="symbol-chance">50% • x2</div>
+              </div>
+            </div>
+            <div class="symbol-item">
+              <div class="symbol-icon pda">📟</div>
+              <div class="symbol-info">
+                <div class="symbol-name">ПДА</div>
+                <div class="symbol-chance">25% • x4</div>
+              </div>
+            </div>
+            <div class="symbol-item">
+              <div class="symbol-icon artifact">🔮</div>
+              <div class="symbol-info">
+                <div class="symbol-name">Артефакт</div>
+                <div class="symbol-chance">15% • x8</div>
+              </div>
+            </div>
+            <div class="symbol-item">
+              <div class="symbol-icon medkit">💊</div>
+              <div class="symbol-info">
+                <div class="symbol-name">Медицинский</div>
+                <div class="symbol-chance">8% • x15</div>
+              </div>
+            </div>
+            <div class="symbol-item">
+              <div class="symbol-icon rare">💎</div>
+              <div class="symbol-info">
+                <div class="symbol-name">Редкий артефакт</div>
+                <div class="symbol-chance">2% • x50</div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -3598,6 +3806,14 @@ function updateBalanceUI(steamId) {
       animateBalanceCounter(balanceEl, currentValue, newValue);
     }
   }
+  
+  // Обновляем баланс в рулетке
+  currentBalance = parseInt(value) || 0;
+  updateRouletteBalance();
+  
+  // Обновляем баланс в слотах
+  slotsBalance = parseInt(value) || 0;
+  updateSlotsBalance();
 }
 
 // Функция анимации счётчика
@@ -5702,6 +5918,9 @@ window.addEventListener('DOMContentLoaded', () => {
       // Разблокируем рулетку для авторизованных пользователей
       enableRoulette();
       
+      // Разблокируем слоты для авторизованных пользователей
+      enableSlots();
+      
       // Show and update balance
       const balanceEl = document.getElementById('userBalance');
       if (balanceEl) {
@@ -6410,6 +6629,21 @@ let rouletteCards = [];
 let rouletteHistory = []; // История игр
 let lastSpinTime = 0; // Время последнего вращения
 
+// Slots Game Logic
+let isSlotsSpinning = false;
+let slotsBalance = 0;
+let slotsHistory = [];
+let lastSlotsSpinTime = 0;
+
+// Символы для слотов с вероятностями
+const SLOT_SYMBOLS = [
+  { id: 'skull', icon: '💀', weight: 50, multiplier: 2 },
+  { id: 'pda', icon: '📟', weight: 25, multiplier: 4 },
+  { id: 'artifact', icon: '🔮', weight: 15, multiplier: 8 },
+  { id: 'medkit', icon: '💊', weight: 8, multiplier: 15 },
+  { id: 'rare', icon: '💎', weight: 2, multiplier: 50 }
+];
+
 // Инициализация рулетки
 function initRoulette() {
   const savedUser = JSON.parse(localStorage.getItem('steam_user'));
@@ -6434,6 +6668,9 @@ function initRoulette() {
     generateRouletteCards();
   }
   updateRouletteBalance();
+  
+  // Инициализируем слоты
+  initSlots();
 }
 
 // Генерация карточек для рулетки
@@ -6717,6 +6954,14 @@ function enableRoulette() {
   if (betInput) betInput.disabled = false;
 }
 
+// Разблокировка слотов при авторизации
+function enableSlots() {
+  const spinButton = document.getElementById('slotsSpinButton');
+  const betInput = document.getElementById('slotsBetAmount');
+  if (spinButton) spinButton.disabled = false;
+  if (betInput) betInput.disabled = false;
+}
+
 // Блокировка рулетки при выходе
 function disableRoulette() {
   const spinButton = document.getElementById('spinButton');
@@ -6732,6 +6977,20 @@ function disableRoulette() {
   lastSpinTime = 0;
   // Скрываем кулдаун
   hideCooldown();
+}
+
+// Блокировка слотов при выходе
+function disableSlots() {
+  const spinButton = document.getElementById('slotsSpinButton');
+  const betInput = document.getElementById('slotsBetAmount');
+  if (spinButton) spinButton.disabled = true;
+  if (betInput) betInput.disabled = true;
+  slotsBalance = 0;
+  updateSlotsBalance();
+  // Сбрасываем время последнего вращения
+  lastSlotsSpinTime = 0;
+  // Скрываем кулдаун
+  hideSlotsCooldown();
 }
 
 // Загрузка истории игр из базы данных
@@ -6869,6 +7128,346 @@ function hideCooldown() {
   }
 }
 
+// Инициализация слотов
+function initSlots() {
+  const savedUser = JSON.parse(localStorage.getItem('steam_user'));
+  if (savedUser) {
+    slotsBalance = parseInt(loadSouls(savedUser.id)) || 0;
+    updateSlotsBalance();
+    generateSlotSymbols();
+  } else {
+    slotsBalance = 0;
+    updateSlotsBalance();
+    const spinButton = document.getElementById('slotsSpinButton');
+    const betInput = document.getElementById('slotsBetAmount');
+    if (spinButton) spinButton.disabled = true;
+    if (betInput) betInput.disabled = true;
+    showToast('Авторизуйтесь через Steam для игры в слоты');
+  }
+}
+
+// Генерация символов для катушек
+function generateSlotSymbols() {
+  const reels = ['reel1', 'reel2', 'reel3'];
+  reels.forEach(reelId => {
+    const reelSymbols = document.querySelector(`#${reelId} .reel-symbols`);
+    if (reelSymbols) {
+      // Создаем 10 символов для каждой катушки (для плавной анимации)
+      let symbolsHTML = '';
+      for (let i = 0; i < 10; i++) {
+        const symbol = getRandomSymbol();
+        symbolsHTML += `<div class="reel-symbol">${symbol.icon}</div>`;
+      }
+      reelSymbols.innerHTML = symbolsHTML;
+    }
+  });
+}
+
+// Получение случайного символа с учетом весов
+function getRandomSymbol() {
+  const totalWeight = SLOT_SYMBOLS.reduce((sum, symbol) => sum + symbol.weight, 0);
+  let random = Math.random() * totalWeight;
+  
+  for (const symbol of SLOT_SYMBOLS) {
+    random -= symbol.weight;
+    if (random <= 0) {
+      return symbol;
+    }
+  }
+  return SLOT_SYMBOLS[0]; // Fallback
+}
+
+// Обновление баланса слотов
+function updateSlotsBalance() {
+  const balanceEl = document.getElementById('slotsBalance');
+  if (balanceEl) {
+    balanceEl.textContent = slotsBalance;
+  }
+}
+
+// Основная функция запуска слотов
+function startSlotsSpin() {
+  if (isSlotsSpinning) return;
+  
+  // Проверяем авторизацию
+  const savedUser = JSON.parse(localStorage.getItem('steam_user'));
+  if (!savedUser) {
+    showToast('Авторизуйтесь через Steam для игры');
+    return;
+  }
+  
+  // Проверка времени между вращениями
+  const currentTime = Date.now();
+  const timeSinceLastSpin = currentTime - lastSlotsSpinTime;
+  const minTimeBetweenSpins = 3000; // 3 секунды
+  
+  if (timeSinceLastSpin < minTimeBetweenSpins) {
+    const remainingTime = Math.ceil((minTimeBetweenSpins - timeSinceLastSpin) / 1000);
+    showToast(`Подождите ${remainingTime} секунд перед следующим вращением`);
+    showSlotsCooldown(remainingTime);
+    return;
+  }
+  
+  // Проверка баланса
+  if (slotsBalance <= 0) {
+    showToast('Недостаточно Souls для игры. Пополните баланс.');
+    return;
+  }
+  
+  const betInput = document.getElementById('slotsBetAmount');
+  const bet = parseInt(betInput.value);
+  
+  // Валидация ставки
+  if (!bet || bet <= 0) {
+    showToast('Введите корректную ставку');
+    return;
+  }
+  
+  if (bet > slotsBalance) {
+    showToast('Недостаточно средств');
+    return;
+  }
+  
+  if (slotsBalance - bet < 0) {
+    showToast('Ставка приведет к отрицательному балансу');
+    return;
+  }
+  
+  // Максимальная ставка
+  const maxBet = Math.min(slotsBalance, 10000);
+  if (bet > maxBet) {
+    showToast(`Максимальная ставка: ${maxBet} Souls`);
+    return;
+  }
+  
+  // Начинаем игру
+  isSlotsSpinning = true;
+  lastSlotsSpinTime = currentTime;
+  const spinButton = document.getElementById('slotsSpinButton');
+  spinButton.disabled = true;
+  
+  // Списываем ставку
+  slotsBalance -= bet;
+  updateSlotsBalance();
+  updateBalanceUI(getCurrentUserId());
+  
+  // Скрываем предыдущий результат
+  const resultDiv = document.getElementById('slotsResult');
+  resultDiv.style.display = 'none';
+  
+  // Определяем результат заранее
+  const result = calculateSlotsResult();
+  const winAmount = Math.floor(bet * result.multiplier);
+  
+  // Запускаем анимацию
+  animateSlotsSpin(result, bet, winAmount);
+}
+
+// Расчет результата слотов
+function calculateSlotsResult() {
+  const symbols = [];
+  for (let i = 0; i < 3; i++) {
+    symbols.push(getRandomSymbol());
+  }
+  
+  // Проверяем совпадения
+  const counts = {};
+  symbols.forEach(symbol => {
+    counts[symbol.id] = (counts[symbol.id] || 0) + 1;
+  });
+  
+  let multiplier = 0;
+  let matches = 0;
+  let matchedSymbol = null;
+  
+  for (const [symbolId, count] of Object.entries(counts)) {
+    if (count > matches) {
+      matches = count;
+      matchedSymbol = SLOT_SYMBOLS.find(s => s.id === symbolId);
+    }
+  }
+  
+  if (matches === 3) {
+    multiplier = matchedSymbol.multiplier; // Полный коэффициент
+  } else if (matches === 2) {
+    multiplier = matchedSymbol.multiplier / 2; // Половина коэффициента
+  } else {
+    multiplier = 0; // Нет выигрыша
+  }
+  
+  return {
+    symbols: symbols,
+    multiplier: multiplier,
+    matches: matches,
+    matchedSymbol: matchedSymbol
+  };
+}
+
+// Анимация вращения слотов
+function animateSlotsSpin(result, bet, winAmount) {
+  const reels = ['reel1', 'reel2', 'reel3'];
+  const animations = [];
+  
+  // Запускаем анимацию для каждой катушки
+  reels.forEach((reelId, index) => {
+    const reelSymbols = document.querySelector(`#${reelId} .reel-symbols`);
+    if (reelSymbols) {
+      // Устанавливаем финальный символ
+      const finalSymbol = result.symbols[index];
+      
+      // Создаем дополнительные символы для анимации
+      let symbolsHTML = '';
+      for (let i = 0; i < 20; i++) {
+        const symbol = getRandomSymbol();
+        symbolsHTML += `<div class="reel-symbol">${symbol.icon}</div>`;
+      }
+      symbolsHTML += `<div class="reel-symbol">${finalSymbol.icon}</div>`;
+      reelSymbols.innerHTML = symbolsHTML;
+      
+      // Запускаем анимацию
+      const duration = 2000 + (index * 500); // Каждая катушка останавливается позже
+      const startTime = Date.now();
+      const startPosition = -20 * 150; // Начальная позиция
+      const endPosition = -20 * 150 + 150; // Финальная позиция
+      
+      const animate = () => {
+        const elapsed = Date.now() - startTime;
+        const progress = Math.min(elapsed / duration, 1);
+        
+        // Функция easing для плавного замедления
+        const easeOut = 1 - Math.pow(1 - progress, 3);
+        const currentPos = startPosition + (endPosition - startPosition) * easeOut;
+        
+        reelSymbols.style.transform = `translateY(${currentPos}px)`;
+        
+        if (progress < 1) {
+          requestAnimationFrame(animate);
+        } else {
+          // Анимация завершена
+          if (index === reels.length - 1) {
+            // Последняя катушка остановилась - показываем результат
+            setTimeout(() => {
+              finishSlotsSpin(result, bet, winAmount);
+            }, 500);
+          }
+        }
+      };
+      
+      requestAnimationFrame(animate);
+    }
+  });
+}
+
+// Завершение игры в слоты
+function finishSlotsSpin(result, bet, winAmount) {
+  // Обновляем баланс
+  slotsBalance += winAmount;
+  updateSlotsBalance();
+  
+  // Сохраняем на сервере и обновляем UI
+  const userId = getCurrentUserId();
+  if (userId) {
+    saveSouls(userId, slotsBalance);
+    updateBalanceUI(userId);
+    
+    // Показываем анимацию изменения баланса
+    if (winAmount > bet) {
+      showBalanceChangePopup(winAmount - bet, 'positive');
+    } else if (winAmount < bet) {
+      showBalanceChangePopup(winAmount - bet, 'negative');
+    }
+  }
+  
+  // Показываем glow эффект при выигрыше
+  const glowEl = document.getElementById('slotsGlow');
+  if (winAmount > 0 && glowEl) {
+    glowEl.classList.add('win');
+    setTimeout(() => {
+      glowEl.classList.remove('win');
+    }, 2000);
+  }
+  
+  // Показываем результат
+  showSlotsResult(result, bet, winAmount);
+  
+  // Разблокируем кнопку с задержкой
+  setTimeout(() => {
+    isSlotsSpinning = false;
+    const spinButton = document.getElementById('slotsSpinButton');
+    if (spinButton) {
+      spinButton.disabled = false;
+      hideSlotsCooldown();
+    }
+  }, 1000);
+}
+
+// Показ результата слотов
+function showSlotsResult(result, bet, winAmount) {
+  const resultDiv = document.getElementById('slotsResult');
+  const messageEl = document.getElementById('slotsResultMessage');
+  const amountEl = document.getElementById('slotsResultAmount');
+  
+  const isWin = winAmount > bet;
+  
+  if (messageEl) {
+    if (isWin) {
+      if (result.matches === 3) {
+        messageEl.textContent = `ДЖЕКПОТ! ${result.matchedSymbol.icon}x3`;
+      } else {
+        messageEl.textContent = `Выигрыш! ${result.matchedSymbol.icon}x2`;
+      }
+      messageEl.className = 'result-message win';
+    } else {
+      messageEl.textContent = 'Попробуйте еще раз';
+      messageEl.className = 'result-message lose';
+    }
+  }
+  
+  if (amountEl) {
+    const profit = winAmount - bet;
+    amountEl.textContent = profit >= 0 ? `+${profit} Souls` : `${profit} Souls`;
+    amountEl.className = `result-amount ${isWin ? 'win' : 'lose'}`;
+  }
+  
+  resultDiv.style.display = 'block';
+}
+
+// Показать кулдаун для слотов
+function showSlotsCooldown(seconds) {
+  const cooldownEl = document.getElementById('slotsCooldown');
+  const timerEl = document.getElementById('slotsCooldownTimer');
+  const spinButton = document.getElementById('slotsSpinButton');
+  
+  if (cooldownEl && timerEl && spinButton) {
+    spinButton.style.display = 'none';
+    cooldownEl.style.display = 'flex';
+    timerEl.textContent = seconds;
+    
+    // Запускаем обратный отсчет
+    const interval = setInterval(() => {
+      seconds--;
+      timerEl.textContent = seconds;
+      
+      if (seconds <= 0) {
+        clearInterval(interval);
+        cooldownEl.style.display = 'none';
+        spinButton.style.display = 'flex';
+      }
+    }, 1000);
+  }
+}
+
+// Скрыть кулдаун для слотов
+function hideSlotsCooldown() {
+  const cooldownEl = document.getElementById('slotsCooldown');
+  const spinButton = document.getElementById('slotsSpinButton');
+  
+  if (cooldownEl && spinButton) {
+    cooldownEl.style.display = 'none';
+    spinButton.style.display = 'flex';
+  }
+}
+
   function logout() {
     localStorage.removeItem('steam_user');
     // Hide balance when logging out
@@ -6879,6 +7478,9 @@ function hideCooldown() {
     
     // Блокируем рулетку при выходе
     disableRoulette();
+    
+    // Блокируем слоты при выходе
+    disableSlots();
     
     location.reload();
   }
