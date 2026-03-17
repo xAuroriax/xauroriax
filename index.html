@@ -1700,6 +1700,11 @@ input, textarea, select {
   opacity: 1;
 }
 
+#authToast.success {
+  background: rgba(16, 185, 129, 0.6); /* Green semi-transparent */
+  border: 1px solid rgba(16, 185, 129, 0.4);
+}
+
 
 /* Gratitude Box Styles */
 .gratitude-box {
@@ -4931,9 +4936,15 @@ ${motivation}`;
     }
   }
 
-  function showToast(msg) {
+  function showToast(msg, isSuccess = false) {
     const t = document.getElementById('authToast');
+    if (!t) return;
     t.textContent = msg;
+    if (isSuccess) {
+      t.classList.add('success');
+    } else {
+      t.classList.remove('success');
+    }
     t.classList.add('show');
     setTimeout(() => t.classList.remove('show'), 3000);
   }
@@ -4957,17 +4968,15 @@ ${motivation}`;
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ steamId: savedUser.id, code: raw })
       });
-      if (!res.ok) {
-        showToast('Ошибка при проверке промокода. Попробуйте позже.');
-        return;
-      }
+      
       const data = await res.json();
-      if (data && data.ok) {
+      
+      if (res.ok && data && data.ok) {
         if (typeof data.newSouls === 'number') {
           saveSouls(savedUser.id, data.newSouls);
           updateSoulsUI(savedUser.id);
         }
-        showToast(data.message || 'Промокод успешно активирован.');
+        showToast(data.message || 'Промокод успешно активирован.', true);
         input.value = '';
       } else {
         showToast((data && data.message) || 'Промокод недействителен или уже использован.');
