@@ -4743,34 +4743,79 @@ ${motivation}`;
     cancelBtn.onclick = close;
   }
 
+  // Улучшенная единая функция уведомлений
+  function showToast(msg, type = 'success') {
+    const t = document.getElementById('authToast');
+    if (!t) return;
+    
+    t.textContent = msg;
+    t.className = ''; // Reset classes
+    t.classList.add('show');
+    
+    if (type === 'error') {
+      t.classList.add('error');
+    } else if (type === 'success') {
+      t.classList.add('success');
+    }
+    
+    setTimeout(() => t.classList.remove('show'), 5000);
+    
+    // Также дублируем в quentaSuccessMsg для совместимости, если он видим
+    const qToast = document.getElementById('quentaSuccessMsg');
+    if (qToast && qToast.offsetParent !== null) {
+      qToast.textContent = msg;
+      qToast.className = 'show' + (type === 'error' ? ' error' : '');
+      setTimeout(() => qToast.classList.remove('show'), 5000);
+    }
+  }
+
   async function editQuenta() {
     const savedUser = JSON.parse(localStorage.getItem('steam_user'));
-    if (!savedUser) return;
+    if (!savedUser || !savedUser.id) {
+      showToast('Ошибка: Steam ID не найден. Перезайдите на сайт.', 'error');
+      return;
+    }
     
+    console.log('Fetching Quenta Data for:', savedUser.id);
     showToast('Загрузка данных...', 'success');
     
     try {
       const response = await fetch(`https://discordwebhookurl.statkevichyt.workers.dev/get-quenta-data?steamId=${savedUser.id}`);
-      if (!response.ok) throw new Error('Failed to fetch');
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.error || 'Failed to fetch');
+      }
       
       const data = await response.json();
-      if (!data || !data.character) {
-        showToast('Данные квенты не найдены', 'error');
+      if (!data || data.error || (Object.keys(data).length === 0)) {
+        showToast('Данные квенты не найдены: ' + (data?.error || 'пустой ответ'), 'error');
         return;
       }
       
+      // Понимаем и старый, и новый формат (с оберткой и без)
+      const char = data.character || data;
+      
+      // Проверка на наличие основных полей
+      if (!char.name && !char.biography && !char.bio) {
+        showToast('Данные квенты пусты или повреждены', 'error');
+        return;
+      }
+
+      const discordVal = data.discord || char.discord || '';
+      const bioVal = char.biography || char.bio || '';
+
       // Fill form fields
-      document.getElementById('qName').value = data.character.name || '';
-      document.getElementById('qCallsign').value = data.character.callsign || '';
-      document.getElementById('qAge').value = data.character.age || '';
-      document.getElementById('qBirthplace').value = data.character.birthplace || '';
-      document.getElementById('qNationality').value = data.character.nationality || '';
-      document.getElementById('qProfession').value = data.character.profession || '';
-      document.getElementById('qDiscord').value = data.discord || '';
-      document.getElementById('qTraits').value = data.character.traits || '';
-      document.getElementById('qSkills').value = data.character.skills || '';
-      document.getElementById('qBio').value = data.character.biography || '';
-      document.getElementById('qMotivation').value = data.character.motivation || '';
+      document.getElementById('qName').value = char.name || '';
+      document.getElementById('qCallsign').value = char.callsign || '';
+      document.getElementById('qAge').value = char.age || '';
+      document.getElementById('qBirthplace').value = char.birthplace || '';
+      document.getElementById('qNationality').value = char.nationality || '';
+      document.getElementById('qProfession').value = char.profession || '';
+      document.getElementById('qDiscord').value = discordVal;
+      document.getElementById('qTraits').value = char.traits || '';
+      document.getElementById('qSkills').value = char.skills || '';
+      document.getElementById('qBio').value = bioVal;
+      document.getElementById('qMotivation').value = char.motivation || '';
       
       // Update word counters
       updateBioCounter();
@@ -4778,8 +4823,8 @@ ${motivation}`;
       showPage('quenta');
       setQuentaStep(1, true); // Start from step 1 in edit mode
     } catch (e) {
-      console.error(e);
-      showToast('Ошибка загрузки данных', 'error');
+      console.error('Edit Quenta Error:', e);
+      showToast('Ошибка загрузки данных: ' + e.message, 'error');
     }
   }
 
@@ -4795,32 +4840,23 @@ ${motivation}`;
           body: JSON.stringify({ steamId: savedUser.id })
         });
         
+        const resData = await response.json().catch(() => ({}));
+        
         if (response.ok) {
+          console.log('Quenta deleted successfully:', resData);
           localStorage.removeItem(`quenta_status_${savedUser.id}`);
           showToast('Квента успешно удалена', 'success');
           renderQuentaStatus('none');
           showPage('home');
         } else {
-          showToast('Ошибка при удалении квенты', 'error');
+          console.error('Quenta deletion failed:', response.status, resData);
+          showToast('Ошибка при удалении: ' + (resData.error || resData.message || 'сервер вернул ошибку'), 'error');
         }
       } catch (e) {
-        showToast('Ошибка загрузки данных', 'error');
+        console.error('Delete Quenta Error:', e);
+        showToast('Ошибка соединения с сервером при удалении: ' + e.message, 'error');
       }
     });
-  }
-
-  function showToast(message, type = 'success') {
-    const toast = document.getElementById('quentaSuccessMsg');
-    if (toast) {
-      toast.textContent = message;
-      if (type === 'error') {
-        toast.classList.add('error');
-      } else {
-        toast.classList.remove('error');
-      }
-      toast.classList.add('show');
-      setTimeout(() => toast.classList.remove('show'), 5000);
-    }
   }
 
   function validateTextContent(text, minWords = 15) {
@@ -4938,67 +4974,73 @@ ${motivation}`;
       return;
     }
 
-    formError.textContent = 'Отправка квенты...';
+    const payload = {
+      steamId: savedUser.id,
+      steamName: savedUser.name,
+      discord,
+      // Дублируем данные на корневом уровне для обратной совместимости с воркером
+      name,
+      callsign,
+      age,
+      birthplace,
+      nationality,
+      profession,
+      traits,
+      skills,
+      biography: bio,
+      bio: bio,
+      motivation,
+      // И в объекте character
+      character: {
+        name,
+        callsign,
+        age,
+        birthplace,
+        nationality,
+        profession,
+        traits,
+        skills,
+        biography: bio,
+        bio: bio,
+        motivation
+      }
+    };
+
+    console.log('Submitting Quenta Payload:', payload);
 
     try {
       const response = await fetch('https://discordwebhookurl.statkevichyt.workers.dev/submit-quenta', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          steamId: savedUser.id,
-          steamName: savedUser.name,
-          discord,
-          name,
-          callsign,
-          age,
-          birthplace,
-          nationality,
-          profession,
-          traits,
-          skills,
-          bio,
-          motivation
-        })
+        body: JSON.stringify(payload)
       });
 
+      const resData = await response.json().catch(() => ({}));
+
       if (response.ok) {
+        console.log('Quenta submitted successfully:', resData);
         formError.textContent = 'Квента отправлена. Администрация рассмотрит её в Discord.';
         
         // Save status locally
         localStorage.setItem(`quenta_status_${savedUser.id}`, 'pending');
         
         // Show success message at the top
-        const successMsg = document.getElementById('quentaSuccessMsg');
-        if (successMsg) {
-          successMsg.classList.add('show');
-          setTimeout(() => successMsg.classList.remove('show'), 5000);
-        }
+        showToast('Квента успешно отправлена!', 'success');
 
-        // Redirect to profile or show home after a delay
+        // Redirect to profile after a delay
         setTimeout(() => {
           showPage('profile');
           updateSteamUI();
         }, 2000);
       } else {
-        throw new Error('Server error');
+        console.error('Quenta submission failed:', response.status, resData);
+        throw new Error(resData.error || resData.message || 'Server error');
       }
     } catch (e) {
-      console.error(e);
-      formError.textContent = 'Не удалось отправить квенту. Попробуйте позже.';
+      console.error('Submit Quenta Catch Error:', e);
+      formError.textContent = 'Не удалось отправить квенту: ' + e.message;
+      showToast('Ошибка при отправке квенты: ' + e.message, 'error');
     }
-  }
-
-  function showToast(msg, isSuccess = false) {
-    const t = document.getElementById('authToast');
-    if (!t) return;
-    t.textContent = msg;
-    if (isSuccess) {
-      t.classList.add('success');
-    } else {
-      t.classList.remove('success');
-    }
-    t.classList.add('show');
-    setTimeout(() => t.classList.remove('show'), 3000);
   }
 
   async function redeemPromoCode() {
@@ -5028,7 +5070,7 @@ ${motivation}`;
           saveSouls(savedUser.id, data.newSouls);
           updateSoulsUI(savedUser.id);
         }
-        showToast(data.message || 'Промокод успешно активирован.', true);
+        showToast(data.message || 'Промокод успешно активирован.', 'success');
         input.value = '';
       } else {
         showToast((data && data.message) || 'Промокод недействителен или уже использован.');
