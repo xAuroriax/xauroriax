@@ -305,35 +305,6 @@ header.hidden + #navToggleBtn {
   padding: 0 10px;
   word-wrap: break-word;
   }
-
-  function getSoulsStorageKey(steamId) {
-    return 'souls_' + (steamId || 'guest');
-  }
-  function loadSouls(steamId) {
-    const key = getSoulsStorageKey(steamId);
-    const raw = localStorage.getItem(key);
-    if (!raw) return 0;
-    const n = parseInt(raw, 10);
-    if (Number.isNaN(n) || n < 0) return 0;
-    return n;
-  }
-  function saveSouls(steamId, amount) {
-    const key = getSoulsStorageKey(steamId);
-    const safe = Math.max(0, Math.floor(amount||0));
-    localStorage.setItem(key, String(safe));
-  }
-  function initSoulsForUser(steamId) {
-    const current = loadSouls(steamId);
-    if (current < 0 || !Number.isFinite(current)) {
-      saveSouls(steamId, 0);
-    }
-  }
-  function updateSoulsUI(steamId) {
-    const value = loadSouls(steamId);
-    const el = document.getElementById('statsSouls');
-    if (el) el.textContent = value;
-  }
-
 .hero p{
 opacity:.75;
 margin-top:10px;
@@ -2225,9 +2196,9 @@ header nav a:hover, .rules-trigger-btn:hover {
     <div class="container profile-container">
       <h1 data-i18n="profile_title">Личный профиль</h1>
       <div class="profile-header">
-        <img id="profileAvatar" src="" alt="Avatar" class="profile-avatar-big">
-        <div class="profile-info">
-          <h2 id="profileName">Stalker</h2>
+        <img id="profileAvatar" src="" alt="Тундам мой" class="profile-avatar-big">
+          <div class="profile-info">
+            <h2 id="profileName">Диамат</h2>
           <p id="profileSteamId" style="color:var(--orange); font-family:monospace; margin-top:5px"></p>
         </div>
       </div>
@@ -2257,7 +2228,7 @@ header nav a:hover, .rules-trigger-btn:hover {
           </div>
           <div class="stat-card">
             <span>Статус квенты</span>
-            <span id="quentaStatusValue" class="stat-value">—</span>
+            <span id="quentaStatusValue" class="stat-value">не подано</span>
             <div id="profileQuentaActions" style="display:none; margin-top:10px; width: 100%; text-align: right;">
                <button class="quenta-edit-btn" onclick="editQuenta()" title="Изменить квенту">✏️ Изменить</button>
                <button class="quenta-delete-btn" onclick="deleteQuenta()" title="Удалить квенту">Удалить квенту</button>
@@ -2267,11 +2238,11 @@ header nav a:hover, .rules-trigger-btn:hover {
         <p id="passportRoleDesc" style="margin-top:16px"></p>
       </div>
 
-      <div class="card manifest" style="margin-top:20px">
+      <div class="card manifest" style="margin-top:20px; display: flex; flex-direction: column; align-items: center;">
         <h2 class="synd-title">Промокод</h2>
-        <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-top:10px">
-          <input id="promoCodeInput" type="text" placeholder="Введите промокод" style="flex:1;min-width:220px;padding:10px 12px;background:#0a0a0a;border:1px solid #222;border-radius:12px;color:#fff"/>
-          <div class="trace-container" style="display:inline-block">
+        <div style="display:flex;flex-direction:column;gap:10px;align-items:stretch;margin-top:10px;width: 50%;">
+          <input id="promoCodeInput" type="text" placeholder="Введите промокод" style="width:100%;min-width:220px;padding:10px 12px;background:#0a0a0a;border:1px solid #222;border-radius:12px;color:#fff"/>
+          <div class="trace-container" style="display:inline-block;margin:0 auto;">
             <div class="trace-line"><svg><rect class="comet-1"></rect><rect class="comet-2"></rect></svg></div>
             <button class="btn-cta btn-cta-inner" type="button" onclick="redeemPromoCode()">Активировать</button>
           </div>
@@ -2458,6 +2429,36 @@ STARFALL SYNDICATE | AURORIA
 </footer>
 
 <script>
+function getSoulsStorageKey(steamId) {
+  return `user-souls:${steamId}`;
+}
+function loadSouls(steamId) {
+  const key = getSoulsStorageKey(steamId);
+  const raw = localStorage.getItem(key);
+  if (!raw) return 0;
+  const n = parseInt(raw, 10);
+  if (Number.isNaN(n) || n < 0) return 0;
+  return n;
+}
+function saveSouls(steamId, amount) {
+  const key = getSoulsStorageKey(steamId);
+  const safe = Math.max(0, Math.floor(amount||0));
+  localStorage.setItem(key, String(safe));
+}
+function initSoulsForUser(steamId) {
+  const current = loadSouls(steamId);
+  if (current < 0 || !Number.isFinite(current)) {
+    saveSouls(steamId, 0);
+  }
+}
+
+
+function updateSoulsUI(steamId) {
+  const value = loadSouls(steamId);
+  const el = document.getElementById('statsSouls');
+  if (el) el.textContent = value;
+}
+
 /* rules data */
 let serverRulesContent = '';
 let serverSidebarContent = '';
