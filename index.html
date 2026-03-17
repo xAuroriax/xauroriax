@@ -3286,7 +3286,7 @@ window.addEventListener('DOMContentLoaded', () => {
   async function fetchNotifications(steamId) {
     if (!steamId) return;
     try {
-      const response = await fetch(`https://discordwebhookurl.statkevichyt.workers.dev/get-notifications?steamId=${steamId}`);
+      const response = await fetch(`https://xauroriax.statkevichyt.workers.dev/get-notifications?steamId=${steamId}`);
       if (response.ok) {
         const notifications = await response.json();
         
@@ -3315,12 +3315,12 @@ window.addEventListener('DOMContentLoaded', () => {
 
     try {
       // Fetch notifications, find unread, mark them
-      const res = await fetch(`https://discordwebhookurl.statkevichyt.workers.dev/get-notifications?steamId=${savedUser.id}`);
+      const res = await fetch(`https://xauroriax.statkevichyt.workers.dev/get-notifications?steamId=${savedUser.id}`);
       const notifs = await res.json();
       const unread = notifs.filter(n => !n.read);
       
       for (const n of unread) {
-        await fetch('https://discordwebhookurl.statkevichyt.workers.dev/mark-notif-read', {
+        await fetch('https://xauroriax.statkevichyt.workers.dev/mark-notif-read', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ steamId: savedUser.id, notifId: n.id })
@@ -3392,7 +3392,7 @@ window.addEventListener('DOMContentLoaded', () => {
     if (!savedUser) return;
 
     try {
-      const response = await fetch(`https://discordwebhookurl.statkevichyt.workers.dev/delete-notification`, {
+      const response = await fetch(`https://xauroriax.statkevichyt.workers.dev/delete-notification`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ steamId: savedUser.id, notifId })
@@ -3429,7 +3429,7 @@ window.addEventListener('DOMContentLoaded', () => {
     if (!savedUser) return;
     
     try {
-      await fetch('https://discordwebhookurl.statkevichyt.workers.dev/mark-notif-read', {
+      await fetch('https://xauroriax.statkevichyt.workers.dev/mark-notif-read', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ steamId: savedUser.id, notifId })
@@ -3444,7 +3444,7 @@ window.addEventListener('DOMContentLoaded', () => {
   async function checkQuentaStatus(steamId) {
     if (!steamId) return;
     try {
-      const response = await fetch(`https://discordwebhookurl.statkevichyt.workers.dev/get-quenta-status?steamId=${steamId}`);
+      const response = await fetch(`https://xauroriax.statkevichyt.workers.dev/get-quenta-status?steamId=${steamId}`);
       if (response.ok) {
         const data = await response.json();
         if (data.status) {
@@ -3844,7 +3844,7 @@ ${motivation}`;
     showToast('Загрузка данных...', 'success');
     
     try {
-      const response = await fetch(`https://discordwebhookurl.statkevichyt.workers.dev/get-quenta-data?steamId=${savedUser.id}`);
+      const response = await fetch(`https://xauroriax.statkevichyt.workers.dev/get-quenta-data?steamId=${savedUser.id}`);
       if (!response.ok) throw new Error('Failed to fetch');
       
       const data = await response.json();
@@ -3883,7 +3883,7 @@ ${motivation}`;
 
     showCustomConfirm('Вы уверены, что хотите удалить квенту? Это действие необратимо.', async () => {
       try {
-        const response = await fetch(`https://discordwebhookurl.statkevichyt.workers.dev/delete-quenta`, {
+        const response = await fetch(`https://xauroriax.statkevichyt.workers.dev/delete-quenta`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ steamId: savedUser.id })
@@ -3957,7 +3957,7 @@ ${motivation}`;
 
       try {
         // Fetch status directly from worker
-        const response = await fetch(`https://discordwebhookurl.statkevichyt.workers.dev/get-quenta-status?steamId=${savedUser.id}`);
+        const response = await fetch(`https://xauroriax.statkevichyt.workers.dev/get-quenta-status?steamId=${savedUser.id}`);
         const data = await response.json();
         const status = data.status || 'none';
         
@@ -4000,7 +4000,7 @@ ${motivation}`;
     
     // Final status check before submit
     try {
-      const statusRes = await fetch(`https://discordwebhookurl.statkevichyt.workers.dev/get-quenta-status?steamId=${savedUser.id}`);
+      const statusRes = await fetch(`https://xauroriax.statkevichyt.workers.dev/get-quenta-status?steamId=${savedUser.id}`);
       const statusData = await statusRes.json();
       if (statusData.status === 'pending') {
         showToast('Вы уже подали заявку, ждите решения администрации', 'success');
@@ -4035,7 +4035,7 @@ ${motivation}`;
     formError.textContent = 'Отправка квенты...';
 
     try {
-      const response = await fetch('https://discordwebhookurl.statkevichyt.workers.dev/submit-quenta', {
+      const response = await fetch('https://xauroriax.statkevichyt.workers.dev/submit-quenta', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
