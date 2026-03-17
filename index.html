@@ -5302,16 +5302,19 @@ ${motivation}`;
 
   async function adminUpdateUser() {
     const steamId = document.getElementById('adminSearchId').value.trim();
+    const soulsVal = parseInt(document.getElementById('adminUserSouls').value);
+    const statsVal = {
+      passed: parseInt(document.getElementById('adminUserPassed').value),
+      failed: parseInt(document.getElementById('adminUserFailed').value),
+      best: parseInt(document.getElementById('adminUserBest').value),
+      roleId: document.getElementById('adminUserRole').value
+    };
+
     const payload = {
       adminId: '76561199427395346',
       steamId: steamId,
-      souls: parseInt(document.getElementById('adminUserSouls').value),
-      stats: {
-        passed: parseInt(document.getElementById('adminUserPassed').value),
-        failed: parseInt(document.getElementById('adminUserFailed').value),
-        best: parseInt(document.getElementById('adminUserBest').value),
-        roleId: document.getElementById('adminUserRole').value
-      },
+      souls: soulsVal,
+      stats: statsVal,
       isBanned: document.getElementById('adminUserBan').value === "1"
     };
 
@@ -5325,6 +5328,15 @@ ${motivation}`;
 
       if (res.ok) {
         showToast('Данные игрока обновлены!', 'success');
+        
+        // Если админ редактирует СЕБЯ, обновляем localStorage и UI
+        const savedUser = JSON.parse(localStorage.getItem('steam_user'));
+        if (savedUser && savedUser.id === steamId) {
+          saveSouls(steamId, soulsVal);
+          localStorage.setItem('exam_stats', JSON.stringify(statsVal));
+          updateSoulsUI(steamId);
+          updateSteamUI();
+        }
       } else {
         throw new Error('Ошибка сервера при сохранении');
       }
