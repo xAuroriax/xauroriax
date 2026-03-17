@@ -4351,14 +4351,14 @@ window.addEventListener('DOMContentLoaded', () => {
       const response = await fetch(`https://discordwebhookurl.statkevichyt.workers.dev/get-quenta-status?steamId=${steamId}`);
       if (response.ok) {
         const data = await response.json();
-        if (data.status) {
-          const oldStatus = localStorage.getItem(`quenta_status_${steamId}`);
-          localStorage.setItem(`quenta_status_${steamId}`, data.status);
-          
-          // Only update UI if status actually changed to avoid unnecessary flicker
-          if (oldStatus !== data.status) {
-            renderQuentaStatus(data.status);
-          }
+        // Новый воркер возвращает { status: "..." }
+        const status = data.status || 'none';
+        const oldStatus = localStorage.getItem(`quenta_status_${steamId}`);
+        localStorage.setItem(`quenta_status_${steamId}`, status);
+        
+        // Update UI if status changed
+        if (oldStatus !== status) {
+          renderQuentaStatus(status);
         }
       }
     } catch (e) {
@@ -4782,20 +4782,20 @@ ${motivation}`;
     try {
       const response = await fetch(`https://discordwebhookurl.statkevichyt.workers.dev/get-quenta-data?steamId=${savedUser.id}`);
       if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        throw new Error(errorData.error || 'Failed to fetch');
+        const errorText = await response.text();
+        throw new Error(errorText || 'Failed to fetch');
       }
       
-      const data = await response.json();
-      if (!data || data.error || (Object.keys(data).length === 0)) {
-        showToast('Данные квенты не найдены: ' + (data?.error || 'пустой ответ'), 'error');
+      let data = await response.json();
+      if (!data) {
+        showToast('Данные квенты не найдены', 'error');
         return;
       }
-      
-      // Понимаем и старый, и новый формат (с оберткой и без)
+
+      // Новый воркер сохраняет весь объект, пришедший с фронта
+      // В нем есть character, а также дублированные поля в корне.
       const char = data.character || data;
       
-      // Проверка на наличие основных полей
       if (!char.name && !char.biography && !char.bio) {
         showToast('Данные квенты пусты или повреждены', 'error');
         return;
@@ -4834,27 +4834,26 @@ ${motivation}`;
 
     showCustomConfirm('Вы уверены, что хотите удалить квенту? Это действие необратимо.', async () => {
       try {
+        // В предоставленном воркере нет /delete-quenta, 
+        // но мы будем использовать /submit-quenta с флагом удаления или просто уведомление.
+        // Пока оставим запрос, но пользователю нужно будет добавить этот метод в воркер.
         const response = await fetch(`https://discordwebhookurl.statkevichyt.workers.dev/delete-quenta`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ steamId: savedUser.id })
         });
         
-        const resData = await response.json().catch(() => ({}));
-        
         if (response.ok) {
-          console.log('Quenta deleted successfully:', resData);
           localStorage.removeItem(`quenta_status_${savedUser.id}`);
           showToast('Квента успешно удалена', 'success');
           renderQuentaStatus('none');
           showPage('home');
         } else {
-          console.error('Quenta deletion failed:', response.status, resData);
-          showToast('Ошибка при удалении: ' + (resData.error || resData.message || 'сервер вернул ошибку'), 'error');
+          showToast('Ошибка при удалении: сервер не поддерживает этот метод', 'error');
         }
       } catch (e) {
         console.error('Delete Quenta Error:', e);
-        showToast('Ошибка соединения с сервером при удалении: ' + e.message, 'error');
+        showToast('Ошибка соединения при удалении', 'error');
       }
     });
   }
