@@ -2,12 +2,11 @@
 <html lang="ru">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Starfall Syndicate | Auroria</title>
 
 <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Orbitron:wght@400;600&display=swap" rel="stylesheet">
 <link rel="icon" type="image/png" href="favicon.png">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
   
 <style>
 :root{
@@ -1629,6 +1628,10 @@ header nav a:hover, .rules-trigger-btn:hover {
   padding:10px 12px;
 }
 
+input, textarea, select {
+  font-size: 16px !important;
+}
+
 .promo-container {
   display: flex;
   flex-direction: column;
@@ -1653,6 +1656,7 @@ header nav a:hover, .rules-trigger-btn:hover {
   color: #fff;
   text-align: center;
   font-family: 'Share Tech Mono', monospace;
+  font-size: 16px;
 }
 
 .logout-container {
@@ -1764,8 +1768,8 @@ header nav a:hover, .rules-trigger-btn:hover {
     overflow-x: hidden;
     position: relative;
     width: 100%;
-    /* Prevent zooming out beyond 1:1 */
-    touch-action: pan-x pan-y;
+    /* Allow zooming and panning */
+    touch-action: auto;
   }
 
   .steam-login-container {
@@ -4046,19 +4050,24 @@ window.addEventListener('DOMContentLoaded', () => {
 
   // Steam Auth Handler
   function checkSteamAuth() {
-    const urlParams = new URLSearchParams(window.location.search);
-    const steamId = urlParams.get('steamid');
-    const persona = urlParams.get('nickname');
-    const avatar = urlParams.get('avatar');
+    try {
+      const urlParams = new URLSearchParams(window.location.search);
+      const steamId = urlParams.get('steamid');
+      const persona = urlParams.get('nickname');
+      const avatar = urlParams.get('avatar');
 
-    if (steamId) {
-      localStorage.setItem('steam_user', JSON.stringify({ 
-        id: steamId, 
-        name: persona || 'Stalker',
-        avatar: avatar || ''
-      }));
-      // Clean URL
-      window.history.replaceState({}, document.title, window.location.pathname);
+      if (steamId && steamId.length > 5) {
+        localStorage.setItem('steam_user', JSON.stringify({ 
+          id: steamId, 
+          name: persona || 'Stalker',
+          avatar: avatar || ''
+        }));
+        // Clean URL but keep the current path correctly
+        const cleanUrl = window.location.protocol + "//" + window.location.host + window.location.pathname;
+        window.history.replaceState({}, document.title, cleanUrl);
+      }
+    } catch (e) {
+      console.error("Auth check error:", e);
     }
 
     updateSteamUI();
