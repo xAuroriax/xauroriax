@@ -2913,7 +2913,7 @@ input, textarea, select {
 
   <div class="trace-container">
     <div class="trace-line"><svg><rect class="comet-1"></rect><rect class="comet-2"></rect></svg></div>
-    <a id="steamLoginBtn" href="https://steamcommunity.com/openid/login?openid.ns=http://specs.openid.net/auth/2.0&openid.mode=checkid_setup&openid.return_to=https://xauroriax.statkevichyt.workers.dev/steam-callback&openid.realm=https://xauroriax.statkevichyt.workers.dev/&openid.identity=http://specs.openid.net/auth/2.0/identifier_select&openid.claimed_id=http://specs.openid.net/auth/2.0/identifier_select" class="steam-login-btn">
+    <a id="steamLoginBtn" href="https://steamcommunity.com/openid/login?openid.ns=http://specs.openid.net/auth/2.0&openid.mode=checkid_setup&openid.return_to=https://api.xauroriax.ru/steam-callback&openid.realm=https://api.xauroriax.ru/&openid.identity=http://specs.openid.net/auth/2.0/identifier_select&openid.claimed_id=http://specs.openid.net/auth/2.0/identifier_select" class="steam-login-btn">
       <i class="fab fa-steam"></i>
       <span id="steamBtnText" data-i18n="login_steam">Войти через Steam</span>
     </a>
@@ -3796,8 +3796,10 @@ function updateBalanceUI(steamId) {
     if (currentValue !== newValue) {
       const difference = newValue - currentValue;
       
-      // Показываем всплывающий текст
-      showBalanceChangePopup(difference);
+      // Показываем всплывающий текст (только если это не автоматическое обновление)
+      if (window.showBalanceChangePopup && !window.skipBalanceAnimation) {
+        showBalanceChangePopup(difference);
+      }
       
       // Добавляем glow эффект
       addBalanceGlow(balanceContainer, difference);
@@ -3807,13 +3809,17 @@ function updateBalanceUI(steamId) {
     }
   }
   
-  // Обновляем баланс в рулетке
-  currentBalance = parseInt(value) || 0;
-  updateRouletteBalance();
+  // Обновляем баланс в рулетке (если он отличается)
+  if (currentBalance !== parseInt(value)) {
+    currentBalance = parseInt(value) || 0;
+    updateRouletteBalance();
+  }
   
-  // Обновляем баланс в слотах
-  slotsBalance = parseInt(value) || 0;
-  updateSlotsBalance();
+  // Обновляем баланс в слотах (если он отличается)
+  if (slotsBalance !== parseInt(value)) {
+    slotsBalance = parseInt(value) || 0;
+    updateSlotsBalance();
+  }
 }
 
 // Функция анимации счётчика
@@ -5610,7 +5616,7 @@ window.addEventListener('DOMContentLoaded', () => {
   async function fetchNotifications(steamId) {
     if (!steamId) return;
     try {
-      const response = await fetch(`https://discordwebhookurl.statkevichyt.workers.dev/get-notifications?steamId=${steamId}`);
+      const response = await fetch(`https://discord.xauroriax.ru/get-notifications?steamId=${steamId}`);
       if (response.ok) {
         let notifications = await response.json();
         
@@ -5625,7 +5631,11 @@ window.addEventListener('DOMContentLoaded', () => {
           return n;
         });
 
-        // 3. Логика звука
+        // 3. Очищаем старые уведомления (старше 7 дней)
+        const sevenDaysAgo = Date.now() - 7 * 24 * 60 * 60 * 1000;
+        notifications = notifications.filter(n => n.timestamp > sevenDaysAgo);
+
+        // 4. Логика звука
         const unread = notifications.filter(n => !n.read);
         if (unread.length > 0) {
           const newest = unread.sort((a, b) => b.timestamp - a.timestamp)[0];
@@ -5651,7 +5661,7 @@ window.addEventListener('DOMContentLoaded', () => {
     if (badge) badge.style.display = 'none';
 
     try {
-      const res = await fetch(`https://discordwebhookurl.statkevichyt.workers.dev/get-notifications?steamId=${savedUser.id}`);
+      const res = await fetch(`https://discord.xauroriax.ru/get-notifications?steamId=${savedUser.id}`);
       const notifs = await res.json();
       const unread = notifs.filter(n => !n.read);
       
@@ -5669,7 +5679,7 @@ window.addEventListener('DOMContentLoaded', () => {
       localStorage.setItem('last_heard_notif_id', lastHeardNotifId);
 
       await Promise.all(unread.map(n => 
-        fetch('https://discordwebhookurl.statkevichyt.workers.dev/mark-notif-read', {
+        fetch('https://discord.xauroriax.ru/mark-notif-read', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ steamId: savedUser.id, notifId: n.id })
@@ -5756,7 +5766,7 @@ window.addEventListener('DOMContentLoaded', () => {
     fetchNotifications(savedUser.id);
 
     try {
-      await fetch('https://discordwebhookurl.statkevichyt.workers.dev/delete-notification', {
+      await fetch('https://discord.xauroriax.ru/delete-notification', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ steamId: savedUser.id, notifId: String(notifId) })
@@ -5804,7 +5814,7 @@ window.addEventListener('DOMContentLoaded', () => {
     fetchNotifications(savedUser.id);
 
     try {
-      await fetch('https://discordwebhookurl.statkevichyt.workers.dev/mark-notif-read', {
+      await fetch('https://discord.xauroriax.ru/mark-notif-read', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ steamId: savedUser.id, notifId: String(notifId) })
@@ -5817,10 +5827,10 @@ window.addEventListener('DOMContentLoaded', () => {
   async function checkQuentaStatus(steamId) {
     if (!steamId) return;
     try {
-      const response = await fetch(`https://discordwebhookurl.statkevichyt.workers.dev/get-quenta-status?steamId=${steamId}`);
+      const response = await fetch(`https://discord.xauroriax.ru/get-quenta-status?steamId=${steamId}`);
       if (response.ok) {
         const data = await response.json();
-        // Новый воркер возвращает { status: "..." }
+        // Новый воркер возвращает { status: "...", reason?: "..." }
         const status = data.status || 'none';
         const oldStatus = localStorage.getItem(`quenta_status_${steamId}`);
         localStorage.setItem(`quenta_status_${steamId}`, status);
@@ -5828,6 +5838,21 @@ window.addEventListener('DOMContentLoaded', () => {
         // Update UI if status changed
         if (oldStatus !== status) {
           renderQuentaStatus(status);
+          
+          // Если квенту отклонили, показываем мгновенное уведомление с причиной
+          if (status === 'rejected' && oldStatus !== 'rejected') {
+            const reason = data.reason || 'Причина не указана';
+            const lang = localStorage.getItem('lang') || 'ru';
+            const message = lang === 'en' 
+              ? `Your quenta was rejected. Reason: ${reason}`
+              : `Ваша квента отклонена. Причина: ${reason}`;
+            
+            showToast(message, 'error');
+            
+            // Блокируем повторную отправку на 5 минут
+            const blockKey = `quenta_blocked_${steamId}`;
+            localStorage.setItem(blockKey, Date.now() + 5 * 60 * 1000);
+          }
         }
       }
     } catch (e) {
@@ -5994,7 +6019,7 @@ window.addEventListener('DOMContentLoaded', () => {
   async function syncUserData(steamId) {
     if (!steamId) return;
     try {
-      const response = await fetch(`https://xauroriax.statkevichyt.workers.dev/get-user-data?steamId=${steamId}`);
+      const response = await fetch(`https://api.xauroriax.ru/get-user-data?steamId=${steamId}`);
       if (response.ok) {
         const data = await response.json();
         
@@ -6320,7 +6345,7 @@ ${motivation}`;
     showToast(i18n[localStorage.getItem('lang')||'ru'].toast_loading_data, 'success');
     
     try {
-      const response = await fetch(`https://discordwebhookurl.statkevichyt.workers.dev/get-quenta-data?steamId=${savedUser.id}`);
+      const response = await fetch(`https://discord.xauroriax.ru/get-quenta-data?steamId=${savedUser.id}`);
       if (!response.ok) {
         const errorText = await response.text();
         throw new Error(errorText || 'Failed to fetch');
@@ -6378,7 +6403,7 @@ ${motivation}`;
         // В предоставленном воркере нет /delete-quenta, 
         // но мы будем использовать /submit-quenta с флагом удаления или просто уведомление.
         // Пока оставим запрос, но пользователю нужно будет добавить этот метод в воркер.
-        const response = await fetch(`https://discordwebhookurl.statkevichyt.workers.dev/delete-quenta`, {
+        const response = await fetch(`https://discord.xauroriax.ru/delete-quenta`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ steamId: savedUser.id })
@@ -6440,7 +6465,7 @@ ${motivation}`;
 
       try {
         // Fetch status directly from worker
-        const response = await fetch(`https://discordwebhookurl.statkevichyt.workers.dev/get-quenta-status?steamId=${savedUser.id}`);
+        const response = await fetch(`https://discord.xauroriax.ru/get-quenta-status?steamId=${savedUser.id}`);
         const data = await response.json();
         const status = data.status || 'none';
         
@@ -6481,9 +6506,22 @@ ${motivation}`;
     if (!ensureSteamForQuenta()) return;
     const savedUser = JSON.parse(localStorage.getItem('steam_user'));
     
+    // Проверяем блокировку после отклонения
+    const blockKey = `quenta_blocked_${savedUser.id}`;
+    const blockUntil = parseInt(localStorage.getItem(blockKey) || '0');
+    if (blockUntil > Date.now()) {
+      const minutesLeft = Math.ceil((blockUntil - Date.now()) / (60 * 1000));
+      const lang = localStorage.getItem('lang') || 'ru';
+      const message = lang === 'en' 
+        ? `Please wait ${minutesLeft} minutes before resubmitting`
+        : `Подождите ${minutesLeft} минут перед повторной отправкой`;
+      showToast(message, 'error');
+      return;
+    }
+    
     // Final status check before submit
     try {
-      const statusRes = await fetch(`https://discordwebhookurl.statkevichyt.workers.dev/get-quenta-status?steamId=${savedUser.id}`);
+      const statusRes = await fetch(`https://discord.xauroriax.ru/get-quenta-status?steamId=${savedUser.id}`);
       const statusData = await statusRes.json();
       if (statusData.status === 'pending') {
         showToast(i18n[lang].toast_already_submitted, 'success');
@@ -6550,7 +6588,7 @@ ${motivation}`;
     console.log('Submitting Quenta Payload:', payload);
 
     try {
-      const response = await fetch('https://discordwebhookurl.statkevichyt.workers.dev/submit-quenta', {
+      const response = await fetch('https://discord.xauroriax.ru/submit-quenta', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload)
@@ -6560,19 +6598,22 @@ ${motivation}`;
 
       if (response.ok) {
         console.log('Quenta submitted successfully:', resData);
-        formError.textContent = i18n[lang].quenta_msg_review;
         
-        // Save status locally
+        // Показываем сообщение об успешной отправке
+        const lang = localStorage.getItem('lang') || 'ru';
+        const successMessage = lang === 'en' 
+          ? 'You have successfully submitted your quenta, wait for admin approval'
+          : 'Вы успешно отправили квенту, ждите подтверждения администрации';
+        showToast(successMessage, 'success');
+        
+        // Сохраняем статус локально
         localStorage.setItem(`quenta_status_${savedUser.id}`, 'pending');
         
-        // Show success message at the top
-        showToast(i18n[localStorage.getItem('lang')||'ru'].toast_quenta_success, 'success');
-
-        // Redirect to profile after a delay
+        // Сразу редирект на профиль
         setTimeout(() => {
           showPage('profile');
           updateSteamUI();
-        }, 2000);
+        }, 1500);
       } else {
         console.error('Quenta submission failed:', response.status, resData);
         throw new Error(resData.error || resData.message || 'Server error');
@@ -6598,7 +6639,7 @@ ${motivation}`;
       return;
     }
     try {
-      const res = await fetch('https://xauroriax.statkevichyt.workers.dev/redeem-code', {
+      const res = await fetch('https://api.xauroriax.ru/redeem-code', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ steamId: savedUser.id, code: raw })
@@ -6648,6 +6689,7 @@ const SLOT_SYMBOLS = [
 function initRoulette() {
   const savedUser = JSON.parse(localStorage.getItem('steam_user'));
   if (savedUser) {
+    // Используем основной баланс, а не отдельную переменную
     currentBalance = parseInt(loadSouls(savedUser.id)) || 0;
     updateRouletteBalance();
     loadRouletteHistory(savedUser.id); // Загружаем историю
@@ -6786,10 +6828,35 @@ function startRouletteSpin() {
   const spinButton = document.getElementById('spinButton');
   spinButton.disabled = true;
   
-  // Списываем ставку
-  currentBalance -= bet;
-  updateRouletteBalance();
-  updateBalanceUI(getCurrentUserId());
+  // Сразу списываем ставку и сохраняем в базу
+  const userId = getCurrentUserId();
+  if (userId) {
+    const currentServerBalance = parseInt(loadSouls(userId)) || 0;
+    const newBalance = currentServerBalance - bet;
+    
+    // Проверяем еще раз баланс перед списанием
+    if (newBalance < 0) {
+      showToast('Недостаточно средств');
+      isSpinning = false;
+      spinButton.disabled = false;
+      return;
+    }
+    
+    // Сохраняем в базу
+    saveSouls(userId, newBalance);
+    
+    // Обновляем локальные переменные
+    currentBalance = newBalance;
+    updateRouletteBalance();
+    
+    // Обновляем основной UI без дублирования анимаций
+    window.skipBalanceAnimation = true;
+    updateBalanceUI(userId);
+    window.skipBalanceAnimation = false;
+    
+    // Показываем анимацию списания
+    showBalanceChangePopup(-bet, 'negative');
+  }
   
   // Скрываем предыдущий результат
   const resultDiv = document.getElementById('rouletteResult');
@@ -6865,7 +6932,13 @@ function animateRouletteSpin(result, bet, winAmount) {
     if (progress < 1) {
       requestAnimationFrame(animate);
     } else {
-      // Анимация завершена
+      // Анимация завершена - устанавливаем финальную позицию
+      strip.style.transform = `translateX(${finalPosition}px)`;
+      
+      // Убедимся что карточки видны
+      strip.style.opacity = '1';
+      strip.style.visibility = 'visible';
+      
       finishRouletteSpin(result, bet, winAmount);
     }
   }
@@ -6875,31 +6948,39 @@ function animateRouletteSpin(result, bet, winAmount) {
 
 // Завершение игры
 function finishRouletteSpin(result, bet, winAmount) {
-  // Обновляем баланс
-  currentBalance += winAmount;
-  updateRouletteBalance();
-  
-  // Сохраняем на сервере и обновляем UI
   const userId = getCurrentUserId();
+  
+  // Начисляем выигрыш (ставка уже списана)
   if (userId) {
-    saveSouls(userId, currentBalance);
+    // Получаем текущий баланс (уже со списанной ставкой)
+    const currentServerBalance = parseInt(loadSouls(userId)) || 0;
+    const newBalance = currentServerBalance + winAmount;
+    
+    // Сохраняем в базу
+    saveSouls(userId, newBalance);
+    
+    // Обновляем локальные переменные
+    currentBalance = newBalance;
+    updateRouletteBalance();
+    
+    // Обновляем основной UI без дублирования анимаций
+    window.skipBalanceAnimation = true;
     updateBalanceUI(userId);
+    window.skipBalanceAnimation = false;
     
     // Сохраняем результат в историю
     const historyResult = {
       bet: bet,
       multiplier: result.multiplier,
       winAmount: winAmount,
-      isWin: winAmount > bet,
+      isWin: winAmount > 0,
       timestamp: Date.now()
     };
     saveRouletteResult(userId, historyResult);
     
     // Показываем анимацию изменения баланса
-    if (winAmount > bet) {
-      showBalanceChangePopup(winAmount - bet, 'positive');
-    } else if (winAmount < bet) {
-      showBalanceChangePopup(winAmount - bet, 'negative');
+    if (winAmount > 0) {
+      showBalanceChangePopup(winAmount, 'positive');
     }
   }
   
@@ -6996,7 +7077,7 @@ function disableSlots() {
 // Загрузка истории игр из базы данных
 async function loadRouletteHistory(steamId) {
   try {
-    const response = await fetch(`https://xauroriax.statkevichyt.workers.dev/roulette-history/${steamId}`);
+    const response = await fetch(`https://api.xauroriax.ru/roulette-history/${steamId}`);
     if (response.ok) {
       const data = await response.json();
       rouletteHistory = data.history || [];
@@ -7016,7 +7097,7 @@ async function loadRouletteHistory(steamId) {
 // Сохранение результата игры в базу данных
 async function saveRouletteResult(steamId, result) {
   try {
-    const response = await fetch('https://xauroriax.statkevichyt.workers.dev/roulette-save', {
+    const response = await fetch('https://api.xauroriax.ru/roulette-save', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -7506,7 +7587,7 @@ function hideSlotsCooldown() {
     updateSteamUI();
 
     try {
-      await fetch('https://xauroriax.statkevichyt.workers.dev/submit-test', {
+      await fetch('https://api.xauroriax.ru/submit-test', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ steamId, score, passed: score >= 18 })
@@ -7567,8 +7648,8 @@ function hideSlotsCooldown() {
     try {
       // Запрашиваем данные сразу из двух воркеров
       const [soulsRes, quentaRes] = await Promise.all([
-        fetch(`https://xauroriax.statkevichyt.workers.dev/admin-get-user?steamId=${steamId}&adminId=76561199427395346`),
-        fetch(`https://discordwebhookurl.statkevichyt.workers.dev/get-quenta-data?steamId=${steamId}`)
+        fetch(`https://api.xauroriax.ru/admin-get-user?steamId=${steamId}&adminId=76561199427395346`),
+        fetch(`https://discord.xauroriax.ru/get-quenta-data?steamId=${steamId}`)
       ]);
 
       if (!soulsRes.ok) throw new Error('Игрок не найден в базе душ');
@@ -7617,7 +7698,7 @@ function hideSlotsCooldown() {
 
     showToast(i18n[localStorage.getItem('lang')||'ru'].toast_admin_saving, 'success');
     try {
-      const res = await fetch(`https://xauroriax.statkevichyt.workers.dev/admin-update-user`, {
+      const res = await fetch(`https://api.xauroriax.ru/admin-update-user`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload)
@@ -7648,12 +7729,12 @@ function hideSlotsCooldown() {
       const steamId = document.getElementById('adminSearchId').value.trim();
       showToast(i18n[lang].toast_admin_resetting, 'success');
       try {
-        await fetch(`https://xauroriax.statkevichyt.workers.dev/admin-reset-user`, {
+        await fetch(`https://api.xauroriax.ru/admin-reset-user`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ adminId: '76561199427395346', steamId })
         });
-        await fetch(`https://discordwebhookurl.statkevichyt.workers.dev/delete-quenta`, {
+        await fetch(`https://discord.xauroriax.ru/delete-quenta`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ steamId })
