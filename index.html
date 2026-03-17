@@ -4111,9 +4111,18 @@ window.addEventListener('DOMContentLoaded', () => {
   let lastHeardNotifId = localStorage.getItem('last_heard_notif_id') || null;
 
   function playNotificationSound() {
-    const audio = new Audio('notification.mp3');
-    audio.volume = 0.5;
-    audio.play().catch(e => console.warn('Audio play blocked:', e));
+    try {
+      const audio = new Audio('notification.mp3');
+      audio.volume = 0.5;
+      const promise = audio.play();
+      if (promise !== undefined) {
+        promise.catch(e => {
+          console.warn('Audio play blocked. Need user interaction.', e);
+        });
+      }
+    } catch (err) {
+      console.warn('Failed to play sound:', err);
+    }
   }
 
   function toggleNotifPopup(e) {
@@ -4121,13 +4130,11 @@ window.addEventListener('DOMContentLoaded', () => {
     const popup = document.getElementById('notifPopup');
     const isActive = popup.classList.toggle('active');
     
-    // If opening popup, mark all as read
     if (isActive) {
       markAllAsRead();
     }
   }
 
-  // Close popup when clicking outside
   document.addEventListener('click', () => {
     const popup = document.getElementById('notifPopup');
     if (popup) popup.classList.remove('active');
@@ -4138,24 +4145,28 @@ window.addEventListener('DOMContentLoaded', () => {
     try {
       const response = await fetch(`https://discordwebhookurl.statkevichyt.workers.dev/get-notifications?steamId=${steamId}`);
       if (response.ok) {
-        const notifications = await response.json();
+        let notifications = await response.json();
         
-        // Находим самое свежее непрочитанное уведомление
+        // 1. Фильтруем удаленные локально
+        const localDeleted = JSON.parse(localStorage.getItem('local_deleted_ids') || '[]');
+        notifications = notifications.filter(n => !localDeleted.includes(String(n.id)));
+
+        // 2. Помечаем прочитанные локально
+        const localRead = JSON.parse(localStorage.getItem('local_read_ids') || '[]');
+        notifications = notifications.map(n => {
+          if (localRead.includes(String(n.id))) return { ...n, read: true };
+          return n;
+        });
+
+        // 3. Логика звука
         const unread = notifications.filter(n => !n.read);
         if (unread.length > 0) {
-          // Сортируем по времени (самое новое первое)
           const newest = unread.sort((a, b) => b.timestamp - a.timestamp)[0];
-          
-          // Играем звук только если это уведомление мы еще не "слышали"
-          if (newest.id !== lastHeardNotifId) {
+          if (String(newest.id) !== String(lastHeardNotifId)) {
             playNotificationSound();
-            lastHeardNotifId = newest.id;
+            lastHeardNotifId = String(newest.id);
             localStorage.setItem('last_heard_notif_id', lastHeardNotifId);
           }
-        } else {
-          // Если непрочитанных нет, сбрасываем ID в памяти (но не в localStorage), 
-          // чтобы следующее новое точно прозвучало
-          lastHeardNotifId = null;
         }
         
         renderNotifications(notifications);
@@ -4167,9 +4178,9 @@ window.addEventListener('DOMContentLoaded', () => {
 
   async function markAllAsRead() {
     const savedUser = JSON.parse(localStorage.getItem('steam_user'));
-    const badge = document.getElementById('notifBadge');
     if (!savedUser) return;
 
+    const badge = document.getElementById('notifBadge');
     if (badge) badge.style.display = 'none';
 
     try {
@@ -4179,9 +4190,15 @@ window.addEventListener('DOMContentLoaded', () => {
       
       if (unread.length === 0) return;
 
-      // Сразу обновляем локальный ID "услышанного", чтобы звук не играл
+      // Сразу помечаем локально
+      const localRead = JSON.parse(localStorage.getItem('local_read_ids') || '[]');
+      unread.forEach(n => {
+        if (!localRead.includes(String(n.id))) localRead.push(String(n.id));
+      });
+      localStorage.setItem('local_read_ids', JSON.stringify(localRead));
+
       const newest = unread.sort((a, b) => b.timestamp - a.timestamp)[0];
-      lastHeardNotifId = newest.id;
+      lastHeardNotifId = String(newest.id);
       localStorage.setItem('last_heard_notif_id', lastHeardNotifId);
 
       await Promise.all(unread.map(n => 
@@ -4252,7 +4269,6 @@ window.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // Новая функция обертка для удаления, чтобы избежать конфликтов имен
   window.handleDeleteNotif = async function(e, notifId) {
     if (e) {
       e.preventDefault();
@@ -4261,17 +4277,22 @@ window.addEventListener('DOMContentLoaded', () => {
     const savedUser = JSON.parse(localStorage.getItem('steam_user'));
     if (!savedUser) return;
 
+    // 1. Сразу помечаем локально как удаленное
+    const localDeleted = JSON.parse(localStorage.getItem('local_deleted_ids') || '[]');
+    if (!localDeleted.includes(String(notifId))) {
+      localDeleted.push(String(notifId));
+      localStorage.setItem('local_deleted_ids', JSON.stringify(localDeleted));
+    }
+    
+    // Сразу обновляем UI (уже отфильтрует)
+    fetchNotifications(savedUser.id);
+
     try {
-      const response = await fetch('https://discordwebhookurl.statkevichyt.workers.dev/delete-notification', {
+      await fetch('https://discordwebhookurl.statkevichyt.workers.dev/delete-notification', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ steamId: savedUser.id, notifId: String(notifId) })
       });
-      
-      if (response.ok) {
-        // Сразу убираем из UI для скорости
-        fetchNotifications(savedUser.id);
-      }
     } catch (err) {
       console.warn('Failed to delete notification:', err);
     }
@@ -4300,17 +4321,25 @@ window.addEventListener('DOMContentLoaded', () => {
     const savedUser = JSON.parse(localStorage.getItem('steam_user'));
     if (!savedUser) return;
     
-    // Сразу помечаем этот ID как "услышанный", чтобы не было звука
-    lastHeardNotifId = notifId;
+    // 1. Сразу помечаем локально, чтобы "однёрка" не вернулась
+    const localRead = JSON.parse(localStorage.getItem('local_read_ids') || '[]');
+    if (!localRead.includes(String(notifId))) {
+      localRead.push(String(notifId));
+      localStorage.setItem('local_read_ids', JSON.stringify(localRead));
+    }
+
+    lastHeardNotifId = String(notifId);
     localStorage.setItem('last_heard_notif_id', lastHeardNotifId);
+
+    // Сразу обновляем UI
+    fetchNotifications(savedUser.id);
 
     try {
       await fetch('https://discordwebhookurl.statkevichyt.workers.dev/mark-notif-read', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ steamId: savedUser.id, notifId })
+        body: JSON.stringify({ steamId: savedUser.id, notifId: String(notifId) })
       });
-      fetchNotifications(savedUser.id);
     } catch (e) {
       console.warn('Failed to mark notification as read:', e);
     }
