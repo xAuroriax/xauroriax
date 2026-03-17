@@ -4646,12 +4646,42 @@ window.addEventListener('DOMContentLoaded', () => {
     }
   }
 
+  // Добавляем функцию синхронизации данных с сервером
+  async function syncUserData(steamId) {
+    if (!steamId) return;
+    try {
+      const response = await fetch(`https://xauroriax.statkevichyt.workers.dev/get-user-data?steamId=${steamId}`);
+      if (response.ok) {
+        const data = await response.json();
+        
+        // Обновляем души в localStorage и на экране
+        if (data && typeof data.souls === 'number') {
+          saveSouls(steamId, data.souls);
+          updateSoulsUI(steamId);
+        }
+        
+        // Обновляем статистику тестов
+        if (data && data.stats) {
+          localStorage.setItem('exam_stats', JSON.stringify(data.stats));
+        }
+        
+        // Проверка бана
+        if (data && data.isBanned) {
+          console.warn('User is banned');
+        }
+      }
+    } catch (e) {
+      console.warn('Sync error:', e);
+    }
+  }
+
   function startGlobalPolling(steamId) {
     if (!steamId || statusCheckInterval) return;
 
     // Immediate initial checks
     checkQuentaStatus(steamId);
     fetchNotifications(steamId);
+    syncUserData(steamId); // Синхронизируем души и стату сразу
 
     // Set interval for real-time updates every 5 seconds
     statusCheckInterval = setInterval(() => {
@@ -4659,6 +4689,7 @@ window.addEventListener('DOMContentLoaded', () => {
       if (currentUser && currentUser.id === steamId) {
         checkQuentaStatus(steamId);
         fetchNotifications(steamId);
+        syncUserData(steamId); // И каждые 5 секунд
       } else {
         // User logged out or changed
         clearInterval(statusCheckInterval);
