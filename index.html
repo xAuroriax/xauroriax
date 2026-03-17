@@ -3255,8 +3255,36 @@ input, textarea, select {
    }
 }
 
+/* Mobile menu toggle - HIDDEN on desktop */
+  .menu-toggle {
+    display: none !important;
+  }
+  
+  /* Mobile sidebar - HIDDEN on desktop */
+  .sidebar {
+    display: none !important;
+  }
+  
+  /* Desktop navigation - VISIBLE on desktop */
+  nav.desktop-only {
+    display: flex !important;
+  }
+
 /* Mobile Optimization (320px - 480px) */
 @media screen and (max-width: 480px) {
+  /* Show mobile elements ONLY on mobile */
+  .menu-toggle {
+    display: block !important;
+  }
+  
+  .sidebar {
+    display: block !important;
+  }
+  
+  /* Hide desktop navigation on mobile */
+  nav.desktop-only {
+    display: none !important;
+  }
   /* General Layout */
   body {
     font-size: 14px;
@@ -3324,12 +3352,13 @@ input, textarea, select {
     left: -280px;
     width: 280px;
     height: 100vh;
-    background: rgba(0,0,0,0.95);
-    backdrop-filter: blur(10px);
+    background: rgba(4,4,4,0.98);
+    backdrop-filter: blur(5px);
     transition: left 0.3s ease;
     z-index: 1000;
     overflow-y: auto;
     padding: 70px 20px 20px;
+    border-right: 1px solid rgba(255,122,24,0.2);
   }
   
   .sidebar.active {
@@ -3343,29 +3372,32 @@ input, textarea, select {
   }
   
   .sidebar li {
-    margin-bottom: 15px;
+    margin-bottom: 8px;
   }
   
   .sidebar a {
     display: block;
-    padding: 15px 20px;
+    padding: 12px 16px;
     color: #d0d0d0;
     text-decoration: none;
-    border-radius: 8px;
-    font-size: 16px;
-    transition: all 0.3s ease;
+    border-radius: 4px;
+    font-size: 14px;
+    transition: all 0.2s ease;
     border: 1px solid transparent;
+    background: rgba(255,122,24,0.05);
   }
   
   .sidebar a:hover {
-    background: var(--orange);
-    color: white;
-    transform: translateX(5px);
+    background: rgba(255,122,24,0.2);
+    color: #ffffff;
+    border-color: rgba(255,122,24,0.3);
+    transform: translateX(2px);
   }
   
   .sidebar a.active {
-    background: var(--orange);
-    color: white;
+    background: rgba(255,122,24,0.3);
+    color: #ffffff;
+    border-color: rgba(255,122,24,0.5);
   }
   
   /* Balance Display */
@@ -3815,7 +3847,7 @@ input, textarea, select {
   .mobile-submenu {
     list-style: none;
     padding: 0;
-    margin: 10px 0 0 0;
+    margin: 5px 0 0 0;
     display: none;
   }
   
@@ -3824,18 +3856,22 @@ input, textarea, select {
   }
   
   .mobile-submenu li {
-    margin-bottom: 10px;
+    margin-bottom: 5px;
   }
   
   .mobile-submenu a {
-    padding: 10px 20px 10px 40px;
-    font-size: 14px;
+    padding: 8px 16px 8px 32px;
+    font-size: 13px;
     color: #b0b0b0;
+    background: rgba(255,122,24,0.02);
+    border-radius: 3px;
   }
   
   .mobile-submenu a:hover {
-    background: rgba(255,122,24,0.3);
-    color: white;
+    background: rgba(255,122,24,0.1);
+    color: #d0d0d0;
+    border-color: transparent;
+    transform: none;
   }
 }
  </style>
@@ -7440,8 +7476,8 @@ function generateGTAMultipliers() {
   const multipliers = [1.2, 1.5, 2, 3, 5, 10];
   const items = [];
   
-  // Create 3 sets for seamless scrolling
-  for (let set = 0; set < 3; set++) {
+  // Create 5 sets for seamless scrolling (more sets = smoother infinite loop)
+  for (let set = 0; set < 5; set++) {
     multipliers.forEach(mult => {
       const item = document.createElement('div');
       item.className = 'multiplier-item';
@@ -7463,8 +7499,8 @@ function startContinuousAnimation() {
   function animate() {
     if (!gtaIsSpinning) {
       // Continuous slow scroll when not spinning
-      gtaCurrentPosition -= 0.5; // Slow continuous movement
-      if (gtaCurrentPosition <= -840) { // Reset position (6 items * 140px)
+      gtaCurrentPosition -= 0.3; // Slower movement for smooth infinite loop
+      if (gtaCurrentPosition <= -1400) { // Reset position (6 items * 5 sets * 140px / 3 sets visible)
         gtaCurrentPosition = 0;
       }
       gtaMultiplierStrip.style.transform = `translateX(${gtaCurrentPosition}px)`;
@@ -7763,14 +7799,14 @@ function animateGTASpin(targetMultiplier, onComplete) {
   const itemCenterOffset = itemWidth / 2;
   const targetPosition = -(targetIndex * itemWidth) + centerOffset - itemCenterOffset;
   
-  // Animation settings - longer duration
-  const duration = 5000; // 5 seconds
+  // Animation settings - longer duration (6 seconds)
+  const duration = 6000; // 6 seconds for smoother animation
   const startTime = Date.now();
   const startPosition = gtaCurrentPosition;
   const distance = targetPosition - startPosition;
   
   // Add extra spins for effect
-  const extraSpins = 4; // More spins for longer animation
+  const extraSpins = 5; // More spins for longer animation
   const finalTarget = targetPosition - (extraSpins * itemWidth * 6); // 6 items per set
   
   // Highlight arrow during spin
@@ -7782,8 +7818,8 @@ function animateGTASpin(targetMultiplier, onComplete) {
     const elapsed = now - startTime;
     const progress = Math.min(elapsed / duration, 1);
     
-    // Enhanced easing function for smooth deceleration
-    const easeOut = 1 - Math.pow(1 - progress, 4);
+    // Enhanced easing function for very smooth deceleration
+    const easeOut = 1 - Math.pow(1 - progress, 5); // Power 5 for smoother end
     
     // Calculate current position
     gtaCurrentPosition = startPosition + (finalTarget - startPosition) * easeOut;
