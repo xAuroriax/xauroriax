@@ -338,10 +338,11 @@ to{opacity:0;transform:translateY(8px)}
 }
 
 .card{
-  background:#080808;
-  border:1px solid #1d1d1d;
-  padding:30px;
-  margin-bottom:30px;
+  background: rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 122, 24, 0.2);
+  padding: 30px;
+  margin-bottom: 30px;
 }
 
 h2{
@@ -352,11 +353,11 @@ letter-spacing:3px;
 /* unified glowing title */
 .synd-title{text-align:center;color:#fff;letter-spacing:3px;margin: -4px 0 12px; text-shadow: 0 0 12px rgba(255,122,24,0.5) !important;}
 .synd-title::after{content:"";display:block;width:120px;height:2px;margin:8px auto 0;background:linear-gradient(90deg,transparent,rgba(255,122,24,.6),transparent)}
- .manifest{background:#0a0a0a;border:1px solid #222;box-shadow:none}
+ .manifest{background: rgba(0, 0, 0, 0.4); border: 1px solid rgba(255, 122, 24, 0.2); backdrop-filter: blur(10px); box-shadow:none}
  .manifest-title{display:inline-block;padding:0;border:none;border-radius:0;color:#fff;letter-spacing:2px;margin:0 0 14px}
  .manifest{text-align:center}
  .manifest p{color:#f0f0f0;line-height:1.8; font-size: 16px; text-shadow: 0 0 1px rgba(255,255,255,0.1);}
- .member-card{background:rgba(10,10,10,0.9);border:1px solid #222;text-align:center;transition:.3s; color: #fff;}
+ .member-card{background: rgba(0, 0, 0, 0.4); border: 1px solid rgba(255, 122, 24, 0.2); backdrop-filter: blur(10px); text-align:center;transition:.3s; color: #fff;}
  .member-card p{ color: #e0e0e0; line-height: 1.6; margin: 10px 0; }
  .member-card [data-i18n="label_nick"], .member-card [data-i18n="label_team"] { color: var(--orange); opacity: 0.9; font-weight: 600; }
  .member-card [data-i18n$="_desc"], .member-card [data-i18n="forming"] { color: #fff; font-size: 15px; text-shadow: 0 0 1px rgba(255,255,255,0.2); }
@@ -364,7 +365,7 @@ letter-spacing:3px;
  .member-card .badge{margin-bottom:8px}
  /* enhanced links grid */
  .links-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(360px,1fr));gap:18px}
- .link-item{display:flex;align-items:center;gap:16px;padding:18px 20px;border-radius:12px;background:rgba(10,10,10,0.9);border:1px solid #2a2a2a;text-decoration:none;color:#fff;transition:.3s}
+ .link-item{display:flex;align-items:center;gap:16px;padding:18px 20px;border-radius:12px;background: rgba(0, 0, 0, 0.4); backdrop-filter: blur(10px); border: 1px solid rgba(255, 122, 24, 0.2); text-decoration:none;color:#fff;transition:.3s}
  .link-item:hover{border-color:var(--orange); text-shadow:0 0 10px var(--orange);}
  .link-icon{width:36px;height:36px;border-radius:8px;box-shadow:none}
  .link-title{font-weight:700;letter-spacing:1px; color: #fff;}
@@ -375,11 +376,11 @@ letter-spacing:3px;
  .link-icon--youtube{background:linear-gradient(135deg,#ff0000,#ff4d4d)}
  .link-icon--twitch{background:linear-gradient(135deg,#9146ff,#b082ff)}
  .links{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:20px;place-items:center}
- .links a{background:#0a0a0a;border:1px solid #2a2a2a;padding:18px 24px;text-align:center;border-radius:12px;font-weight:600;letter-spacing:1px;min-width:200px;color:#fff}
+ .links a{background: rgba(0, 0, 0, 0.4); border: 1px solid rgba(255, 122, 24, 0.2); backdrop-filter: blur(10px); padding:18px 24px;text-align:center;border-radius:12px;font-weight:600;letter-spacing:1px;min-width:200px;color:#fff}
 .links a:hover{border-color:#fff;color:#fff;text-shadow:0 0 6px var(--orange);transform:translateY(-1px)}
-.links a{background:linear-gradient(180deg,#0a0a0a,#0c0c0c);box-shadow:none}
-.links-card{backdrop-filter:blur(1.5px)}
-.lore-card{border:1px solid #222;padding:20px}
+.links a{background: rgba(0, 0, 0, 0.4); box-shadow:none}
+.links-card{backdrop-filter:blur(10px)}
+.lore-card{border: 1px solid rgba(255, 122, 24, 0.2); padding:20px}
  /* back-compat for old selector (kept consistent) */
   #team h2.synd-title{margin: -4px 0 12px}
   #team h2.synd-title::after{content:"";display:block;width:120px;height:2px;margin:8px auto 0;background:linear-gradient(90deg,transparent,rgba(255,122,24,.6),transparent)}
@@ -1181,10 +1182,11 @@ header nav a:hover, header nav a.active {
   align-items: center;
   max-width: 480px; /* Reduced from 600px */
   margin: 0 auto;
-  background: rgba(10,10,10,0.9);
+  background: rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(10px);
   padding: 30px;
   border-radius: 24px;
-  border: 1px solid rgba(255,122,24,0.15);
+  border: 1px solid rgba(255,122,24,0.2);
   box-shadow: 0 20px 50px rgba(0,0,0,0.5);
 }
 
@@ -1532,8 +1534,8 @@ header nav a:hover, header nav a.active {
   top: 320px;
   left: 60px;
   width: 320px;
-  background: rgba(0,0,0,0.5);
-  backdrop-filter: blur(8px);
+  background: rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(10px);
   border-radius: 12px;
   padding: 20px;
   color: #fff;
@@ -1541,7 +1543,7 @@ header nav a:hover, header nav a.active {
   line-height: 1.6;
   z-index: 10;
   font-family: 'Share Tech Mono', monospace;
-  border: 1px solid rgba(255,255,255,0.1);
+  border: 1px solid rgba(255, 122, 24, 0.2);
   overflow: hidden;
   box-shadow: 0 10px 30px rgba(0,0,0,0.5);
 }
@@ -1836,10 +1838,6 @@ header nav a:hover, header nav a.active {
 <div class="card manifest">
 <div class="manifest-title synd-title" data-i18n="manifest_title">От создателей</div>
 <p data-i18n="manifest_text">Auroria это мир, где каждая история создаётся игроками. Зона не прощает ошибок и не забывает поступков. Здесь каждое слово, каждое решение и каждая пуля оставляют след. На нашем сервере вы не просто играете — вы становитесь частью живой истории. Мы предоставляем вам инструменты для создания настоящего RolePlay: персонажи, конфликты, союзы, легенды и трагедии. Не ищите лёгкой выгоды. Создавайте истории, которые будут помнить другие сталкеры. Зона наблюдает. И каждое действие имеет последствия.</p>
-</div>
-<div class="card lore-card">
-<h2 class="synd-title" data-i18n="lore_title">Видео‑лор: Падающая Звезда</h2>
-<div class="video-16x9"><div class="yt-lazy" data-video-id="GDXO10ue5cM" data-start="90"></div></div>
 </div>
 </div>
 
