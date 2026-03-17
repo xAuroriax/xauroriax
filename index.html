@@ -16,15 +16,55 @@
 --highlight:#ff7a18;
 }
 
-body{
-margin:0;
-background:var(--bg);
-color:#d0d0d0;
-font-family:'Share Tech Mono', monospace;
-overflow-x:hidden;
-min-height:100vh;
-display:flex;
-flex-direction:column;
+/* Smooth Background Transition */
+body::before {
+  content: "";
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: 
+    linear-gradient(to bottom, rgba(0,0,0,0.3) 0%, rgba(0,0,0,0.7) 50%, rgba(0,0,0,1) 100%),
+    url('background.jpg') no-repeat center top;
+  background-size: cover;
+  z-index: -2;
+}
+
+body {
+  margin: 0;
+  background: #000; /* Pure black at bottom */
+  color: #d0d0d0;
+  font-family: 'Share Tech Mono', monospace;
+  overflow-x: hidden;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* hero */
+.hero {
+  margin-top: 0;
+  height: 700px;
+  background: transparent; /* Show main background through */
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  position: relative;
+  z-index: 1;
+}
+
+.hero::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 200px;
+  background: linear-gradient(to bottom, transparent, #000);
+  pointer-events: none;
 }
 
 /* HUD frame */
@@ -266,22 +306,6 @@ header.hidden + #navToggleBtn {
   transform: rotate(0deg); /* Points LEFT when open (active) */
 }
 
-/* hero */
-.hero{
-margin-top: 0;
-height:600px;
-background:
-  linear-gradient(rgba(0,0,0,.80),rgba(0,0,0,.95)),
-  url("https://images.unsplash.com/photo-1503435980610-a51f3ddfee50?auto=format&fit=crop&w=1800&q=80");
-background-size:cover;
-background-position:center;
-display:flex;
-flex-direction:column;
-justify-content:center;
-align-items:center;
-text-align:center;
-}
-
 .hero h1{
   font-family:'Orbitron', sans-serif;
   font-size:56px;
@@ -503,41 +527,6 @@ color:var(--orange);
 .video-16x9 .video-play{display:inline-block;padding:12px 18px;border:1px solid rgba(255,122,24,.6);border-radius:999px;color:#fff;text-decoration:none;letter-spacing:2px;background:rgba(0,0,0,.45);backdrop-filter:blur(2px);transition:.2s}
 .video-16x9 .video-play:hover{border-color:#fff;text-shadow:0 0 6px var(--orange)}
 
-/* Video Background */
-.video-background {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  z-index: -2;
-  overflow: hidden;
-  background: #000 url('background.jpg') no-repeat center center;
-  background-size: cover;
-}
-
-.video-background video {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  min-width: 100%;
-  min-height: 100%;
-  width: auto;
-  height: auto;
-  transform: translate(-50%, -50%);
-  object-fit: cover;
-}
-
-.overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(0, 0, 0, 0.5); /* Adjust opacity for better visibility */
-  z-index: -1;
-}
-
 @keyframes anomalyMove{
 0%{transform:translate(-5vw,60vh)}
 50%{transform:translate(70vw,25vh)}
@@ -732,12 +721,7 @@ margin-top:auto;
 </div>
 <div id="quentaSuccessMsg" data-i18n="quenta_submitted">Вы успешно подали квенту, ждите подтверждения</div>
 <div id="authToast"></div>
-<div class="video-background">
-  <video autoplay muted loop playsinline poster="background.jpg">
-    <source src="background.mp4" type="video/mp4">
-  </video>
-</div>
-<div class="overlay"></div>
+
 <div class="noise"></div>
 <div class="rain"></div>
 <div class="dust"></div>
