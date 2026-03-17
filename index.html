@@ -969,7 +969,7 @@ header nav a:hover, header nav a.active {
   right: 0;
   margin-top: 15px;
   width: 320px;
-  background: rgba(5,5,5,0.98);
+  background: rgba(0,0,0,0.98); /* Pure black background */
   border: 1px solid rgba(255,122,24,0.4);
   border-radius: 12px;
   box-shadow: 0 15px 40px rgba(0,0,0,0.9);
@@ -995,7 +995,7 @@ header nav a:hover, header nav a.active {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  background: rgba(255,122,24,0.03);
+  background: transparent; /* Remove orange tint */
 }
 
 .notification-header h4 {
@@ -3261,10 +3261,23 @@ window.addEventListener('DOMContentLoaded', () => {
 
   let statusCheckInterval = null;
 
+  let lastNotifCount = 0;
+
+  function playNotificationSound() {
+    const audio = new Audio('notification.mp3');
+    audio.volume = 0.5;
+    audio.play().catch(e => console.warn('Audio play blocked:', e));
+  }
+
   function toggleNotifPopup(e) {
     if (e) e.stopPropagation();
     const popup = document.getElementById('notifPopup');
-    popup.classList.toggle('active');
+    const isActive = popup.classList.toggle('active');
+    
+    // If opening popup, mark all as read
+    if (isActive) {
+      markAllAsRead();
+    }
   }
 
   // Close popup when clicking outside
@@ -3279,10 +3292,45 @@ window.addEventListener('DOMContentLoaded', () => {
       const response = await fetch(`https://discordwebhookurl.statkevichyt.workers.dev/get-notifications?steamId=${steamId}`);
       if (response.ok) {
         const notifications = await response.json();
+        
+        // Check for new notifications to play sound
+        const currentUnread = notifications.filter(n => !n.read).length;
+        if (currentUnread > lastNotifCount) {
+          playNotificationSound();
+        }
+        lastNotifCount = currentUnread;
+        
         renderNotifications(notifications);
       }
     } catch (e) {
       console.warn('Failed to fetch notifications:', e);
+    }
+  }
+
+  async function markAllAsRead() {
+    const savedUser = JSON.parse(localStorage.getItem('steam_user'));
+    const badge = document.getElementById('notifBadge');
+    if (!savedUser || !badge || badge.style.display === 'none') return;
+
+    // Visual feedback: hide badge immediately
+    badge.style.display = 'none';
+    lastNotifCount = 0;
+
+    try {
+      // Fetch notifications, find unread, mark them
+      const res = await fetch(`https://discordwebhookurl.statkevichyt.workers.dev/get-notifications?steamId=${savedUser.id}`);
+      const notifs = await res.json();
+      const unread = notifs.filter(n => !n.read);
+      
+      for (const n of unread) {
+        await fetch('https://discordwebhookurl.statkevichyt.workers.dev/mark-notif-read', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ steamId: savedUser.id, notifId: n.id })
+        });
+      }
+    } catch (e) {
+      console.warn('Failed to mark all as read:', e);
     }
   }
 
@@ -3447,9 +3495,18 @@ window.addEventListener('DOMContentLoaded', () => {
     const loginContainer = document.querySelector('.steam-login-container');
     
     if (savedUser && loginContainer) {
-      // Instant check with worker on UI update
+      // Clear existing interval if any
+      if (statusCheckInterval) clearInterval(statusCheckInterval);
+
+      // Initial checks
       checkQuentaStatus(savedUser.id);
       fetchNotifications(savedUser.id);
+
+      // Real-time polling every 5 seconds
+      statusCheckInterval = setInterval(() => {
+        checkQuentaStatus(savedUser.id);
+        fetchNotifications(savedUser.id);
+      }, 5000);
 
       // Re-inject HTML to keep notification bell and login button
       loginContainer.innerHTML = `
