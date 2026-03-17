@@ -1629,6 +1629,32 @@ header nav a:hover, .rules-trigger-btn:hover {
   padding:10px 12px;
 }
 
+.promo-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+.promo-inputs {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  align-items: center;
+  margin-top: 15px;
+  width: 100%;
+}
+#promoCodeInput {
+  width: 100%;
+  max-width: 280px;
+  padding: 12px;
+  background: #050505 !important;
+  border: 1px solid rgba(255,122,24,0.2) !important;
+  border-radius: 10px;
+  color: #fff;
+  text-align: center;
+  font-family: 'Share Tech Mono', monospace;
+}
+
 .logout-container {
   width: 100%;
   display: flex;
@@ -1825,6 +1851,22 @@ header nav a:hover, .rules-trigger-btn:hover {
 
   .gratitude-text {
     font-size: 11px;
+  }
+
+  /* Mobile Notification Centering */
+  .notification-popup {
+    right: -50px !important;
+    width: 280px !important;
+    max-width: 85vw !important;
+  }
+
+  /* Promo and Logout Mobile Fixes */
+  #promoCodeInput {
+    max-width: 220px !important;
+  }
+  .logout-container {
+    margin-bottom: 80px !important;
+    margin-top: 40px !important;
   }
 }
  </style>
@@ -2238,10 +2280,10 @@ header nav a:hover, .rules-trigger-btn:hover {
         <p id="passportRoleDesc" style="margin-top:16px"></p>
       </div>
 
-      <div class="card manifest" style="margin-top:20px; display: flex; flex-direction: column; align-items: center;">
+      <div class="card manifest promo-container" style="margin-top:20px;">
         <h2 class="synd-title">Промокод</h2>
-        <div style="display:flex;flex-direction:column;gap:10px;align-items:stretch;margin-top:10px;width: 50%;">
-          <input id="promoCodeInput" type="text" placeholder="Введите промокод" style="width:100%;min-width:220px;padding:10px 12px;background:#0a0a0a;border:1px solid #222;border-radius:12px;color:#fff"/>
+        <div class="promo-inputs">
+          <input id="promoCodeInput" type="text" placeholder="Введите промокод" />
           <div class="trace-container" style="display:inline-block;margin:0 auto;">
             <div class="trace-line"><svg><rect class="comet-1"></rect><rect class="comet-2"></rect></svg></div>
             <button class="btn-cta btn-cta-inner" type="button" onclick="redeemPromoCode()">Активировать</button>
