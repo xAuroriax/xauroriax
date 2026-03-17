@@ -3254,10 +3254,628 @@ input, textarea, select {
      margin-bottom: 20px !important; /* Offset from bottom edge */
    }
 }
+
+/* Mobile Optimization (320px - 480px) */
+@media screen and (max-width: 480px) {
+  /* General Layout */
+  body {
+    font-size: 14px;
+    line-height: 1.4;
+    overflow-x: hidden;
+  }
+  
+  .container {
+    padding: 10px;
+    max-width: 100%;
+  }
+  
+  .card {
+    margin: 10px 5px;
+    padding: 15px;
+    border-radius: 10px;
+  }
+  
+  /* Header & Navigation */
+  header {
+    padding: 10px;
+  }
+  
+  .synd-title {
+    font-size: 16px !important;
+    margin-bottom: 10px !important;
+  }
+  
+  nav {
+    position: relative;
+  }
+  
+  .menu-toggle {
+    display: block !important;
+    width: 50px;
+    height: 50px;
+    background: var(--orange);
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    position: fixed;
+    top: 10px;
+    left: 10px;
+    z-index: 1001;
+    transition: all 0.3s ease;
+  }
+  
+  .menu-toggle:hover {
+    background: #ff9030;
+    transform: scale(1.05);
+  }
+  
+  .menu-toggle span {
+    display: block;
+    width: 25px;
+    height: 3px;
+    background: white;
+    margin: 5px auto;
+    transition: 0.3s;
+  }
+  
+  .sidebar {
+    position: fixed;
+    top: 0;
+    left: -280px;
+    width: 280px;
+    height: 100vh;
+    background: rgba(0,0,0,0.95);
+    backdrop-filter: blur(10px);
+    transition: left 0.3s ease;
+    z-index: 1000;
+    overflow-y: auto;
+    padding: 70px 20px 20px;
+  }
+  
+  .sidebar.active {
+    left: 0;
+  }
+  
+  .sidebar ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  
+  .sidebar li {
+    margin-bottom: 15px;
+  }
+  
+  .sidebar a {
+    display: block;
+    padding: 15px 20px;
+    color: #d0d0d0;
+    text-decoration: none;
+    border-radius: 8px;
+    font-size: 16px;
+    transition: all 0.3s ease;
+    border: 1px solid transparent;
+  }
+  
+  .sidebar a:hover {
+    background: var(--orange);
+    color: white;
+    transform: translateX(5px);
+  }
+  
+  .sidebar a.active {
+    background: var(--orange);
+    color: white;
+  }
+  
+  /* Balance Display */
+  .user-balance {
+    position: fixed;
+    top: 10px;
+    right: 10px;
+    z-index: 1000;
+    padding: 8px 12px;
+    font-size: 12px;
+    border-radius: 20px;
+    background: rgba(0,0,0,0.8);
+    border: 1px solid var(--orange);
+    min-width: auto;
+  }
+  
+  .balance-amount {
+    font-size: 14px;
+  }
+  
+  /* Hero Section */
+  .hero {
+    height: auto;
+    min-height: 400px;
+    padding: 20px 10px;
+  }
+  
+  .hero-content {
+    padding: 20px 10px;
+    text-align: center;
+  }
+  
+  .hero h1 {
+    font-size: 24px;
+    margin-bottom: 15px;
+  }
+  
+  .hero p {
+    font-size: 14px;
+    margin-bottom: 20px;
+  }
+  
+  .steam-button {
+    padding: 12px 24px;
+    font-size: 14px;
+    margin: 10px 5px;
+  }
+  
+  /* Buttons & Inputs */
+  .btn {
+    padding: 12px 20px;
+    font-size: 14px;
+    border-radius: 8px;
+    margin: 5px;
+    min-height: 44px; /* Tap-friendly */
+  }
+  
+  input[type="text"],
+  input[type="number"],
+  input[type="email"],
+  textarea,
+  select {
+    padding: 12px;
+    font-size: 14px;
+    border-radius: 8px;
+    min-height: 44px;
+    margin: 5px 0;
+  }
+  
+  /* GTA Roulette Mobile */
+  .gta-roulette {
+    padding: 15px;
+  }
+  
+  .betting-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 10px;
+    margin-bottom: 15px;
+  }
+  
+  .betting-item {
+    padding: 10px;
+    border-radius: 8px;
+  }
+  
+  .mult-display {
+    font-size: 18px;
+    margin-bottom: 8px;
+  }
+  
+  .bet-input-small {
+    width: 100%;
+    padding: 10px;
+    font-size: 14px;
+    border-radius: 6px;
+    margin-bottom: 8px;
+    min-height: 44px;
+  }
+  
+  .place-bet-btn {
+    width: 100%;
+    padding: 12px;
+    font-size: 14px;
+    border-radius: 6px;
+    min-height: 44px;
+  }
+  
+  .bet-animations {
+    position: relative;
+    height: 30px;
+    margin-top: 5px;
+  }
+  
+  .bet-animation-multiplier {
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--orange);
+    color: white;
+    padding: 5px 10px;
+    border-radius: 15px;
+    font-size: 12px;
+    white-space: nowrap;
+    z-index: 10;
+  }
+  
+  /* Timer Display */
+  .auto-spin-timer {
+    margin-bottom: 15px;
+    padding: 10px;
+    background: rgba(0,0,0,0.5);
+    border-radius: 8px;
+  }
+  
+  .timer-display {
+    font-size: 14px;
+    text-align: center;
+  }
+  
+  .timer-value {
+    font-size: 20px;
+    font-weight: bold;
+    color: var(--orange);
+  }
+  
+  .timer-bar {
+    height: 6px;
+    background: rgba(255,255,255,0.2);
+    border-radius: 3px;
+    margin-top: 8px;
+    overflow: hidden;
+  }
+  
+  .timer-progress {
+    height: 100%;
+    background: var(--orange);
+    transition: width 1s linear;
+  }
+  
+  /* Roulette Display */
+  .multiplier-display {
+    position: relative;
+    height: 120px;
+    margin-bottom: 15px;
+    overflow: hidden;
+    border-radius: 8px;
+    background: rgba(0,0,0,0.3);
+  }
+  
+  .multiplier-track {
+    position: relative;
+    height: 100%;
+    overflow: hidden;
+  }
+  
+  .multiplier-strip {
+    display: flex;
+    height: 100%;
+    transition: transform 0.1s linear;
+  }
+  
+  .multiplier-item {
+    min-width: 100px;
+    height: 80px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 5px;
+    border-radius: 6px;
+    font-size: 16px;
+    font-weight: bold;
+  }
+  
+  .roulette-arrow {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 40px;
+    height: 40px;
+    background: var(--orange);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10;
+    box-shadow: 0 0 20px rgba(255,122,24,0.8);
+  }
+  
+  .arrow-icon {
+    font-size: 20px;
+    color: white;
+  }
+  
+  /* Game Status */
+  .game-status {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding: 10px;
+    background: rgba(0,0,0,0.3);
+    border-radius: 8px;
+    margin-bottom: 15px;
+  }
+  
+  .status-info,
+  .total-bets {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 14px;
+  }
+  
+  .status-value,
+  .bets-value {
+    color: var(--orange);
+    font-weight: bold;
+  }
+  
+  /* History */
+  .roulette-history-local {
+    margin-top: 15px;
+  }
+  
+  .roulette-history-local h3 {
+    font-size: 16px;
+    margin-bottom: 10px;
+  }
+  
+  .history-container-local {
+    max-height: 200px;
+    overflow-y: auto;
+  }
+  
+  .history-list-local {
+    font-size: 12px;
+  }
+  
+  .history-item-local {
+    padding: 8px;
+    margin-bottom: 5px;
+    background: rgba(0,0,0,0.3);
+    border-radius: 6px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  
+  /* Pages */
+  .page {
+    padding: 10px;
+    min-height: calc(100vh - 60px);
+  }
+  
+  /* Forms */
+  .form-group {
+    margin-bottom: 15px;
+  }
+  
+  .form-group label {
+    display: block;
+    margin-bottom: 5px;
+    font-size: 14px;
+    font-weight: bold;
+  }
+  
+  .form-group input,
+  .form-group textarea,
+  .form-group select {
+    width: 100%;
+    padding: 12px;
+    font-size: 14px;
+    border-radius: 8px;
+    border: 1px solid #333;
+    background: rgba(0,0,0,0.5);
+    color: white;
+    min-height: 44px;
+  }
+  
+  /* Tables */
+  table {
+    width: 100%;
+    font-size: 12px;
+    border-collapse: collapse;
+  }
+  
+  th, td {
+    padding: 8px;
+    text-align: left;
+    border-bottom: 1px solid #333;
+  }
+  
+  th {
+    background: rgba(0,0,0,0.3);
+    font-weight: bold;
+  }
+  
+  /* Toast Notifications */
+  .toast {
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    padding: 12px 20px;
+    border-radius: 8px;
+    font-size: 14px;
+    z-index: 2000;
+    max-width: 90%;
+    text-align: center;
+  }
+  
+  /* Modal */
+  .modal {
+    padding: 20px;
+    max-width: 95%;
+    margin: 20px auto;
+  }
+  
+  .modal-content {
+    padding: 20px;
+    border-radius: 12px;
+  }
+  
+  .modal h2 {
+    font-size: 18px;
+    margin-bottom: 15px;
+  }
+  
+  .modal p {
+    font-size: 14px;
+    margin-bottom: 15px;
+  }
+  
+  /* Performance Optimizations */
+  * {
+    -webkit-tap-highlight-color: transparent;
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    user-select: none;
+  }
+  
+  input, textarea {
+    -webkit-user-select: auto;
+    user-select: auto;
+  }
+  
+  /* Disable hover effects on touch devices */
+  @media (hover: none) {
+    .btn:hover,
+    .sidebar a:hover,
+    .menu-toggle:hover {
+      transform: none;
+    }
+  }
+  
+  /* Smooth scrolling */
+  html {
+    scroll-behavior: smooth;
+  }
+  
+  /* Prevent zoom on input focus */
+  input[type="text"],
+  input[type="number"],
+  input[type="email"],
+  textarea,
+  select {
+    font-size: 16px; /* Prevents zoom on iOS */
+  }
+  
+  /* Hide desktop elements on mobile */
+  .desktop-only {
+    display: none !important;
+  }
+  
+  /* Mobile specific animations */
+  @media (prefers-reduced-motion: reduce) {
+    * {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
+}
+
+/* Extra Small Devices (320px - 360px) */
+@media screen and (max-width: 360px) {
+  .container {
+    padding: 5px;
+  }
+  
+  .card {
+    margin: 5px 2px;
+    padding: 10px;
+  }
+  
+  .sidebar {
+    width: 250px;
+    left: -250px;
+  }
+  
+  .user-balance {
+    font-size: 11px;
+    padding: 6px 10px;
+  }
+  
+  .balance-amount {
+    font-size: 12px;
+  }
+  
+  .multiplier-item {
+    min-width: 80px;
+    font-size: 14px;
+  }
+  
+  .roulette-arrow {
+    width: 35px;
+    height: 35px;
+  }
+  
+  .arrow-icon {
+    font-size: 16px;
+  }
+  
+  /* Mobile Submenu Styles */
+  .mobile-submenu {
+    list-style: none;
+    padding: 0;
+    margin: 10px 0 0 0;
+    display: none;
+  }
+  
+  .mobile-submenu.active {
+    display: block;
+  }
+  
+  .mobile-submenu li {
+    margin-bottom: 10px;
+  }
+  
+  .mobile-submenu a {
+    padding: 10px 20px 10px 40px;
+    font-size: 14px;
+    color: #b0b0b0;
+  }
+  
+  .mobile-submenu a:hover {
+    background: rgba(255,122,24,0.3);
+    color: white;
+  }
+}
  </style>
 <header>
+<!-- Mobile Menu Toggle -->
+<button class="menu-toggle" onclick="toggleMobileMenu()" aria-label="Toggle menu">
+  <span></span>
+  <span></span>
+  <span></span>
+</button>
+
+<!-- Mobile Sidebar -->
+<div class="sidebar" id="mobileSidebar">
+  <ul>
+    <li><a onclick="showPage('home'); toggleMobileMenu()"><i class="fas fa-home"></i>Главная</a></li>
+    <li>
+      <a onclick="toggleMobileRulesDropdown()"><i class="fas fa-book"></i>Правила</a>
+      <ul class="mobile-submenu" id="mobileRulesSubmenu">
+        <li><a onclick="switchRules('server'); toggleMobileMenu()"><i class="fas fa-server"></i>Правила сервера</a></li>
+        <li><a onclick="switchRules('discord'); toggleMobileMenu()"><i class="fab fa-discord"></i>Правила Discord</a></li>
+        <li><a onclick="switchRules('quenta'); toggleMobileMenu()"><i class="fas fa-pen-fancy"></i>Правила квенты</a></li>
+        <li><a onclick="switchRules('site'); toggleMobileMenu()"><i class="fas fa-globe"></i>Правила сайта</a></li>
+      </ul>
+    </li>
+    <li><a onclick="showPage('quenta'); toggleMobileMenu()"><i class="fas fa-file-alt"></i>Квента</a></li>
+    <li>
+      <a onclick="toggleMobileBlackMarketDropdown()"><i class="fas fa-skull-crossbones"></i>Черный рынок</a>
+      <ul class="mobile-submenu" id="mobileBlackMarketSubmenu">
+        <li><a onclick="showPage('roulette'); toggleMobileMenu()"><i class="fas fa-dice"></i>Рулетка</a></li>
+        <li><a onclick="showPage('poker'); toggleMobileMenu()"><i class="fas fa-poker-chip"></i>Покер</a></li>
+        <li><a onclick="showPage('slots'); toggleMobileMenu()"><i class="fas fa-slot-machine"></i>Слоты</a></li>
+      </ul>
+    </li>
+    <li><a onclick="showPage('team'); toggleMobileMenu()"><i class="fas fa-users"></i>Синдикат</a></li>
+    <li><a onclick="showPage('links'); toggleMobileMenu()"><i class="fas fa-link"></i>Ссылки</a></li>
+  </ul>
+</div>
+
 <h2 class="synd-title" style="font-size:18px; margin-bottom:20px; text-align:center">AURORIA</h2>
-<nav>
+<nav class="desktop-only">
 <a onclick="showPage('home')"><i class="fas fa-home"></i><span data-i18n="nav_home">Главная</span></a>
 
 <div class="nav-dropdown">
@@ -8687,6 +9305,138 @@ function hideSlotsCooldown() {
     initRoulette();
     initGTARoulette(); // Initialize GTA Auto-Roulette
   });
+
+// Mobile Menu Functions
+function toggleMobileMenu() {
+  const sidebar = document.getElementById('mobileSidebar');
+  const menuToggle = document.querySelector('.menu-toggle');
+  
+  sidebar.classList.toggle('active');
+  menuToggle.classList.toggle('active');
+  
+  // Close menu when clicking outside
+  if (sidebar.classList.contains('active')) {
+    setTimeout(() => {
+      document.addEventListener('click', closeMobileMenuOutside);
+    }, 100);
+  } else {
+    document.removeEventListener('click', closeMobileMenuOutside);
+  }
+}
+
+function closeMobileMenuOutside(event) {
+  const sidebar = document.getElementById('mobileSidebar');
+  const menuToggle = document.querySelector('.menu-toggle');
+  
+  if (!sidebar.contains(event.target) && !menuToggle.contains(event.target)) {
+    sidebar.classList.remove('active');
+    menuToggle.classList.remove('active');
+    document.removeEventListener('click', closeMobileMenuOutside);
+  }
+}
+
+function toggleMobileRulesDropdown() {
+  const submenu = document.getElementById('mobileRulesSubmenu');
+  submenu.classList.toggle('active');
+  
+  // Close other dropdowns
+  document.getElementById('mobileBlackMarketSubmenu').classList.remove('active');
+}
+
+function toggleMobileBlackMarketDropdown() {
+  const submenu = document.getElementById('mobileBlackMarketSubmenu');
+  submenu.classList.toggle('active');
+  
+  // Close other dropdowns
+  document.getElementById('mobileRulesSubmenu').classList.remove('active');
+}
+
+// Optimize animations for mobile
+if (window.innerWidth <= 480) {
+  // Reduce animation complexity for mobile
+  const style = document.createElement('style');
+  style.textContent = `
+    .multiplier-item {
+      transition: none;
+    }
+    
+    .bet-animation-multiplier {
+      animation: none;
+      opacity: 1;
+    }
+    
+    .roulette-arrow.spinning .arrow-icon {
+      animation: none;
+      filter: drop-shadow(0 0 15px rgba(255,122,24,0.8));
+    }
+  `;
+  document.head.appendChild(style);
+}
+
+// Handle orientation changes
+window.addEventListener('orientationchange', () => {
+  // Close mobile menu on orientation change
+  const sidebar = document.getElementById('mobileSidebar');
+  const menuToggle = document.querySelector('.menu-toggle');
+  sidebar.classList.remove('active');
+  menuToggle.classList.remove('active');
+  
+  // Reinitialize roulette if needed
+  if (typeof gtaMultiplierStrip !== 'undefined') {
+    setTimeout(() => {
+      gtaCurrentPosition = 0;
+      if (gtaMultiplierStrip) {
+        gtaMultiplierStrip.style.transform = 'translateX(0)';
+      }
+    }, 500);
+  }
+});
+
+// Touch optimization for roulette
+if ('ontouchstart' in window) {
+  // Prevent double-tap zoom on roulette elements
+  document.addEventListener('touchstart', function(e) {
+    if (e.target.closest('.multiplier-display') || 
+        e.target.closest('.betting-item') || 
+        e.target.closest('.place-bet-btn')) {
+      e.preventDefault();
+    }
+  }, { passive: false });
+}
+
+// Performance optimization for mobile
+if (window.innerWidth <= 480) {
+  // Reduce continuous animation frequency
+  let lastAnimationTime = 0;
+  const animationInterval = 100; // 100ms instead of 60fps
+  
+  function optimizedContinuousAnimation() {
+    const now = Date.now();
+    if (now - lastAnimationTime >= animationInterval) {
+      if (!gtaIsSpinning && gtaMultiplierStrip) {
+        gtaCurrentPosition -= 0.5;
+        if (gtaCurrentPosition <= -840) {
+          gtaCurrentPosition = 0;
+        }
+        gtaMultiplierStrip.style.transform = `translateX(${gtaCurrentPosition}px)`;
+      }
+      lastAnimationTime = now;
+    }
+    requestAnimationFrame(optimizedContinuousAnimation);
+  }
+  
+  // Replace continuous animation with optimized version
+  if (typeof startContinuousAnimation === 'function') {
+    const originalStartContinuousAnimation = startContinuousAnimation;
+    startContinuousAnimation = function() {
+      if (window.innerWidth <= 480) {
+        optimizedContinuousAnimation();
+      } else {
+        originalStartContinuousAnimation();
+      }
+    };
+  }
+}
 </script>
 
 </body>
