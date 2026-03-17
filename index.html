@@ -516,6 +516,89 @@ color:var(--orange);
 .video-16x9 .video-play{display:inline-block;padding:12px 18px;border:1px solid rgba(255,122,24,.6);border-radius:999px;color:#fff;text-decoration:none;letter-spacing:2px;background:rgba(0,0,0,.45);backdrop-filter:blur(2px);transition:.2s}
 .video-16x9 .video-play:hover{border-color:#fff;text-shadow:0 0 6px var(--orange)}
 
+/* Navigation Dropdown */
+.nav-dropdown {
+  position: relative;
+  width: 100%;
+}
+
+.nav-dropdown-trigger {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+}
+
+.nav-dropdown-trigger a {
+  flex-grow: 1;
+}
+
+.dropdown-arrow {
+  color: var(--orange);
+  padding: 10px;
+  cursor: pointer;
+  transition: transform 0.3s ease;
+  font-size: 14px;
+}
+
+.dropdown-arrow:hover {
+  text-shadow: 0 0 10px var(--orange);
+}
+
+.nav-dropdown.active .dropdown-arrow {
+  transform: rotate(180deg);
+}
+
+.nav-submenu {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s ease;
+  opacity: 0;
+  padding-left: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 0;
+}
+
+.nav-dropdown.active .nav-submenu {
+  max-height: 300px; /* Adjust based on content */
+  opacity: 1;
+  margin-top: 10px;
+  margin-bottom: 15px;
+}
+
+.nav-submenu a {
+  font-size: 13px !important;
+  padding: 8px 15px !important;
+  border-radius: 8px !important;
+  background: rgba(255, 255, 255, 0.02) !important;
+  border: 1px solid rgba(255, 255, 255, 0.05) !important;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.nav-submenu a i {
+  font-size: 12px;
+  width: 16px;
+  margin-right: 0 !important;
+}
+
+.nav-submenu a:hover {
+  background: rgba(255, 122, 24, 0.1) !important;
+  border-color: var(--orange) !important;
+}
+
+/* Rules Categories Visibility */
+.rules-category-content {
+  display: none;
+}
+
+.rules-category-content.active {
+  display: block;
+}
+
 @keyframes anomalyMove{
 0%{transform:translate(-5vw,60vh)}
 50%{transform:translate(70vw,25vh)}
@@ -1675,7 +1758,20 @@ header nav a:hover, header nav a.active {
 <h2 class="synd-title" style="font-size:18px; margin-bottom:20px; text-align:center">AURORIA</h2>
 <nav>
 <a onclick="showPage('home')"><i class="fas fa-home"></i><span data-i18n="nav_home">Главная</span></a>
-<a onclick="showPage('rules')"><i class="fas fa-book"></i><span data-i18n="nav_rules">Правила</span></a>
+
+<div class="nav-dropdown">
+  <div class="nav-dropdown-trigger">
+    <a onclick="showPage('rules')"><i class="fas fa-book"></i><span data-i18n="nav_rules">Правила</span></a>
+    <i class="fas fa-chevron-down dropdown-arrow" onclick="toggleRulesDropdown(event)"></i>
+  </div>
+  <div class="nav-submenu" id="rulesSubmenu">
+    <a onclick="switchRules('server')"><i class="fas fa-server"></i><span>Правила сервера</span></a>
+    <a onclick="switchRules('discord')"><i class="fab fa-discord"></i><span>Правила Discord</span></a>
+    <a onclick="switchRules('quenta')"><i class="fas fa-pen-fancy"></i><span>Правила квенты</span></a>
+    <a onclick="switchRules('site')"><i class="fas fa-globe"></i><span>Правила сайта</span></a>
+  </div>
+</div>
+
 <a onclick="showPage('quenta')"><i class="fas fa-file-alt"></i><span data-i18n="nav_quenta">Квента</span></a>
 <a onclick="showPage('team')"><i class="fas fa-users"></i><span data-i18n="nav_team">Синдикат</span></a>
 <a onclick="showPage('links')"><i class="fas fa-link"></i><span data-i18n="nav_links">Ссылки</span></a>
@@ -2297,6 +2393,45 @@ if (header && !header.classList.contains('hidden')) {
     }, 100); // Small delay to let the page become active
   } else if (id === 'home') {
     window.scrollTo({top: 0, behavior: 'smooth'});
+  }
+}
+
+function toggleRulesDropdown(event) {
+  if (event) event.stopPropagation();
+  const dropdown = document.querySelector('.nav-dropdown');
+  dropdown.classList.toggle('active');
+}
+
+function switchRules(type) {
+  // First, show the rules page
+  showPage('rules');
+  
+  // Update category visibility
+  const categories = document.querySelectorAll('.rules-category-content');
+  categories.forEach(c => c.classList.remove('active'));
+  
+  let targetId = '';
+  if (type === 'server') targetId = 'rulesServer';
+  if (type === 'discord') targetId = 'rulesDiscord';
+  if (type === 'quenta') targetId = 'rulesQuenta';
+  if (type === 'site') targetId = 'rulesSite';
+  
+  const target = document.getElementById(targetId);
+  if (target) target.classList.add('active');
+
+  // Update sidebar visibility
+  const sidebar = document.getElementById('rulesSidebar');
+  if (sidebar) {
+    sidebar.style.display = (type === 'server') ? 'flex' : 'none';
+  }
+
+  // Update title
+  const rulesTitle = document.querySelector('#rules .synd-title');
+  if (rulesTitle) {
+    if (type === 'server') rulesTitle.textContent = 'Правила сервера';
+    if (type === 'discord') rulesTitle.textContent = 'Правила Discord';
+    if (type === 'quenta') rulesTitle.textContent = 'Правила подачи квенты';
+    if (type === 'site') rulesTitle.textContent = 'Правила сайта';
   }
 }
 
