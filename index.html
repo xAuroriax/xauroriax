@@ -4108,7 +4108,7 @@ window.addEventListener('DOMContentLoaded', () => {
 
   let statusCheckInterval = null;
 
-  let lastNotifCount = 0;
+  let lastHeardNotifId = localStorage.getItem('last_heard_notif_id') || null;
 
   function playNotificationSound() {
     const audio = new Audio('notification.mp3');
@@ -4140,13 +4140,23 @@ window.addEventListener('DOMContentLoaded', () => {
       if (response.ok) {
         const notifications = await response.json();
         
-        // Check for new notifications to play sound
-        const currentUnread = notifications.filter(n => !n.read).length;
-        if (currentUnread > lastNotifCount) {
-          playNotificationSound();
+        // Находим самое свежее непрочитанное уведомление
+        const unread = notifications.filter(n => !n.read);
+        if (unread.length > 0) {
+          // Сортируем по времени (самое новое первое)
+          const newest = unread.sort((a, b) => b.timestamp - a.timestamp)[0];
+          
+          // Играем звук только если это уведомление мы еще не "слышали"
+          if (newest.id !== lastHeardNotifId) {
+            playNotificationSound();
+            lastHeardNotifId = newest.id;
+            localStorage.setItem('last_heard_notif_id', lastHeardNotifId);
+          }
+        } else {
+          // Если непрочитанных нет, сбрасываем ID в памяти (но не в localStorage), 
+          // чтобы следующее новое точно прозвучало
+          lastHeardNotifId = null;
         }
-        // ВАЖНО: Обновляем счетчик всегда, чтобы звук не повторялся при открытии
-        lastNotifCount = currentUnread;
         
         renderNotifications(notifications);
       }
@@ -4160,8 +4170,6 @@ window.addEventListener('DOMContentLoaded', () => {
     const badge = document.getElementById('notifBadge');
     if (!savedUser) return;
 
-    // Сразу сбрасываем счетчик локально, чтобы звук не играл повторно
-    lastNotifCount = 0;
     if (badge) badge.style.display = 'none';
 
     try {
@@ -4169,7 +4177,13 @@ window.addEventListener('DOMContentLoaded', () => {
       const notifs = await res.json();
       const unread = notifs.filter(n => !n.read);
       
-      // Отправляем запросы на прочтение параллельно для скорости
+      if (unread.length === 0) return;
+
+      // Сразу обновляем локальный ID "услышанного", чтобы звук не играл
+      const newest = unread.sort((a, b) => b.timestamp - a.timestamp)[0];
+      lastHeardNotifId = newest.id;
+      localStorage.setItem('last_heard_notif_id', lastHeardNotifId);
+
       await Promise.all(unread.map(n => 
         fetch('https://discordwebhookurl.statkevichyt.workers.dev/mark-notif-read', {
           method: 'POST',
@@ -4178,7 +4192,6 @@ window.addEventListener('DOMContentLoaded', () => {
         })
       ));
       
-      // Обновляем список после всех запросов
       fetchNotifications(savedUser.id);
     } catch (e) {
       console.warn('Failed to mark all as read:', e);
@@ -4240,7 +4253,7 @@ window.addEventListener('DOMContentLoaded', () => {
   }
 
   // Новая функция обертка для удаления, чтобы избежать конфликтов имен
-  async function handleDeleteNotif(e, notifId) {
+  window.handleDeleteNotif = async function(e, notifId) {
     if (e) {
       e.preventDefault();
       e.stopPropagation();
@@ -4262,7 +4275,7 @@ window.addEventListener('DOMContentLoaded', () => {
     } catch (err) {
       console.warn('Failed to delete notification:', err);
     }
-  }
+  };
 
   function showNotifDetail(n) {
     const modal = document.getElementById('notifModal');
@@ -4287,13 +4300,16 @@ window.addEventListener('DOMContentLoaded', () => {
     const savedUser = JSON.parse(localStorage.getItem('steam_user'));
     if (!savedUser) return;
     
+    // Сразу помечаем этот ID как "услышанный", чтобы не было звука
+    lastHeardNotifId = notifId;
+    localStorage.setItem('last_heard_notif_id', lastHeardNotifId);
+
     try {
       await fetch('https://discordwebhookurl.statkevichyt.workers.dev/mark-notif-read', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ steamId: savedUser.id, notifId })
       });
-      // Refresh list
       fetchNotifications(savedUser.id);
     } catch (e) {
       console.warn('Failed to mark notification as read:', e);
