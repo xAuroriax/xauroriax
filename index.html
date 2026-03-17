@@ -1517,7 +1517,7 @@ header nav a:hover, header nav a.active {
 /* Gratitude Box Styles */
 .gratitude-box {
   position: absolute;
-  top: 720px;
+  top: 520px;
   left: 60px;
   width: 320px;
   background: rgba(0, 0, 0, 0.4);
@@ -2279,10 +2279,25 @@ if(activeNav){activeNav.classList.add('active');}
 const header = document.querySelector('header');
 const btn = document.getElementById('navToggleBtn');
 if (header && !header.classList.contains('hidden')) {
-  header.classList.add('hidden');
-  if (btn) btn.classList.remove('active');
-}
-window.scrollTo({top:0, behavior:'smooth'});
+    header.classList.add('hidden');
+    if (btn) btn.classList.remove('active');
+  }
+
+  // Smooth scroll to the content with offset
+  if (next && id !== 'home') {
+    setTimeout(() => {
+      const rect = next.getBoundingClientRect();
+      const offset = 80; // Space from top
+      const targetY = window.pageYOffset + rect.top - offset;
+      
+      window.scrollTo({
+        top: targetY,
+        behavior: 'smooth'
+      });
+    }, 100); // Small delay to let the page become active
+  } else if (id === 'home') {
+    window.scrollTo({top: 0, behavior: 'smooth'});
+  }
 }
 
 /* smooth scroll to rules section */
