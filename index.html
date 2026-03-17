@@ -1016,7 +1016,7 @@ header nav a {
 }
 
 /* Navigation Links Style Refresh - Permanent Comet */
-header nav a, .rules-trigger-btn {
+header nav a, .rules-trigger-btn, .blackmarket-trigger-btn {
   position: relative;
   overflow: visible;
   z-index: 1;
@@ -1037,7 +1037,12 @@ header nav a, .rules-trigger-btn {
   box-sizing: border-box;
 }
 
-header nav a::after, .rules-trigger-btn::after {
+.blackmarket-trigger-btn {
+  width: 100%;
+  box-sizing: border-box;
+}
+
+header nav a::after, .rules-trigger-btn::after, .blackmarket-trigger-btn::after {
   content: '';
   position: absolute;
   inset: -1.5px;
@@ -1049,14 +1054,14 @@ header nav a::after, .rules-trigger-btn::after {
   pointer-events: none;
 }
 
-header nav a.active, .rules-trigger-btn.active {
+header nav a.active, .rules-trigger-btn.active, .blackmarket-trigger-btn.active {
   background: transparent !important;
   border-color: var(--orange) !important;
   color: #fff !important;
   text-shadow: 0 0 10px var(--orange) !important;
 }
 
-header nav a:hover, .rules-trigger-btn:hover {
+header nav a:hover, .rules-trigger-btn:hover, .blackmarket-trigger-btn:hover {
   transform: translateY(-3px) scale(1.015);
   border-color: rgba(255,122,24,0.5) !important;
   box-shadow: 0 5px 15px rgba(0,0,0,0.6);
@@ -1185,6 +1190,579 @@ header nav a:hover, .rules-trigger-btn:hover {
   font-weight: bold;
   box-shadow: 0 0 10px rgba(255,75,75,0.5);
   display: none; /* Hidden by default */
+}
+
+/* User Balance */
+.user-balance-container {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 10px;
+  background: rgba(10,10,10,0.8);
+  border: 1px solid rgba(100,150,100,0.3);
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  backdrop-filter: blur(4px);
+  position: relative;
+}
+
+.user-balance-container:hover {
+  border-color: rgba(120,180,120,0.5);
+  box-shadow: 0 0 12px rgba(100,150,100,0.2);
+  transform: translateY(-1px);
+}
+
+.balance-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: rgba(150,200,150,0.8);
+  transition: color 0.3s ease;
+}
+
+.user-balance-container:hover .balance-icon {
+  color: rgba(180,220,180,1);
+  filter: drop-shadow(0 0 4px rgba(100,150,100,0.4));
+}
+
+.balance-amount {
+  font-family: 'Orbitron', monospace;
+  font-size: 14px;
+  font-weight: 500;
+  color: rgba(180,220,180,0.9);
+  text-shadow: 0 0 8px rgba(100,150,100,0.3);
+  min-width: 30px;
+  text-align: right;
+}
+
+/* Tooltip */
+.user-balance-container::after {
+  content: attr(title);
+  position: absolute;
+  bottom: -30px;
+  left: 50%;
+  transform: translateX(-50%) scale(0.8);
+  background: rgba(20,20,20,0.95);
+  color: rgba(180,220,180,0.9);
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transition: all 0.2s ease;
+  border: 1px solid rgba(100,150,100,0.3);
+  z-index: 1003;
+}
+
+.user-balance-container:hover::after {
+  opacity: 1;
+  transform: translateX(-50%) scale(1);
+}
+
+/* Balance Change Animations */
+.balance-change-popup {
+  position: absolute;
+  top: -25px;
+  right: -10px;
+  font-family: 'Orbitron', monospace;
+  font-size: 12px;
+  font-weight: bold;
+  padding: 2px 6px;
+  border-radius: 4px;
+  opacity: 0;
+  transform: translateY(0) scale(0.8);
+  animation: balancePopup 2s ease-out forwards;
+  pointer-events: none;
+  z-index: 1004;
+}
+
+.balance-change-popup.positive {
+  color: rgba(150, 200, 150, 0.9);
+  background: rgba(50, 100, 50, 0.3);
+  border: 1px solid rgba(100, 150, 100, 0.4);
+  text-shadow: 0 0 6px rgba(100, 200, 100, 0.4);
+}
+
+.balance-change-popup.negative {
+  color: rgba(200, 150, 150, 0.9);
+  background: rgba(100, 50, 50, 0.3);
+  border: 1px solid rgba(150, 100, 100, 0.4);
+  text-shadow: 0 0 6px rgba(200, 100, 100, 0.4);
+}
+
+@keyframes balancePopup {
+  0% {
+    opacity: 0;
+    transform: translateY(0) scale(0.8);
+  }
+  20% {
+    opacity: 1;
+    transform: translateY(-8px) scale(1);
+  }
+  80% {
+    opacity: 1;
+    transform: translateY(-12px) scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-18px) scale(0.9);
+  }
+}
+
+/* Balance Glow Effects */
+.user-balance-container.glow-positive {
+  border-color: rgba(120, 180, 120, 0.8);
+  box-shadow: 0 0 20px rgba(100, 150, 100, 0.4);
+  animation: balancePulsePositive 0.6s ease-out;
+}
+
+.user-balance-container.glow-negative {
+  border-color: rgba(180, 120, 120, 0.8);
+  box-shadow: 0 0 20px rgba(150, 100, 100, 0.4);
+  animation: balancePulseNegative 0.6s ease-out;
+}
+
+@keyframes balancePulsePositive {
+  0% {
+    transform: scale(1);
+    box-shadow: 0 0 12px rgba(100, 150, 100, 0.2);
+  }
+  50% {
+    transform: scale(1.05);
+    box-shadow: 0 0 25px rgba(100, 150, 100, 0.5);
+  }
+  100% {
+    transform: scale(1);
+    box-shadow: 0 0 12px rgba(100, 150, 100, 0.2);
+  }
+}
+
+@keyframes balancePulseNegative {
+  0% {
+    transform: scale(1);
+    box-shadow: 0 0 12px rgba(150, 100, 100, 0.2);
+  }
+  50% {
+    transform: scale(1.05);
+    box-shadow: 0 0 25px rgba(150, 100, 100, 0.5);
+  }
+  100% {
+    transform: scale(1);
+    box-shadow: 0 0 12px rgba(150, 100, 100, 0.2);
+  }
+}
+
+/* Smooth counter animation */
+.balance-amount.changing {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Black Market Pages Styles */
+.blackmarket-content {
+  text-align: center;
+  padding: 20px;
+}
+
+.roulette-table {
+  margin: 30px auto;
+  max-width: 600px;
+}
+
+.roulette-wheel {
+  width: 200px;
+  height: 200px;
+  margin: 0 auto 20px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(255,122,24,0.1) 0%, rgba(20,20,20,0.8) 70%);
+  border: 3px solid rgba(255,122,24,0.3);
+  position: relative;
+  box-shadow: 0 0 30px rgba(255,122,24,0.2);
+}
+
+.wheel-inner {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  background: conic-gradient(from 0deg, #2a2a2a 0deg, #ff7a18 60deg, #2a2a2a 120deg, #ff7a18 180deg, #2a2a2a 240deg, #ff7a18 300deg, #2a2a2a 360deg);
+  animation: wheelSpin 20s linear infinite;
+}
+
+@keyframes wheelSpin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.betting-area {
+  padding: 20px;
+  background: rgba(20,20,20,0.5);
+  border: 1px solid rgba(255,122,24,0.2);
+  border-radius: 8px;
+}
+
+/* Новые стили для горизонтальной рулетки */
+.roulette-game {
+  padding: 20px;
+}
+
+.roulette-betting {
+  background: rgba(20,20,20,0.6);
+  border: 1px solid rgba(255,122,24,0.2);
+  border-radius: 12px;
+  padding: 20px;
+  margin-bottom: 30px;
+  text-align: center;
+}
+
+.balance-display {
+  margin-bottom: 20px;
+  font-size: 18px;
+  color: rgba(180,220,180,0.9);
+}
+
+.balance-label {
+  color: rgba(255,255,255,0.7);
+  margin-right: 10px;
+}
+
+.bet-input-group {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+}
+
+.bet-label {
+  color: rgba(255,255,255,0.8);
+  font-weight: 500;
+}
+
+.bet-input {
+  background: rgba(10,10,10,0.8);
+  border: 1px solid rgba(255,122,24,0.3);
+  border-radius: 6px;
+  padding: 8px 12px;
+  color: #fff;
+  font-family: 'Orbitron', monospace;
+  font-size: 16px;
+  width: 120px;
+  text-align: center;
+}
+
+.bet-input:focus {
+  outline: none;
+  border-color: rgba(255,122,24,0.6);
+  box-shadow: 0 0 10px rgba(255,122,24,0.2);
+}
+
+.bet-souls {
+  color: rgba(255,122,24,0.8);
+  font-weight: 500;
+}
+
+.spin-button {
+  background: linear-gradient(135deg, rgba(255,122,24,0.8) 0%, rgba(255,100,0,0.6) 100%);
+  border: 2px solid rgba(255,122,24,0.5);
+  border-radius: 8px;
+  padding: 12px 30px;
+  color: #fff;
+  font-weight: bold;
+  font-size: 16px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.spin-button:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 5px 20px rgba(255,122,24,0.4);
+  border-color: rgba(255,122,24,0.8);
+}
+
+.spin-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.roulette-result {
+  background: rgba(20,20,20,0.8);
+  border: 1px solid rgba(255,122,24,0.3);
+  border-radius: 12px;
+  padding: 20px;
+  margin-bottom: 30px;
+  text-align: center;
+}
+
+.result-message {
+  font-size: 20px;
+  font-weight: bold;
+  margin-bottom: 10px;
+}
+
+.result-amount {
+  font-size: 24px;
+  font-family: 'Orbitron', monospace;
+  font-weight: bold;
+}
+
+.result-message.win {
+  color: rgba(150,200,150,0.9);
+  text-shadow: 0 0 10px rgba(100,200,100,0.4);
+}
+
+.result-message.lose {
+  color: rgba(200,150,150,0.9);
+  text-shadow: 0 0 10px rgba(200,100,100,0.4);
+}
+
+.result-amount.win {
+  color: rgba(150,200,150,0.9);
+  text-shadow: 0 0 8px rgba(100,200,100,0.3);
+}
+
+.result-amount.lose {
+  color: rgba(200,150,150,0.9);
+  text-shadow: 0 0 8px rgba(200,100,100,0.3);
+}
+
+.roulette-container {
+  position: relative;
+  margin: 40px 0;
+  height: 120px;
+  overflow: hidden;
+  border-radius: 12px;
+  background: rgba(10,10,10,0.6);
+  border: 1px solid rgba(255,122,24,0.2);
+}
+
+.roulette-pointer {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 10;
+}
+
+.pointer-arrow {
+  width: 0;
+  height: 0;
+  border-left: 15px solid transparent;
+  border-right: 15px solid transparent;
+  border-top: 25px solid rgba(255,122,24,0.9);
+  filter: drop-shadow(0 0 10px rgba(255,122,24,0.6));
+  animation: pointerPulse 2s ease-in-out infinite;
+}
+
+@keyframes pointerPulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.1); }
+}
+
+.roulette-track {
+  position: relative;
+  height: 100%;
+  overflow: hidden;
+}
+
+.roulette-strip {
+  display: flex;
+  height: 100%;
+  transition: transform 0.1s linear;
+  will-change: transform;
+}
+
+.roulette-card {
+  flex-shrink: 0;
+  width: 100px;
+  height: 100px;
+  margin: 10px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  font-size: 18px;
+  font-family: 'Orbitron', monospace;
+  border: 2px solid;
+  position: relative;
+  overflow: hidden;
+}
+
+.roulette-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(135deg, rgba(255,255,255,0.1) 0%, transparent 50%);
+  pointer-events: none;
+}
+
+.roulette-card.mult-x5 {
+  background: linear-gradient(135deg, rgba(255,100,0,0.3) 0%, rgba(255,50,0,0.2) 100%);
+  border-color: rgba(255,100,0,0.8);
+  color: rgba(255,150,50,0.9);
+  box-shadow: 0 0 20px rgba(255,100,0,0.3);
+}
+
+.roulette-card.mult-x2 {
+  background: linear-gradient(135deg, rgba(100,150,255,0.3) 0%, rgba(50,100,200,0.2) 100%);
+  border-color: rgba(100,150,255,0.8);
+  color: rgba(150,200,255,0.9);
+  box-shadow: 0 0 15px rgba(100,150,255,0.3);
+}
+
+.roulette-card.mult-x1 {
+  background: linear-gradient(135deg, rgba(100,255,100,0.3) 0%, rgba(50,200,50,0.2) 100%);
+  border-color: rgba(100,255,100,0.8);
+  color: rgba(150,255,150,0.9);
+  box-shadow: 0 0 10px rgba(100,255,100,0.3);
+}
+
+.roulette-card.mult-x05 {
+  background: linear-gradient(135deg, rgba(255,255,100,0.3) 0%, rgba(200,200,50,0.2) 100%);
+  border-color: rgba(255,255,100,0.8);
+  color: rgba(255,255,150,0.9);
+  box-shadow: 0 0 8px rgba(255,255,100,0.3);
+}
+
+.roulette-card.mult-x0 {
+  background: linear-gradient(135deg, rgba(100,100,100,0.3) 0%, rgba(50,50,50,0.2) 100%);
+  border-color: rgba(150,150,150,0.8);
+  color: rgba(180,180,180,0.9);
+  box-shadow: 0 0 5px rgba(150,150,150,0.2);
+}
+
+.roulette-info {
+  background: rgba(20,20,20,0.6);
+  border: 1px solid rgba(255,122,24,0.2);
+  border-radius: 12px;
+  padding: 20px;
+  margin-top: 30px;
+}
+
+.roulette-info h3 {
+  color: rgba(255,255,255,0.9);
+  margin-bottom: 15px;
+  text-align: center;
+}
+
+.multipliers-list {
+  display: flex;
+  justify-content: space-around;
+  flex-wrap: wrap;
+  gap: 15px;
+}
+
+.multiplier-item {
+  text-align: center;
+  padding: 10px;
+  background: rgba(10,10,10,0.5);
+  border: 1px solid rgba(255,122,24,0.2);
+  border-radius: 8px;
+  min-width: 80px;
+}
+
+.mult-value {
+  display: block;
+  font-size: 18px;
+  font-weight: bold;
+  font-family: 'Orbitron', monospace;
+  margin-bottom: 5px;
+}
+
+.mult-desc {
+  display: block;
+  font-size: 12px;
+  color: rgba(255,255,255,0.6);
+}
+
+.poker-table {
+  margin: 30px auto;
+  max-width: 700px;
+}
+
+.table-surface {
+  width: 100%;
+  height: 300px;
+  background: radial-gradient(ellipse at center, rgba(50,150,50,0.2) 0%, rgba(20,20,20,0.8) 70%);
+  border: 2px solid rgba(100,150,100,0.3);
+  border-radius: 150px;
+  margin: 0 auto 20px;
+  box-shadow: inset 0 0 50px rgba(0,0,0,0.5);
+}
+
+.player-positions {
+  padding: 20px;
+  background: rgba(20,20,20,0.5);
+  border: 1px solid rgba(100,150,100,0.2);
+  border-radius: 8px;
+}
+
+.slot-machines {
+  display: flex;
+  justify-content: center;
+  gap: 30px;
+  margin: 30px 0;
+}
+
+.slot-machine {
+  background: rgba(30,30,30,0.8);
+  border: 2px solid rgba(255,122,24,0.3);
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: 0 0 20px rgba(0,0,0,0.5);
+}
+
+.slot-reels {
+  display: flex;
+  gap: 5px;
+  margin-bottom: 15px;
+  justify-content: center;
+}
+
+.reel {
+  width: 60px;
+  height: 80px;
+  background: linear-gradient(180deg, #1a1a1a 0%, #3a3a3a 50%, #1a1a1a 100%);
+  border: 1px solid rgba(255,122,24,0.2);
+  border-radius: 4px;
+  position: relative;
+  overflow: hidden;
+}
+
+.reel::before {
+  content: "?";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: rgba(255,122,24,0.6);
+  font-size: 24px;
+  font-weight: bold;
+}
+
+.slot-lever {
+  width: 10px;
+  height: 40px;
+  background: linear-gradient(180deg, #ff7a18 0%, #cc5500 100%);
+  border-radius: 5px;
+  margin: 0 auto;
+  cursor: pointer;
+  transition: transform 0.3s ease;
+}
+
+.slot-lever:hover {
+  transform: translateY(2px);
 }
 
 /* Notification Popup */
@@ -1850,6 +2428,33 @@ input, textarea, select {
     transform: scale(0.8);
     transform-origin: right top;
   }
+
+  .user-balance-container {
+    padding: 4px 6px;
+    gap: 4px;
+  }
+
+  .balance-icon svg {
+    width: 14px !important;
+    height: 14px !important;
+  }
+
+  .balance-amount {
+    font-size: 12px;
+    min-width: 24px;
+  }
+
+  .balance-change-popup {
+    font-size: 10px;
+    top: -20px;
+    right: -8px;
+    padding: 1px 4px;
+  }
+
+  .user-balance-container.glow-positive,
+  .user-balance-container.glow-negative {
+    transform: scale(1.02);
+  }
   
   #navToggleBtn {
     top: 75px !important;
@@ -1990,6 +2595,16 @@ input, textarea, select {
 </div>
 
 <a onclick="showPage('quenta')"><i class="fas fa-file-alt"></i><span data-i18n="nav_quenta">Квента</span></a>
+
+<div class="nav-dropdown">
+  <a onclick="toggleBlackMarketDropdown(event)" class="blackmarket-trigger-btn"><i class="fas fa-skull-crossbones"></i><span data-i18n="nav_blackmarket">Черный рынок</span></a>
+  <div class="nav-submenu" id="blackmarketSubmenu">
+    <a onclick="showPage('roulette')"><i class="fas fa-dice"></i><span data-i18n="blackmarket_roulette">Рулетка</span></a>
+    <a onclick="showPage('poker')"><i class="fas fa-poker-chip"></i><span data-i18n="blackmarket_poker">Покер</span></a>
+    <a onclick="showPage('slots')"><i class="fas fa-slot-machine"></i><span data-i18n="blackmarket_slots">Слоты</span></a>
+  </div>
+</div>
+
 <a onclick="showPage('team')"><i class="fas fa-users"></i><span data-i18n="nav_team">Синдикат</span></a>
 <a onclick="showPage('links')"><i class="fas fa-link"></i><span data-i18n="nav_links">Ссылки</span></a>
 </nav>
@@ -2017,6 +2632,20 @@ input, textarea, select {
         <div class="notification-empty" data-i18n="notif_empty">Нет новых уведомлений</div>
       </div>
     </div>
+  </div>
+
+  <!-- User Balance -->
+  <div id="userBalance" class="user-balance-container" style="display:none;" title="Баланс">
+    <div class="balance-icon">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+        <circle cx="8" cy="8" r="7.5" stroke="currentColor" stroke-width="1" opacity="0.6"/>
+        <path d="M8 1C4.13401 1 1 4.13401 1 8C1 11.866 4.13401 15 8 15C11.866 15 15 11.866 15 8C15 4.13401 11.866 1 8 1ZM8 3C10.7614 3 13 5.23858 13 8C13 10.7614 10.7614 13 8 13C5.23858 13 3 10.7614 3 8C3 5.23858 5.23858 3 8 3Z" fill="currentColor"/>
+        <circle cx="8" cy="5" r="1.5" fill="currentColor"/>
+        <circle cx="8" cy="11" r="1.5" fill="currentColor"/>
+        <path d="M5 8C5 7.44772 5.44772 7 6 7H10C10.5523 7 11 7.44772 11 8C11 8.55228 10.5523 9 10 9H6C5.44772 9 5 8.55228 5 8Z" fill="currentColor"/>
+      </svg>
+    </div>
+    <span id="balanceAmount" class="balance-amount">0</span>
   </div>
 
   <div class="trace-container">
@@ -2404,6 +3033,118 @@ input, textarea, select {
     </div>
   </section>
 
+<div class="page" id="roulette">
+  <div class="container">
+    <div class="card">
+      <h2 class="synd-title" data-i18n="blackmarket_roulette">Рулетка</h2>
+      <div class="roulette-game">
+        <!-- Блок для ставки -->
+        <div class="roulette-betting">
+          <div class="balance-display">
+            <span class="balance-label">Ваш баланс:</span>
+            <span id="rouletteBalance" class="balance-amount">0</span>
+          </div>
+          <div class="bet-input-group">
+            <label for="betAmount" class="bet-label">Ставка:</label>
+            <input type="number" id="betAmount" class="bet-input" min="1" placeholder="Введите ставку">
+            <span class="bet-souls">Souls</span>
+          </div>
+          <button id="spinButton" class="spin-button" onclick="startRouletteSpin()">
+            <i class="fas fa-dice"></i>
+            <span>КРУТИТЬ</span>
+          </button>
+        </div>
+
+        <!-- Блок для результатов -->
+        <div class="roulette-result" id="rouletteResult" style="display: none;">
+          <div class="result-message" id="resultMessage"></div>
+          <div class="result-amount" id="resultAmount"></div>
+        </div>
+
+        <!-- Горизонтальная рулетка -->
+        <div class="roulette-container">
+          <!-- Указатель в центре -->
+          <div class="roulette-pointer">
+            <div class="pointer-arrow"></div>
+          </div>
+          
+          <!-- Контейнер для прокрутки -->
+          <div class="roulette-track">
+            <div class="roulette-strip" id="rouletteStrip">
+              <!-- Карточки будут сгенерированы через JavaScript -->
+            </div>
+          </div>
+        </div>
+
+        <!-- Информация о коэффициентах -->
+        <div class="roulette-info">
+          <h3>Коэффициенты выигрыша:</h3>
+          <div class="multipliers-list">
+            <div class="multiplier-item">
+              <span class="mult-value">x5</span>
+              <span class="mult-desc">Редкий</span>
+            </div>
+            <div class="multiplier-item">
+              <span class="mult-value">x2</span>
+              <span class="mult-desc">Необычный</span>
+            </div>
+            <div class="multiplier-item">
+              <span class="mult-value">x1</span>
+              <span class="mult-desc">Обычный</span>
+            </div>
+            <div class="multiplier-item">
+              <span class="mult-value">x0.5</span>
+              <span class="mult-desc">Низкий</span>
+            </div>
+            <div class="multiplier-item">
+              <span class="mult-value">x0</span>
+              <span class="mult-desc">Проигрыш</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="page" id="poker">
+  <div class="container">
+    <div class="card">
+      <h2 class="synd-title" data-i18n="blackmarket_poker">Покер</h2>
+      <div class="blackmarket-content">
+        <p>Классический покер в атмосфере Зоны.</p>
+        <div class="poker-table">
+          <div class="table-surface"></div>
+          <div class="player-positions">
+            <p>Места для игроков: до 6 участников.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="page" id="slots">
+  <div class="container">
+    <div class="card">
+      <h2 class="synd-title" data-i18n="blackmarket_slots">Слоты</h2>
+      <div class="blackmarket-content">
+        <p>Зоновские автоматы с уникальными символами.</p>
+        <div class="slot-machines">
+          <div class="slot-machine">
+            <div class="slot-reels">
+              <div class="reel"></div>
+              <div class="reel"></div>
+              <div class="reel"></div>
+            </div>
+            <div class="slot-lever"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
 <div class="page" id="team">
 <div class="card">
 <h2 class="synd-title" data-i18n="team_title">Синдикат</h2>
@@ -2688,6 +3429,100 @@ function updateSoulsUI(steamId) {
   const value = loadSouls(steamId);
   const el = document.getElementById('statsSouls');
   if (el) el.textContent = value;
+}
+
+function updateBalanceUI(steamId) {
+  const value = loadSouls(steamId);
+  const balanceEl = document.getElementById('balanceAmount');
+  const balanceContainer = document.getElementById('userBalance');
+  
+  if (balanceEl && balanceContainer) {
+    const currentValue = parseInt(balanceEl.textContent) || 0;
+    const newValue = parseInt(value) || 0;
+    
+    // Если значение изменилось, запускаем анимации
+    if (currentValue !== newValue) {
+      const difference = newValue - currentValue;
+      
+      // Показываем всплывающий текст
+      showBalanceChangePopup(difference);
+      
+      // Добавляем glow эффект
+      addBalanceGlow(balanceContainer, difference);
+      
+      // Анимируем счётчик
+      animateBalanceCounter(balanceEl, currentValue, newValue);
+    }
+  }
+}
+
+// Функция анимации счётчика
+function animateBalanceCounter(element, start, end) {
+  const duration = 600; // 0.6 секунды
+  const startTime = performance.now();
+  
+  element.classList.add('changing');
+  
+  function updateCounter(currentTime) {
+    const elapsed = currentTime - startTime;
+    const progress = Math.min(elapsed / duration, 1);
+    
+    // Используем easeOutCubic для плавной анимации
+    const easeOutCubic = 1 - Math.pow(1 - progress, 3);
+    const current = Math.round(start + (end - start) * easeOutCubic);
+    
+    element.textContent = current;
+    
+    if (progress < 1) {
+      requestAnimationFrame(updateCounter);
+    } else {
+      element.classList.remove('changing');
+    }
+  }
+  
+  requestAnimationFrame(updateCounter);
+}
+
+// Функция показа всплывающего текста
+function showBalanceChangePopup(difference) {
+  const balanceContainer = document.getElementById('userBalance');
+  if (!balanceContainer) return;
+  
+  // Удаляем существующий popup если есть
+  const existingPopup = balanceContainer.querySelector('.balance-change-popup');
+  if (existingPopup) {
+    existingPopup.remove();
+  }
+  
+  // Создаем новый popup
+  const popup = document.createElement('div');
+  popup.className = `balance-change-popup ${difference > 0 ? 'positive' : 'negative'}`;
+  popup.textContent = `${difference > 0 ? '+' : ''}${difference}`;
+  
+  balanceContainer.appendChild(popup);
+  
+  // Автоматически удаляем после анимации
+  setTimeout(() => {
+    if (popup.parentNode) {
+      popup.remove();
+    }
+  }, 2000);
+}
+
+// Функция добавления glow эффекта
+function addBalanceGlow(container, difference) {
+  // Удаляем предыдущие glow классы
+  container.classList.remove('glow-positive', 'glow-negative');
+  
+  // Добавляем соответствующий glow эффект
+  setTimeout(() => {
+    container.classList.add(difference > 0 ? 'glow-positive' : 'glow-negative');
+    
+    // Удаляем класс после анимации
+    setTimeout(() => {
+      container.classList.remove('glow-positive', 'glow-negative');
+    }, 600);
+  }, 50);
 }
 
 /* rules data */
@@ -3238,6 +4073,37 @@ function toggleRulesDropdown(event) {
   }
 }
 
+function toggleBlackMarketDropdown(event) {
+  if (event) event.stopPropagation();
+  
+  // Find the specific blackmarket dropdown
+  const blackmarketDropdown = Array.from(document.querySelectorAll('.nav-dropdown')).find(dropdown => 
+    dropdown.querySelector('.blackmarket-trigger-btn')
+  );
+  const trigger = document.querySelector('.blackmarket-trigger-btn');
+  
+  if (!blackmarketDropdown || !trigger) return;
+  
+  const isOpening = !blackmarketDropdown.classList.contains('active');
+  blackmarketDropdown.classList.toggle('active');
+  
+  // Highlight trigger when open
+  if (isOpening) {
+    trigger.classList.add('active');
+  } else {
+    // Remove highlight when closed
+    trigger.classList.remove('active');
+  }
+  
+  // Close other dropdowns
+  const otherDropdowns = document.querySelectorAll('.nav-dropdown:not(:has(.blackmarket-trigger-btn))');
+  otherDropdowns.forEach(dropdown => {
+    dropdown.classList.remove('active');
+    const otherTrigger = dropdown.querySelector('.rules-trigger-btn');
+    if (otherTrigger) otherTrigger.classList.remove('active');
+  });
+}
+
 function switchRules(type) {
   const data = rulesData[type];
   if (!data) return;
@@ -3429,6 +4295,10 @@ nav_rules:"Правила",
 nav_team:"Синдикат",
 nav_links:"Ссылки",
 nav_quenta:"Квента",
+nav_blackmarket:"Черный рынок",
+blackmarket_roulette:"Рулетка",
+blackmarket_poker:"Покер",
+blackmarket_slots:"Слоты",
 team_title:"Синдикат",
 links_title:"Сообщество",
 manifest_title:"От создателей",
@@ -3860,6 +4730,10 @@ en: {
   nav_team: "Syndicate",
   nav_links: "Links",
   nav_quenta: "Quenta",
+  nav_blackmarket: "Black Market",
+  blackmarket_roulette: "Roulette",
+  blackmarket_poker: "Poker",
+  blackmarket_slots: "Slots",
   team_title: "Syndicate",
   links_title: "Community",
   manifest_title: "From the Creators",
@@ -4764,6 +5638,7 @@ window.addEventListener('DOMContentLoaded', () => {
     }
 
     updateSteamUI();
+    initRoulette();
   }
 
   let statusCheckInterval = null;
@@ -5082,6 +5957,20 @@ window.addEventListener('DOMContentLoaded', () => {
           </div>
         </div>
 
+        <!-- User Balance -->
+        <div id="userBalance" class="user-balance-container" title="Баланс">
+          <div class="balance-icon">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+              <circle cx="8" cy="8" r="7.5" stroke="currentColor" stroke-width="1" opacity="0.6"/>
+              <path d="M8 1C4.13401 1 1 4.13401 1 8C1 11.866 4.13401 15 8 15C11.866 15 15 11.866 15 8C15 4.13401 11.866 1 8 1ZM8 3C10.7614 3 13 5.23858 13 8C13 10.7614 10.7614 13 8 13C5.23858 13 3 10.7614 3 8C3 5.23858 5.23858 3 8 3Z" fill="currentColor"/>
+              <circle cx="8" cy="5" r="1.5" fill="currentColor"/>
+              <circle cx="8" cy="11" r="1.5" fill="currentColor"/>
+              <path d="M5 8C5 7.44772 5.44772 7 6 7H10C10.5523 7 11 7.44772 11 8C11 8.55228 10.5523 9 10 9H6C5.44772 9 5 8.55228 5 8Z" fill="currentColor"/>
+            </svg>
+          </div>
+          <span id="balanceAmount" class="balance-amount">0</span>
+        </div>
+
         <div class="trace-container" onclick="showPage('profile')">
           <div class="trace-line"><svg><rect class="comet-1"></rect><rect class="comet-2"></rect></svg></div>
           <div class="steam-login-btn">
@@ -5093,6 +5982,13 @@ window.addEventListener('DOMContentLoaded', () => {
 
       initSoulsForUser(savedUser.id);
       updateSoulsUI(savedUser.id);
+      
+      // Show and update balance
+      const balanceEl = document.getElementById('userBalance');
+      if (balanceEl) {
+        balanceEl.style.display = 'flex';
+        updateBalanceUI(savedUser.id);
+      }
 
       startGlobalPolling(savedUser.id);
       
@@ -5168,6 +6064,7 @@ window.addEventListener('DOMContentLoaded', () => {
         if (data && typeof data.souls === 'number') {
           saveSouls(steamId, data.souls);
           updateSoulsUI(steamId);
+          updateBalanceUI(steamId); // Обновляем баланс
         }
         
         // Обновляем статистику тестов
@@ -5787,8 +6684,229 @@ ${motivation}`;
     }
   }
 
+// Roulette Game Logic
+let isSpinning = false;
+let currentBalance = 0;
+let rouletteCards = [];
+
+// Инициализация рулетки
+function initRoulette() {
+  const savedUser = JSON.parse(localStorage.getItem('steam_user'));
+  if (savedUser) {
+    currentBalance = parseInt(loadSouls(savedUser.id)) || 0;
+    updateRouletteBalance();
+  }
+  
+  generateRouletteCards();
+  updateRouletteBalance();
+}
+
+// Генерация карточек для рулетки
+function generateRouletteCards() {
+  const multipliers = [
+    { value: 0, class: 'mult-x0', weight: 30 },
+    { value: 0.5, class: 'mult-x05', weight: 25 },
+    { value: 1, class: 'mult-x1', weight: 25 },
+    { value: 2, class: 'mult-x2', weight: 15 },
+    { value: 5, class: 'mult-x5', weight: 5 }
+  ];
+  
+  // Создаем массив карточек с учетом веса
+  const cardPool = [];
+  multipliers.forEach(mult => {
+    for (let i = 0; i < mult.weight; i++) {
+      cardPool.push(mult);
+    }
+  });
+  
+  // Перемешиваем и создаем карточки
+  const shuffled = cardPool.sort(() => Math.random() - 0.5);
+  const strip = document.getElementById('rouletteStrip');
+  
+  // Создаем 3 набора карточек для бесшовной прокрутки
+  for (let set = 0; set < 3; set++) {
+    shuffled.forEach(mult => {
+      const card = document.createElement('div');
+      card.className = `roulette-card ${mult.class}`;
+      card.textContent = `x${mult.value}`;
+      card.dataset.multiplier = mult.value;
+      strip.appendChild(card);
+      rouletteCards.push(card);
+    });
+  }
+}
+
+// Обновление баланса на странице рулетки
+function updateRouletteBalance() {
+  const balanceEl = document.getElementById('rouletteBalance');
+  if (balanceEl) {
+    balanceEl.textContent = currentBalance;
+  }
+}
+
+// Основная функция запуска рулетки
+function startRouletteSpin() {
+  if (isSpinning) return;
+  
+  const betInput = document.getElementById('betAmount');
+  const bet = parseInt(betInput.value);
+  
+  // Валидация ставки
+  if (!bet || bet <= 0) {
+    showToast('Введите корректную ставку');
+    return;
+  }
+  
+  if (bet > currentBalance) {
+    showToast('Недостаточно средств');
+    return;
+  }
+  
+  // Начинаем игру
+  isSpinning = true;
+  const spinButton = document.getElementById('spinButton');
+  spinButton.disabled = true;
+  
+  // Списываем ставку
+  currentBalance -= bet;
+  updateRouletteBalance();
+  updateBalanceUI(getCurrentUserId());
+  
+  // Скрываем предыдущий результат
+  const resultDiv = document.getElementById('rouletteResult');
+  resultDiv.style.display = 'none';
+  
+  // Определяем результат заранее
+  const result = calculateRouletteResult();
+  const winAmount = Math.floor(bet * result.multiplier);
+  
+  // Запускаем анимацию
+  animateRouletteSpin(result, bet, winAmount);
+}
+
+// Расчет результата рулетки
+function calculateRouletteResult() {
+  const multipliers = [
+    { value: 0, weight: 30 },
+    { value: 0.5, weight: 25 },
+    { value: 1, weight: 25 },
+    { value: 2, weight: 15 },
+    { value: 5, weight: 5 }
+  ];
+  
+  const totalWeight = multipliers.reduce((sum, m) => sum + m.weight, 0);
+  let random = Math.random() * totalWeight;
+  
+  for (const mult of multipliers) {
+    random -= mult.weight;
+    if (random <= 0) {
+      return { multiplier: mult.value, class: `mult-x${mult.value}`.replace('.', '') };
+    }
+  }
+  
+  return { multiplier: 0, class: 'mult-x0' };
+}
+
+// Анимация прокрутки рулетки
+function animateRouletteSpin(result, bet, winAmount) {
+  const strip = document.getElementById('rouletteStrip');
+  const cardWidth = 120; // 100px + 10px margin
+  const containerWidth = strip.parentElement.offsetWidth;
+  const centerPosition = containerWidth / 2;
+  
+  // Находим целевую карточку
+  const targetCard = rouletteCards.find(card => 
+    card.dataset.multiplier == result.multiplier
+  );
+  const targetIndex = rouletteCards.indexOf(targetCard);
+  
+  // Вычисляем конечную позицию
+  const totalWidth = rouletteCards.length * cardWidth;
+  const targetPosition = -(targetIndex * cardWidth - centerPosition + cardWidth / 2);
+  
+  // Добавляем несколько полных оборотов для эффекта
+  const spins = 3;
+  const finalPosition = targetPosition - (spins * totalWidth);
+  
+  // Анимация с ускорением и замедлением
+  let startTime = null;
+  const duration = 3000 + Math.random() * 2000; // 3-5 секунд
+  
+  function animate(currentTime) {
+    if (!startTime) startTime = currentTime;
+    const elapsed = currentTime - startTime;
+    const progress = Math.min(elapsed / duration, 1);
+    
+    // Используем easeOutCubic для плавного замедления
+    const easeProgress = 1 - Math.pow(1 - progress, 3);
+    
+    // Применяем трансформацию
+    strip.style.transform = `translateX(${finalPosition * easeProgress}px)`;
+    
+    if (progress < 1) {
+      requestAnimationFrame(animate);
+    } else {
+      // Анимация завершена
+      finishRouletteSpin(result, bet, winAmount);
+    }
+  }
+  
+  requestAnimationFrame(animate);
+}
+
+// Завершение игры
+function finishRouletteSpin(result, bet, winAmount) {
+  // Обновляем баланс
+  currentBalance += winAmount;
+  updateRouletteBalance();
+  updateBalanceUI(getCurrentUserId());
+  saveSouls(getCurrentUserId(), currentBalance);
+  
+  // Показываем результат
+  showRouletteResult(result, bet, winAmount);
+  
+  // Разблокируем кнопку
+  isSpinning = false;
+  const spinButton = document.getElementById('spinButton');
+  spinButton.disabled = false;
+}
+
+// Показ результата
+function showRouletteResult(result, bet, winAmount) {
+  const resultDiv = document.getElementById('rouletteResult');
+  const messageEl = document.getElementById('resultMessage');
+  const amountEl = document.getElementById('resultAmount');
+  
+  const isWin = winAmount > bet;
+  const profit = winAmount - bet;
+  
+  messageEl.textContent = isWin ? 'ВЫИГРЫШ!' : 'ПРОИГРЫШ';
+  messageEl.className = `result-message ${isWin ? 'win' : 'lose'}`;
+  
+  if (isWin) {
+    amountEl.textContent = `+${profit} Souls`;
+    amountEl.className = 'result-amount win';
+  } else {
+    amountEl.textContent = `${profit} Souls`;
+    amountEl.className = 'result-amount lose';
+  }
+  
+  resultDiv.style.display = 'block';
+}
+
+// Получение текущего ID пользователя
+function getCurrentUserId() {
+  const savedUser = JSON.parse(localStorage.getItem('steam_user'));
+  return savedUser ? savedUser.id : null;
+}
+
   function logout() {
     localStorage.removeItem('steam_user');
+    // Hide balance when logging out
+    const balanceEl = document.getElementById('userBalance');
+    if (balanceEl) {
+      balanceEl.style.display = 'none';
+    }
     location.reload();
   }
 
