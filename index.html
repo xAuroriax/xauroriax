@@ -115,7 +115,7 @@ nav a i {
   .active, header nav a.active{
     color:#fff !important;
     border-color:var(--orange) !important;
-    background:rgba(255,122,24,0.15) !important;
+    background:transparent !important;
     text-shadow:0 0 8px var(--orange) !important;
   }
 
@@ -219,7 +219,7 @@ header{
 }
 
 .setting-btn.active {
-  background: rgba(255,122,24,0.1);
+  background: transparent !important;
   border-color: var(--orange);
   color: #fff;
   box-shadow: none !important;
@@ -251,13 +251,13 @@ header{
 }
 
 .exam-answer-btn:hover {
-  background: rgba(255,122,24,0.05);
+  background: transparent !important;
   border-color: rgba(255,122,24,0.3);
   color: #fff;
 }
 
 .exam-answer-btn.active {
-  background: rgba(255,122,24,0.15);
+  background: transparent !important;
   border-color: var(--orange);
   color: #fff;
   box-shadow: inset 0 0 15px rgba(255,122,24,0.1);
@@ -438,12 +438,12 @@ border:1px solid transparent;
 }
 .rules-sidebar a:hover{
 color:#fff;
-background:rgba(255,122,24,0.05);
+background:transparent !important;
 border-color:rgba(255,122,24,0.2);
 }
 .rules-sidebar a.active{
 color:#fff;
-background:rgba(255,122,24,0.1);
+background:transparent !important;
 border-color:var(--orange);
 text-shadow:0 0 8px var(--orange);
 }
@@ -452,6 +452,16 @@ text-shadow:0 0 8px var(--orange);
 flex:1;
 max-width:800px;
 color: #e0e0e0;
+}
+.rules-content.fade-out{
+  opacity:0;
+  transform:translateY(8px);
+  transition:opacity .25s ease,transform .25s ease;
+}
+.rules-content.fade-in{
+  opacity:1;
+  transform:translateY(0);
+  transition:opacity .25s ease,transform .25s ease;
 }
 .rules-content p,.rules-content li,.rules-content td,.rules-content th,.rules-content span,.rules-content strong{ text-shadow:none !important; color: inherit; }
 
@@ -569,14 +579,19 @@ color:var(--orange);
 }
 
 .nav-submenu a {
+  position: relative;
+  overflow: visible;
+  z-index: 1;
   font-size: 13px !important;
-  padding: 8px 15px !important;
-  border-radius: 8px !important;
-  background: rgba(255, 255, 255, 0.02) !important;
-  border: 1px solid rgba(255, 255, 255, 0.05) !important;
+  padding: 10px 18px !important;
+  border-radius: 10px !important;
+  background: rgba(20,20,20,0.6) !important;
+  border: 1px solid rgba(255,122,24,0.1) !important;
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 12px;
+  color: var(--orange) !important;
+  transition: 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
 
 .nav-submenu a i {
@@ -585,9 +600,25 @@ color:var(--orange);
   margin-right: 0 !important;
 }
 
-.nav-submenu a:hover {
-  background: rgba(255, 122, 24, 0.1) !important;
+.nav-submenu a:hover, .nav-submenu a.active {
+  background: transparent !important;
   border-color: var(--orange) !important;
+  color: #fff !important;
+  text-shadow: 0 0 10px var(--orange) !important;
+  transform: translateY(-3px) scale(1.015);
+}
+
+/* Fixed Comet for Submenu Links */
+.nav-submenu a::after {
+  content: '';
+  position: absolute;
+  inset: -1.5px;
+  border: 1.5px solid var(--orange);
+  border-radius: 10px;
+  -webkit-mask: conic-gradient(from var(--angle, 0deg), var(--orange) 0deg, transparent 60deg) border-box;
+  mask: conic-gradient(from var(--angle, 0deg), var(--orange) 0deg, transparent 60deg) border-box;
+  animation: cometRotateAngle 3s linear infinite;
+  pointer-events: none;
 }
 
 /* Rules Categories Visibility */
@@ -897,20 +928,74 @@ header nav a {
   padding: 10px 18px;
   border-radius: 10px;
   color: var(--orange) !important;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
 }
 
-/* Fixed Comet for Nav Links - No beam, permanent */
-header nav a::after {
+.nav-dropdown-trigger {
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+}
+
+.nav-dropdown-trigger a {
+  background: transparent !important;
+  border: none !important;
+  padding: 0 !important;
+  pointer-events: none;
+}
+
+.nav-dropdown-trigger a::after {
+  display: none !important;
+}
+
+/* Navigation Links Style Refresh - Permanent Comet */
+header nav a, .rules-trigger-btn {
+  position: relative;
+  overflow: visible;
+  z-index: 1;
+  background: rgba(20,20,20,0.6) !important;
+  border: 1px solid rgba(255,122,24,0.1) !important;
+  transition: 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  padding: 10px 18px;
+  border-radius: 10px;
+  color: var(--orange) !important;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  text-decoration: none;
+}
+
+.rules-trigger-btn {
+  width: 100%;
+  box-sizing: border-box;
+}
+
+header nav a::after, .rules-trigger-btn::after {
   content: '';
   position: absolute;
   inset: -1.5px;
   border: 1.5px solid var(--orange);
   border-radius: 10px;
-  /* Use mask to show ONLY a small segment moving around the border */
   -webkit-mask: conic-gradient(from var(--angle, 0deg), var(--orange) 0deg, transparent 60deg) border-box;
   mask: conic-gradient(from var(--angle, 0deg), var(--orange) 0deg, transparent 60deg) border-box;
   animation: cometRotateAngle 3s linear infinite;
   pointer-events: none;
+}
+
+header nav a.active, .rules-trigger-btn.active {
+  background: transparent !important;
+  border-color: var(--orange) !important;
+  color: #fff !important;
+  text-shadow: 0 0 10px var(--orange) !important;
+}
+
+header nav a:hover, .rules-trigger-btn:hover {
+  transform: translateY(-3px) scale(1.015);
+  border-color: rgba(255,122,24,0.5) !important;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.6);
+  z-index: 10;
 }
 
 @property --angle {
@@ -921,16 +1006,6 @@ header nav a::after {
 
 @keyframes cometRotateAngle {
   to { --angle: 360deg; }
-}
-
-header nav a.active {
-  background: rgba(255,122,24,0.1) !important;
-  border-color: var(--orange) !important;
-  color: #fff !important;
-}
-
-header nav a:hover, header nav a.active {
-  text-shadow: 0 0 10px var(--orange) !important;
 }
 
 /* CTA Refinement (Smaller and more elegant) */
@@ -988,7 +1063,7 @@ header nav a:hover, header nav a.active {
   border: 1px solid #1b1b1b;
 }
 .rules-sidebar a:hover, .rules-sidebar a.active {
-   background: rgba(255,122,24,0.1);
+   background: transparent !important;
    border-color: var(--orange);
  }
 
@@ -1760,10 +1835,7 @@ header nav a:hover, header nav a.active {
 <a onclick="showPage('home')"><i class="fas fa-home"></i><span data-i18n="nav_home">Главная</span></a>
 
 <div class="nav-dropdown">
-  <div class="nav-dropdown-trigger">
-    <a onclick="showPage('rules')"><i class="fas fa-book"></i><span data-i18n="nav_rules">Правила</span></a>
-    <i class="fas fa-chevron-down dropdown-arrow" onclick="toggleRulesDropdown(event)"></i>
-  </div>
+  <a onclick="toggleRulesDropdown(event)" class="rules-trigger-btn"><i class="fas fa-book"></i><span data-i18n="nav_rules">Правила</span></a>
   <div class="nav-submenu" id="rulesSubmenu">
     <a onclick="switchRules('server')"><i class="fas fa-server"></i><span>Правила сервера</span></a>
     <a onclick="switchRules('discord')"><i class="fab fa-discord"></i><span>Правила Discord</span></a>
@@ -2343,6 +2415,466 @@ STARFALL SYNDICATE | AURORIA
 </footer>
 
 <script>
+/* rules data */
+let serverRulesContent = '';
+let serverSidebarContent = '';
+let quentaRulesContent = `
+<div id="qrules1" class="rules-section"><h3>📌 1.0. ОБЩИЕ ПОЛОЖЕНИЯ</h3>
+<p>1.1. Роль сталкера</p>
+<p>1.1.1. Сталкер — один из самых распространённых типов персонажей в Зоне.</p>
+<p>1.1.2. Однако распространённость роли не упрощает требования к её проработке.</p>
+<p>1.1.3. Каждый сталкер — это полноценная личность, а не шаблонный персонаж.</p>
+<p>1.2. Уникальность персонажа</p>
+<p>1.2.1. Каждый персонаж должен быть уникальным.</p>
+<p>1.2.2. У него обязательно должны быть:</p>
+<ul>
+<li>собственная история</li>
+<li>жизненный опыт</li>
+<li>характер</li>
+<li>мотивация</li>
+<li>цели</li>
+<li>страхи</li>
+</ul>
+<p>1.3. Требования к биографии</p>
+<p>1.3.1. Квента должна раскрывать персонажа как живого человека.</p>
+<p>1.3.2. Биография не должна быть поверхностной или формальной.</p>
+<p>1.3.3. В тексте обязательно должны присутствовать:</p>
+<ul>
+<li>личная история</li>
+<li>ключевые события жизни</li>
+<li>формирование личности</li>
+</ul>
+<p>1.4. Проверка администрацией</p>
+<p>1.4.1. Квенты сталкеров проверяются наравне с другими ролями.</p>
+<p>1.4.2. Поверхностные, короткие или нелогичные квенты:</p>
+<ul>
+<li>отклоняются</li>
+<li>отправляются на доработку</li>
+</ul>
+</div>
+<div id="qrules2" class="rules-section"><h3>📏 2.0. МИНИМАЛЬНЫЕ ТРЕБОВАНИЯ К КВЕНТЕ</h3>
+<p>2.1. Объём</p>
+<p>2.1.1. Минимальный объём — 800 слов.</p>
+<p>2.1.2. Квенты меньшего объёма автоматически отправляются на доработку.</p>
+<p>2.2. Качество текста</p>
+<p>Квента должна быть:</p>
+<ul>
+<li>2.2.1. читаемой</li>
+<li>2.2.2. логичной</li>
+<li>2.2.3. структурированной</li>
+<li>2.2.4. полностью раскрывающей персонажа</li>
+</ul>
+</div>
+<div id="qrules3" class="rules-section"><h3>🧾 3.0. ОБЯЗАТЕЛЬНЫЕ РАЗДЕЛЫ КВЕНТЫ</h3>
+<p>3.1. Имя персонажа</p>
+<ul>
+<li>3.1.1. Указывается полное имя персонажа.</li>
+<li>3.1.2. Имя должно соответствовать сеттингу и выглядеть реалистично.</li>
+</ul>
+<p>3.2. Позывной</p>
+<ul>
+<li>3.2.1. У каждого персонажа обязан быть позывной.</li>
+<li>3.2.2. Позывной должен иметь обоснование в биографии.</li>
+<li>3.2.3. Он может появиться во время службы, среди друзей, среди сталкеров или после события в Зоне.</li>
+<li>3.2.4. Позывной без объяснения запрещён.</li>
+</ul>
+<p>3.3. Возраст</p>
+<ul>
+<li>3.3.1. Возраст должен соответствовать биографии, опыту и навыкам.</li>
+</ul>
+<p>3.4. Место рождения</p>
+<ul>
+<li>3.4.1. Указывается город или регион. Это необходимо для понимания среды, в которой вырос персонаж.</li>
+</ul>
+<p>3.5. Бывшая профессия</p>
+<ul>
+<li>3.5.1. Обязательно указать деятельность до Зоны.</li>
+<li>3.5.2. Профессия должна объяснять навыки, знания и жизненный опыт персонажа.</li>
+</ul>
+<p>3.6. Навыки персонажа</p>
+<ul>
+<li>3.6.1. Все навыки должны быть логически объяснены.</li>
+<li>3.6.2. Примеры:</li>
+<li>владение оружием → служба, охрана, военный опыт</li>
+<li>технические навыки → работа механиком, инженером</li>
+<li>3.6.3. Запрещено давать навыки без объяснения и создавать «универсальных специалистов».</li>
+</ul>
+<p>3.7. Биография персонажа</p>
+<ul>
+<li>3.7.1. Биография — основной элемент квенты.</li>
+<li>3.7.2. Обязательно раскрыть детство, подростковый период, образование, работу или службу, ключевые события жизни.</li>
+<li>3.7.3. Биография должна быть последовательной, подробной и логичной.</li>
+<li>3.7.4. Недопустимо писать краткое или обрывочное описание.</li>
+</ul>
+<p>3.8. Причины попадания в Зону</p>
+<ul>
+<li>3.8.1. Причина обязательна и должна быть обоснована.</li>
+<li>3.8.2. Возможные варианты: деньги, бегство от прошлого, поиск артефактов, жажда приключений, трагедия, долги/криминал.</li>
+<li>3.8.3. Причина должна быть логичной, реалистичной и связанной с биографией.</li>
+</ul>
+<p>3.9. Поведение в Зоне</p>
+<p>Игрок обязан описать:</p>
+<ul>
+<li>3.9.1. отношение к другим сталкерам;</li>
+<li>3.9.2. отношение к группировкам;</li>
+<li>3.9.3. поведение в опасных ситуациях;</li>
+<li>3.9.4. принципы выживания.</li>
+</ul>
+<p>3.9.5. Это влияет на ролевую игру и проверяется администрацией.</p>
+</div>
+<div id="qrules4" class="rules-section"><h3>⛔ 4.0. ОГРАНИЧЕНИЯ</h3>
+<ul>
+<li>4.1.1. Запрещено создавать персонажей‑легенд, «суперсолдат» и персонажей с чрезмерными навыками.</li>
+<li>4.2.1. Запрещено копировать чужие квенты.</li>
+<li>4.2.2. Запрещено писать слишком короткие биографии.</li>
+<li>4.2.3. Запрещено давать знания о Зоне без объяснения.</li>
+</ul>
+</div>
+<div id="qrules5" class="rules-section"><h3>🔧 5.0. ДОРАБОТКА КВЕНТЫ</h3>
+<p>5.1. Проверка</p>
+<ul>
+<li>5.1.1. Администрация имеет право отправить квенту на доработку.</li>
+</ul>
+<p>5.2. Обязанности игрока</p>
+<p>Игрок обязан:</p>
+<ul>
+<li>5.2.1. исправить ошибки;</li>
+<li>5.2.2. дополнить биографию;</li>
+<li>5.2.3. привести квенту к требованиям.</li>
+</ul>
+<p>5.3. Ограничения</p>
+<ul>
+<li>5.3.1. До принятия квенты персонаж не допускается к игре.</li>
+</ul>
+</div>
+<div id="qrules6" class="rules-section"><h3>❓ 6.0. ПОМОЩЬ В НАПИСАНИИ КВЕНТЫ</h3>
+<p>6.1. Как получить помощь</p>
+<ul>
+<li>6.1.1. Открыть канал 🆘┃тикеты┃🆘.</li>
+<li>6.1.2. Выбрать категорию «Техническая поддержка».</li>
+<li>6.1.3. Указать: «Проблема с персонажем».</li>
+</ul>
+<p>6.2. Кто помогает</p>
+<p>Игроку могут помочь:</p>
+<ul>
+<li>6.2.1. администратор;</li>
+<li>6.2.2. модератор;</li>
+<li>6.2.3. RP‑куратор;</li>
+<li>6.2.4. лор‑мастер.</li>
+</ul>
+<p>6.3. Дополнительная помощь</p>
+<ul>
+<li>6.3.1. При необходимости помощь оказывается в голосовом формате.</li>
+<li>6.3.2. Игроку подробно объяснят, как писать квенту и как раскрывать персонажа.</li>
+</ul>
+...</div>
+`;
+let quentaSidebarContent = `
+<a onclick="scrollToSection('qrules1')">1.0 Общие положения</a>
+<a onclick="scrollToSection('qrules2')">2.0 Минимальные требования</a>
+<a onclick="scrollToSection('qrules3')">3.0 Обязательные разделы</a>
+<a onclick="scrollToSection('qrules4')">4.0 Ограничения</a>
+<a onclick="scrollToSection('qrules5')">5.0 Доработка квенты</a>
+<a onclick="scrollToSection('qrules6')">6.0 Помощь в написании</a>
+`;
+let discordRulesContent = `
+<div id="drules1" class="rules-section"><h3>📜 1.0. ОБЩИЕ ПОЛОЖЕНИЯ</h3>
+<p>1.1. Назначение сервера</p>
+<p>1.1.1. Discord‑сервер является внеигровым (non‑RP) пространством.</p>
+<p>1.1.2. Сервер предназначен для общения участников, помощи новичкам, обсуждения проекта и совместного времяпрепровождения (игры, фильмы, голосовые каналы).</p>
+<p>1.1.3. Ролевой процесс не проводится в Discord.</p>
+<p>1.2. Обязательность правил</p>
+<p>1.2.1. Все участники обязаны соблюдать данные правила.</p>
+<p>1.2.2. Незнание правил не освобождает от ответственности.</p>
+<p>1.3. Полномочия администрации</p>
+<ul>
+<li>1.3.1. Администрация имеет право выдавать наказания, удалять контент, ограничивать доступ к каналам.</li>
+<li>1.3.2. Решения администрации являются окончательными.</li>
+</ul>
+</div>
+<div id="drules2" class="rules-section"><h3>💬 2.0. ПРАВИЛА ОБЩЕНИЯ</h3>
+<p>2.1. Уважительное поведение</p>
+<ul>
+<li>2.1.1. Запрещены оскорбления, унижения, агрессия.</li>
+<li>2.1.2. Запрещена травля (буллинг) участников.</li>
+<li>2.1.3. Конфликты должны решаться спокойно или через администрацию.</li>
+</ul>
+<p>2.2. Адекватность общения</p>
+<ul>
+<li>2.2.1. Участники обязаны поддерживать дружелюбную атмосферу.</li>
+<li>2.2.2. Запрещено провоцировать других пользователей.</li>
+</ul>
+<p>2.3. Запрещённый контент</p>
+<ul>
+<li>2.3.1. Запрещено публиковать порнографию.</li>
+<li>2.3.2. Запрещён шок‑контент.</li>
+<li>2.3.3. Запрещён контент с насилием.</li>
+<li>2.3.4. Запрещён контент, нарушающий законы.</li>
+</ul>
+<p>2.4. Спам и флуд</p>
+<ul>
+<li>2.4.1. Запрещено спамить сообщениями, дублировать сообщения, злоупотреблять капсом.</li>
+<li>2.4.2. Флуд допускается только в соответствующих каналах.</li>
+</ul>
+<p>2.5. Реклама</p>
+<ul>
+<li>2.5.1. Любая реклама запрещена без разрешения администрации.</li>
+<li>2.5.2. Это касается Discord‑серверов, сайтов, каналов и личных проектов.</li>
+</ul>
+</div>
+<div id="drules3" class="rules-section"><h3>🎮 3.0. ИСПОЛЬЗОВАНИЕ СЕРВЕРА</h3>
+<p>3.1. Назначение каналов</p>
+<ul>
+<li>3.1.1. Каждый канал имеет своё назначение.</li>
+<li>3.1.2. Запрещено писать не по теме канала.</li>
+</ul>
+<p>3.2. Помощь участникам</p>
+<ul>
+<li>3.2.1. Участники могут помогать друг другу.</li>
+<li>3.2.2. Приветствуются ответы на вопросы, советы новичкам и обмен опытом.</li>
+</ul>
+<p>3.3. Общение вне игры</p>
+<ul>
+<li>3.3.1. Разрешено обсуждать любые темы в рамках правил.</li>
+<li>3.3.2. Разрешено делиться видео и другим контентом.</li>
+<li>3.3.3. Разрешено общаться на свободные темы.</li>
+</ul>
+<p>3.4. Совместная активность</p>
+<ul>
+<li>3.4.1. Разрешается играть в другие игры, смотреть фильмы и общаться в голосовых каналах.</li>
+</ul>
+</div>
+<div id="drules4" class="rules-section"><h3>🔊 4.0. ГОЛОСОВЫЕ КАНАЛЫ</h3>
+<p>4.1. Поведение</p>
+<ul>
+<li>4.1.1. Запрещено кричать, создавать помехи и намеренно мешать разговору.</li>
+</ul>
+<p>4.2. Уважение участников</p>
+<ul>
+<li>4.2.1. Нельзя перебивать других.</li>
+<li>4.2.2. Необходимо давать возможность высказаться.</li>
+</ul>
+<p>4.3. Музыка и звуки</p>
+<ul>
+<li>4.3.1. Запрещено включать громкие звуки без согласия участников.</li>
+<li>4.3.2. Запрещено злоупотреблять саундбордом.</li>
+</ul>
+</div>
+<div id="drules5" class="rules-section"><h3>👤 5.0. ПРОФИЛЬ ПОЛЬЗОВАТЕЛЯ</h3>
+<p>5.1. Никнейм</p>
+<ul>
+<li>5.1.1. Ник должен быть читаемым и адекватным.</li>
+<li>5.1.2. Запрещены оскорбительные и провокационные ники.</li>
+</ul>
+<p>5.2. Аватар</p>
+<ul>
+<li>5.2.1. Запрещён контент 18+, сцены насилия и оскорбления.</li>
+</ul>
+</div>
+<div id="drules6" class="rules-section"><h3>⚖ 6.0. НАКАЗАНИЯ</h3>
+<p>6.1. Виды наказаний</p>
+<ul>
+<li>6.1.1. Предупреждение.</li>
+<li>6.1.2. Мут.</li>
+<li>6.1.3. Кик.</li>
+<li>6.1.4. Бан.</li>
+</ul>
+<p>6.2. Принципы</p>
+<ul>
+<li>6.2.1. Наказание зависит от характера нарушения.</li>
+<li>6.2.2. Повторные нарушения усиливают санкции.</li>
+</ul>
+<p>6.3. Обжалование</p>
+<ul>
+<li>6.3.1. Участник может обратиться к администрации.</li>
+<li>6.3.2. Решение может быть пересмотрено при необходимости.</li>
+</ul>
+</div>
+<div id="drules7" class="rules-section"><h3>🚫 7.0. ЗАПРЕЩЁННЫЕ ДЕЙСТВИЯ</h3>
+<p>7.1. Основные запреты</p>
+<ul>
+<li>7.1.1. Оскорбление участников или администрации.</li>
+<li>7.1.2. Провокации конфликтов.</li>
+<li>7.1.3. Попытки обхода наказаний.</li>
+<li>7.1.4. Использование твинков для обхода ограничений.</li>
+</ul>
+<p>7.2. Обман</p>
+<ul>
+<li>7.2.1. Запрещено вводить администрацию в заблуждение.</li>
+<li>7.2.2. Запрещены ложные жалобы.</li>
+</ul>
+</div>
+<div id="drules8" class="rules-section"><h3>🔧 8.0. ДОПОЛНИТЕЛЬНО</h3>
+<p>8.1. Изменение правил</p>
+<ul>
+<li>8.1.1. Администрация может изменять правила Discord‑сервера.</li>
+</ul>
+<p>8.2. Ответственность</p>
+<ul>
+<li>8.2.1. Каждый участник несёт ответственность за свои действия.</li>
+</ul>
+</div>
+`;
+let discordSidebarContent = `
+<a onclick="scrollToSection('drules1')">1.0 Общие положения</a>
+<a onclick="scrollToSection('drules2')">2.0 Правила общения</a>
+<a onclick="scrollToSection('drules3')">3.0 Использование сервера</a>
+<a onclick="scrollToSection('drules4')">4.0 Голосовые каналы</a>
+<a onclick="scrollToSection('drules5')">5.0 Профиль пользователя</a>
+<a onclick="scrollToSection('drules6')">6.0 Наказания</a>
+<a onclick="scrollToSection('drules7')">7.0 Запрещённые действия</a>
+<a onclick="scrollToSection('drules8')">8.0 Дополнительно</a>
+`;
+let siteRulesContent = `
+<div id="srules1" class="rules-section"><h3>🌐 1.0. ОБЩИЕ ПОЛОЖЕНИЯ</h3>
+<p>1.1. Назначение сайта</p>
+<p>1.1.1. Сайт является официальной платформой проекта.</p>
+<p>1.1.2. Через сайт осуществляется регистрация аккаунтов, подача квент, взаимодействие с администрацией и получение информации о проекте.</p>
+<p>1.2. Обязательность правил</p>
+<p>1.2.1. Все пользователи сайта обязаны соблюдать данные правила.</p>
+<p>1.2.2. Незнание правил не освобождает от ответственности.</p>
+<p>1.3. Полномочия администрации</p>
+<ul>
+<li>1.3.1. Администрация имеет право редактировать и удалять контент, ограничивать доступ к аккаунтам, выдавать санкции.</li>
+<li>1.3.2. Решения администрации являются окончательными.</li>
+</ul>
+</div>
+<div id="srules2" class="rules-section"><h3>👤 2.0. АККАУНТ ПОЛЬЗОВАТЕЛЯ</h3>
+<p>2.1. Регистрация</p>
+<ul>
+<li>2.1.1. Пользователь обязан указывать достоверные данные.</li>
+<li>2.1.2. Запрещено создавать аккаунты с оскорбительными или провокационными именами и данными.</li>
+</ul>
+<p>2.2. Ответственность за аккаунт</p>
+<ul>
+<li>2.2.1. Пользователь несёт полную ответственность за свой аккаунт.</li>
+<li>2.2.2. Запрещено передавать аккаунт третьим лицам и использовать чужие аккаунты.</li>
+</ul>
+<p>2.3. Несколько аккаунтов</p>
+<ul>
+<li>2.3.1. Запрещено создание твинков (нескольких аккаунтов).</li>
+<li>2.3.2. Исключения возможны только с разрешения администрации.</li>
+</ul>
+</div>
+<div id="srules3" class="rules-section"><h3>📝 3.0. КОНТЕНТ ПОЛЬЗОВАТЕЛЯ</h3>
+<p>3.1. Общие требования</p>
+<ul>
+<li>3.1.1. Весь публикуемый контент должен быть адекватным, читаемым и логичным.</li>
+</ul>
+<p>3.2. Запрещённый контент</p>
+<ul>
+<li>3.2.1. Оскорбления и агрессию.</li>
+<li>3.2.2. Порнографию.</li>
+<li>3.2.3. Шок‑контент.</li>
+<li>3.2.4. Контент, нарушающий законодательство.</li>
+</ul>
+<p>3.3. Квенты и тексты</p>
+<ul>
+<li>3.3.1. Все квенты должны быть оригинальными и соответствовать правилам проекта.</li>
+<li>3.3.2. Запрещено копировать чужие работы и использовать чужой контент без разрешения.</li>
+</ul>
+</div>
+<div id="srules4" class="rules-section"><h3>⚙ 4.0. ИСПОЛЬЗОВАНИЕ САЙТА</h3>
+<p>4.1. Назначение функций</p>
+<ul>
+<li>4.1.1. Пользователь обязан использовать функции сайта по назначению.</li>
+</ul>
+<p>4.2. Запрещённые действия</p>
+<ul>
+<li>4.2.1. Запрещено ломать работу сайта, использовать баги и обходить систему.</li>
+</ul>
+<p>4.3. Технические ограничения</p>
+<ul>
+<li>4.3.1. Запрещены попытки взлома и использование стороннего ПО для получения преимуществ.</li>
+</ul>
+</div>
+<div id="srules5" class="rules-section"><h3>📨 5.0. ВЗАИМОДЕЙСТВИЕ С АДМИНИСТРАЦИЕЙ</h3>
+<p>5.1. Обращения</p>
+<ul>
+<li>5.1.1. Пользователь имеет право обратиться к администрации через сайт.</li>
+<li>5.1.2. Обращения должны быть корректными и понятными.</li>
+</ul>
+<p>5.2. Запрещено</p>
+<ul>
+<li>5.2.1. Спамить обращениями.</li>
+<li>5.2.2. Создавать ложные жалобы.</li>
+<li>5.2.3. Оскорблять администрацию.</li>
+</ul>
+</div>
+<div id="srules6" class="rules-section"><h3>⚖ 6.0. НАКАЗАНИЯ</h3>
+<p>6.1. Виды санкций</p>
+<ul>
+<li>6.1.1. Предупреждение.</li>
+<li>6.1.2. Ограничение функций аккаунта.</li>
+<li>6.1.3. Временная блокировка.</li>
+<li>6.1.4. Полная блокировка аккаунта.</li>
+</ul>
+<p>6.2. Принципы</p>
+<ul>
+<li>6.2.1. Наказание зависит от тяжести нарушения.</li>
+<li>6.2.2. Повторные нарушения усиливают санкции.</li>
+</ul>
+<p>6.3. Обжалование</p>
+<ul>
+<li>6.3.1. Пользователь может подать апелляцию.</li>
+<li>6.3.2. Решение рассматривается администрацией.</li>
+</ul>
+</div>
+<div id="srules7" class="rules-section"><h3>🔐 7.0. БЕЗОПАСНОСТЬ</h3>
+<p>7.1. Защита данных</p>
+<ul>
+<li>7.1.1. Пользователь обязан хранить данные аккаунта в безопасности и не передавать пароль третьим лицам.</li>
+</ul>
+<p>7.2. Ответственность</p>
+<ul>
+<li>7.2.1. Администрация не несёт ответственности за утерю доступа по вине пользователя и передачу аккаунта третьим лицам.</li>
+</ul>
+</div>
+<div id="srules8" class="rules-section"><h3>🚫 8.0. ЗАПРЕЩЁННЫЕ ДЕЙСТВИЯ</h3>
+<p>8.1. Основные запреты</p>
+<ul>
+<li>8.1.1. Использование сайта в целях мошенничества или распространения вредоносного контента.</li>
+</ul>
+<p>8.2. Манипуляции</p>
+<ul>
+<li>8.2.1. Запрещено вводить администрацию в заблуждение и использовать уязвимости системы.</li>
+</ul>
+</div>
+<div id="srules9" class="rules-section"><h3>🔧 9.0. ДОПОЛНИТЕЛЬНО</h3>
+<p>9.1. Изменение правил</p>
+<ul>
+<li>9.1.1. Администрация имеет право изменять правила без уведомления.</li>
+</ul>
+<p>9.2. Согласие</p>
+<ul>
+<li>9.2.1. Регистрируясь на сайте, пользователь автоматически соглашается с правилами.</li>
+</ul>
+</div>
+`;
+let siteSidebarContent = `
+<a onclick="scrollToSection('srules1')">1.0 Общие положения</a>
+<a onclick="scrollToSection('srules2')">2.0 Аккаунт пользователя</a>
+<a onclick="scrollToSection('srules3')">3.0 Контент пользователя</a>
+<a onclick="scrollToSection('srules4')">4.0 Использование сайта</a>
+<a onclick="scrollToSection('srules5')">5.0 Взаимодействие с администрацией</a>
+<a onclick="scrollToSection('srules6')">6.0 Наказания</a>
+<a onclick="scrollToSection('srules7')">7.0 Безопасность</a>
+<a onclick="scrollToSection('srules8')">8.0 Запрещённые действия</a>
+<a onclick="scrollToSection('srules9')">9.0 Дополнительно</a>
+`;
+let rulesData = {};
+
+function initRulesData() {
+  serverRulesContent = document.getElementById('rulesContent')?.innerHTML || '';
+  serverSidebarContent = document.getElementById('rulesSidebar')?.innerHTML || '';
+  rulesData = {
+    'server': { title: 'Правила сервера', content: serverRulesContent, sidebar: serverSidebarContent },
+    'discord': { title: 'Правила Discord', content: discordRulesContent, sidebar: discordSidebarContent },
+    'quenta': { title: 'Правила квенты', content: quentaRulesContent, sidebar: quentaSidebarContent },
+    'site': { title: 'Правила сайта', content: siteRulesContent, sidebar: siteSidebarContent }
+  };
+}
+
 /* navigation */
 function showPage(id){
 if(id==='quenta'){
@@ -2368,8 +2900,23 @@ setTimeout(()=>{next.classList.remove('entering');},350);
 // nav active highlight
 let navLinks=Array.from(document.querySelectorAll('header nav a'));
 navLinks.forEach(a=>a.classList.remove('active'));
-let activeNav=navLinks.find(a=>a.getAttribute('onclick')?.includes(id));
-if(activeNav){activeNav.classList.add('active');}
+const triggers = document.querySelectorAll('.rules-trigger-btn');
+triggers.forEach(t => t.classList.remove('active'));
+
+let activeNav=navLinks.find(a=> {
+  const onclick = a.getAttribute('onclick');
+  return onclick && onclick.includes(`'${id}'`);
+});
+
+if(activeNav){
+  activeNav.classList.add('active');
+  // If it's inside a submenu, highlight the trigger too
+  const trigger = activeNav.closest('.nav-dropdown')?.querySelector('.rules-trigger-btn');
+  if (trigger) trigger.classList.add('active');
+} else if (id === 'rules') {
+  const rulesTrigger = document.querySelector('.rules-trigger-btn');
+  if (rulesTrigger) rulesTrigger.classList.add('active');
+}
 
 // Auto-hide header after selection
 const header = document.querySelector('header');
@@ -2399,40 +2946,54 @@ if (header && !header.classList.contains('hidden')) {
 function toggleRulesDropdown(event) {
   if (event) event.stopPropagation();
   const dropdown = document.querySelector('.nav-dropdown');
+  const trigger = document.querySelector('.rules-trigger-btn');
+  
+  const isOpening = !dropdown.classList.contains('active');
   dropdown.classList.toggle('active');
+  
+  // Highlight trigger when open
+  if (isOpening) {
+    trigger.classList.add('active');
+  } else {
+    // Keep highlighted only if we are on rules page
+    const isRulesPage = document.getElementById('rules').classList.contains('active');
+    if (!isRulesPage) trigger.classList.remove('active');
+  }
 }
 
 function switchRules(type) {
-  // First, show the rules page
+  const data = rulesData[type];
+  if (!data) return;
+  
+  // Update Title
+  const titleEl = document.querySelector('#rules h2.synd-title');
+  if (titleEl) titleEl.textContent = data.title;
+  
+  const contentEl = document.getElementById('rulesContent');
+  const sidebarEl = document.getElementById('rulesSidebar');
+  currentRulesType=type;
+  highlightFreezeUntil=0;
+  if (contentEl) {
+    contentEl.classList.remove('fade-in');
+    contentEl.classList.add('fade-out');
+    setTimeout(()=>{
+      contentEl.innerHTML = data.content;
+      contentEl.classList.remove('fade-out');
+      void contentEl.offsetWidth;
+      contentEl.classList.add('fade-in');
+      updateActiveLink();
+    },180);
+  }
+  if (sidebarEl && data.sidebar) {
+    sidebarEl.innerHTML = data.sidebar;
+  }
+  
+  // Highlight active submenu link
+  document.querySelectorAll('.nav-submenu a').forEach(a => a.classList.remove('active'));
+  const activeSub = Array.from(document.querySelectorAll('.nav-submenu a')).find(a => a.getAttribute('onclick')?.includes(`'${type}'`));
+  if (activeSub) activeSub.classList.add('active');
+
   showPage('rules');
-  
-  // Update category visibility
-  const categories = document.querySelectorAll('.rules-category-content');
-  categories.forEach(c => c.classList.remove('active'));
-  
-  let targetId = '';
-  if (type === 'server') targetId = 'rulesServer';
-  if (type === 'discord') targetId = 'rulesDiscord';
-  if (type === 'quenta') targetId = 'rulesQuenta';
-  if (type === 'site') targetId = 'rulesSite';
-  
-  const target = document.getElementById(targetId);
-  if (target) target.classList.add('active');
-
-  // Update sidebar visibility
-  const sidebar = document.getElementById('rulesSidebar');
-  if (sidebar) {
-    sidebar.style.display = (type === 'server') ? 'flex' : 'none';
-  }
-
-  // Update title
-  const rulesTitle = document.querySelector('#rules .synd-title');
-  if (rulesTitle) {
-    if (type === 'server') rulesTitle.textContent = 'Правила сервера';
-    if (type === 'discord') rulesTitle.textContent = 'Правила Discord';
-    if (type === 'quenta') rulesTitle.textContent = 'Правила подачи квенты';
-    if (type === 'site') rulesTitle.textContent = 'Правила сайта';
-  }
 }
 
 /* smooth scroll to rules section */
@@ -2476,7 +3037,13 @@ function scrollToSection(id){
 }
 
 /* auto highlight sidebar by scroll (main sections only) */
-const mainSectionIds=['law1','language2','metagaming3','conflict4','rpk5','unique6','realism7','newbies8','factions9','unique10','final11'];
+const rulesSectionIdsMap={
+  server:['law1','language2','metagaming3','conflict4','rpk5','unique6','realism7','newbies8','factions9','unique10','final11'],
+  discord:['drules1','drules2','drules3','drules4','drules5','drules6','drules7','drules8'],
+  quenta:['qrules1','qrules2','qrules3','qrules4','qrules5','qrules6'],
+  site:['srules1','srules2','srules3','srules4','srules5','srules6','srules7','srules8','srules9']
+};
+let currentRulesType='server';
 let highlightFreezeUntil=0;
 function setActiveSidebar(id){
   let links=document.querySelectorAll('#rulesSidebar a');
@@ -2491,8 +3058,10 @@ function setActiveSidebar(id){
 function updateActiveLink(){
   if(Date.now()<highlightFreezeUntil) return;
   const centerY=window.innerHeight/2;
-  let activeId=mainSectionIds[0];
-  for(let id of mainSectionIds){
+  let ids=rulesSectionIdsMap[currentRulesType]||rulesSectionIdsMap.server;
+  if(!ids||!ids.length) return;
+  let activeId=ids[0];
+  for(let id of ids){
     let sec=document.getElementById(id);
     if(!sec) continue;
     let h3=sec.querySelector('h3')||sec;
@@ -2513,6 +3082,7 @@ window.addEventListener('scroll',()=>{
 
 /* boot overlay once on load */
 window.addEventListener('load',()=>{
+initRulesData();
 const savedLang=localStorage.getItem('lang')||'ru';
 applyI18n(savedLang);
 const hdr=document.querySelector('header');
