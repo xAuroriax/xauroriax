@@ -1547,16 +1547,396 @@ header nav a:hover, .rules-trigger-btn:hover, .blackmarket-trigger-btn:hover {
   gap: 15px;
   justify-content: center;
   position: relative;
-  z-index: 2;
 }
 
-.slot-reel {
-  width: 120px;
-  height: 150px;
-  background: rgba(5,5,5,0.9);
-  border: 2px solid rgba(255,122,24,0.4);
-  border-radius: 10px;
+/* GTA RP Roulette Styles */
+.gta-roulette {
+  padding: 30px;
+  background: rgba(10,10,10,0.8);
+  border-radius: 15px;
+  border: 1px solid rgba(255,122,24,0.2);
+}
+
+.roulette-control-panel {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 20px;
+  margin-bottom: 30px;
+  padding: 20px;
+  background: rgba(20,20,20,0.6);
+  border-radius: 12px;
+  border: 1px solid rgba(255,122,24,0.1);
+}
+
+.multiplier-selector {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.selector-label {
+  color: #ff7b00;
+  font-weight: 600;
+  font-size: 14px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.multiplier-options {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+}
+
+.mult-btn {
+  background: rgba(255,122,24,0.1);
+  border: 1px solid rgba(255,122,24,0.3);
+  color: #ff7b00;
+  padding: 8px 12px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 12px;
+  transition: all 0.3s ease;
+  text-transform: uppercase;
+}
+
+.mult-btn:hover {
+  background: rgba(255,122,24,0.2);
+  border-color: #ff7b00;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(255,122,24,0.3);
+}
+
+.mult-btn.active {
+  background: #ff7b00;
+  color: #000;
+  border-color: #ff7b00;
+  box-shadow: 0 0 20px rgba(255,122,24,0.5);
+}
+
+.bet-section {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.bet-label {
+  color: #ff7b00;
+  font-weight: 600;
+  font-size: 14px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.bet-input-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.bet-input {
+  flex: 1;
+  background: rgba(0,0,0,0.6);
+  border: 1px solid rgba(255,122,24,0.3);
+  color: #fff;
+  padding: 12px;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: 600;
+  text-align: center;
+  transition: all 0.3s ease;
+}
+
+.bet-input:focus {
+  outline: none;
+  border-color: #ff7b00;
+  box-shadow: 0 0 15px rgba(255,122,24,0.3);
+}
+
+.bet-currency {
+  position: absolute;
+  right: 12px;
+  color: #ff7b00;
+  font-weight: 600;
+  font-size: 12px;
+  text-transform: uppercase;
+  opacity: 0.7;
+}
+
+.auto-spin-section {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.auto-spin-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #ff7b00;
+  font-weight: 600;
+  font-size: 14px;
+  cursor: pointer;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.auto-spin-label input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  accent-color: #ff7b00;
+}
+
+.roulette-main {
+  position: relative;
+  margin: 40px 0;
+}
+
+.multiplier-display {
+  position: relative;
+  height: 120px;
+  margin-bottom: 40px;
+  background: rgba(0,0,0,0.8);
+  border-radius: 15px;
+  border: 2px solid rgba(255,122,24,0.3);
   overflow: hidden;
+}
+
+.multiplier-track {
+  position: relative;
+  height: 100%;
+  overflow: hidden;
+}
+
+.multiplier-strip {
+  display: flex;
+  align-items: center;
+  height: 100%;
+  position: absolute;
+  top: 0;
+  left: 0;
+  will-change: transform;
+}
+
+.multiplier-item {
+  flex-shrink: 0;
+  width: 120px;
+  height: 80px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 10px;
+  background: rgba(255,122,24,0.1);
+  border: 2px solid rgba(255,122,24,0.5);
+  border-radius: 10px;
+  font-weight: 700;
+  font-size: 24px;
+  color: #ff7b00;
+  text-transform: uppercase;
+  transition: all 0.3s ease;
+}
+
+.multiplier-item.highlight {
+  background: rgba(255,122,24,0.3);
+  border-color: #ff7b00;
+  box-shadow: 0 0 20px rgba(255,122,24,0.6);
+  transform: scale(1.1);
+}
+
+.roulette-arrow {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 10;
+}
+
+.arrow-icon {
+  width: 0;
+  height: 0;
+  border-left: 20px solid transparent;
+  border-right: 20px solid transparent;
+  border-top: 30px solid #ff7b00;
+  filter: drop-shadow(0 0 10px rgba(255,122,24,0.8));
+  animation: arrowPulse 2s infinite;
+}
+
+@keyframes arrowPulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.8; transform: scale(1.05); }
+}
+
+.roulette-arrow.spinning .arrow-icon {
+  animation: arrowGlow 0.5s infinite alternate;
+  filter: drop-shadow(0 0 20px rgba(255,122,24,1));
+}
+
+@keyframes arrowGlow {
+  0% { filter: drop-shadow(0 0 10px rgba(255,122,24,0.8)); }
+  100% { filter: drop-shadow(0 0 30px rgba(255,122,24,1)); }
+}
+
+.spin-button-container {
+  display: flex;
+  justify-content: center;
+  margin: 40px 0;
+}
+
+.gta-spin-button {
+  position: relative;
+  background: linear-gradient(135deg, #ff7b00, #ff5500);
+  border: none;
+  color: #fff;
+  padding: 20px 60px;
+  border-radius: 15px;
+  font-size: 18px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 8px 25px rgba(255,122,24,0.4);
+  overflow: hidden;
+}
+
+.gta-spin-button:hover:not(:disabled) {
+  transform: translateY(-3px);
+  box-shadow: 0 12px 35px rgba(255,122,24,0.6);
+}
+
+.gta-spin-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+.spin-glow {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: radial-gradient(circle, rgba(255,255,255,0.3) 0%, transparent 70%);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.gta-spin-button:hover .spin-glow {
+  opacity: 1;
+}
+
+.bet-animation-container {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  pointer-events: none;
+  z-index: 20;
+}
+
+.bet-animation {
+  position: absolute;
+  background: rgba(255,122,24,0.9);
+  color: #fff;
+  padding: 8px 16px;
+  border-radius: 20px;
+  font-weight: 600;
+  font-size: 14px;
+  text-transform: uppercase;
+  animation: betFloat 2s ease-out forwards;
+  pointer-events: none;
+  z-index: 25;
+}
+
+@keyframes betFloat {
+  0% {
+    opacity: 0;
+    transform: translateY(20px) scale(0.8);
+  }
+  20% {
+    opacity: 1;
+    transform: translateY(-10px) scale(1.1);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-60px) scale(0.9);
+  }
+}
+
+.steam-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: 2px solid #ff7b00;
+  margin-right: 8px;
+  vertical-align: middle;
+}
+
+.game-info {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+  padding: 20px;
+  background: rgba(20,20,20,0.6);
+  border-radius: 12px;
+  border: 1px solid rgba(255,122,24,0.1);
+}
+
+.info-item {
+  text-align: center;
+}
+
+.info-label {
+  display: block;
+  color: #888;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 5px;
+}
+
+.info-value {
+  color: #ff7b00;
+  font-weight: 700;
+  font-size: 16px;
+  text-transform: uppercase;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .roulette-control-panel {
+    grid-template-columns: 1fr;
+    gap: 15px;
+  }
+  
+  .multiplier-options {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
+  .game-info {
+    grid-template-columns: 1fr;
+    gap: 15px;
+  }
+  
+  .gta-spin-button {
+    padding: 15px 40px;
+    font-size: 16px;
+  }
+  
+  .multiplier-item {
+    width: 100px;
+    height: 60px;
+    font-size: 18px;
+  }
+}
+
+.slots-reels {
+  display: flex;
+  gap: 15px;
+  justify-content: center;
   position: relative;
 }
 
@@ -3295,82 +3675,95 @@ input, textarea, select {
       </div>
     </div>
   </section>
-
 <div class="page" id="roulette">
   <div class="container">
     <div class="card">
       <h2 class="synd-title" data-i18n="blackmarket_roulette">Рулетка</h2>
-      <div class="roulette-game">
-        <!-- Блок для ставки -->
-        <div class="roulette-betting">
-          <div class="balance-display">
-            <span class="balance-label">Ваш баланс:</span>
-            <span id="rouletteBalance" class="balance-amount">0</span>
+      
+      <!-- Новая рулетка в стиле GTA RP -->
+      <div class="gta-roulette">
+        <!-- Панель управления -->
+        <div class="roulette-control-panel">
+          <!-- Выбор коэффициента -->
+          <div class="multiplier-selector">
+            <label class="selector-label">Коэффициент:</label>
+            <div class="multiplier-options">
+              <button class="mult-btn" data-mult="1.2" onclick="selectMultiplier(1.2)">x1.2</button>
+              <button class="mult-btn" data-mult="1.5" onclick="selectMultiplier(1.5)">x1.5</button>
+              <button class="mult-btn" data-mult="2" onclick="selectMultiplier(2)">x2</button>
+              <button class="mult-btn" data-mult="3" onclick="selectMultiplier(3)">x3</button>
+              <button class="mult-btn" data-mult="5" onclick="selectMultiplier(5)">x5</button>
+              <button class="mult-btn" data-mult="10" onclick="selectMultiplier(10)">x10</button>
+            </div>
           </div>
-          <div class="bet-input-group">
-            <label for="betAmount" class="bet-label">Ставка:</label>
-            <input type="number" id="betAmount" class="bet-input" min="1" placeholder="Введите ставку">
-            <span class="bet-souls">Souls</span>
+
+          <!-- Ввод ставки -->
+          <div class="bet-section">
+            <label class="bet-label">Ставка:</label>
+            <div class="bet-input-wrapper">
+              <input type="number" id="betAmount" class="bet-input" min="1" placeholder="0">
+              <span class="bet-currency">Souls</span>
+            </div>
           </div>
-          <button id="spinButton" class="spin-button" onclick="startRouletteSpin()">
-            <i class="fas fa-dice"></i>
-            <span>КРУТИТЬ</span>
-          </button>
-          <div id="spinCooldown" class="spin-cooldown" style="display: none;">
-            <i class="fas fa-clock"></i>
-            <span id="cooldownTimer">0</span>с
+
+          <!-- Кнопка автокрутки -->
+          <div class="auto-spin-section">
+            <label class="auto-spin-label">
+              <input type="checkbox" id="autoSpinToggle" onchange="toggleAutoSpin()">
+              <span>Авто-крутка (30 сек)</span>
+            </label>
           </div>
         </div>
 
-        <!-- Блок для результатов -->
-        <div class="roulette-result" id="rouletteResult" style="display: none;">
-          <div class="result-message" id="resultMessage"></div>
-          <div class="result-amount" id="resultAmount"></div>
-        </div>
-
-        <!-- Горизонтальная рулетка -->
-        <div class="roulette-container">
-          <!-- Указатель в центре -->
-          <div class="roulette-pointer">
-            <div class="pointer-arrow"></div>
-          </div>
-          
-          <!-- Контейнер для прокрутки -->
-          <div class="roulette-track">
-            <div class="roulette-strip" id="rouletteStrip">
-              <!-- Карточки будут сгенерированы через JavaScript -->
+        <!-- Основная рулетка -->
+        <div class="roulette-main">
+          <!-- Анимированные коэффициенты -->
+          <div class="multiplier-display">
+            <div class="multiplier-track">
+              <div class="multiplier-strip" id="multiplierStrip">
+                <!-- Коэффициенты будут сгенерированы JS -->
+              </div>
+            </div>
+            
+            <!-- Оранжевая стрелка -->
+            <div class="roulette-arrow">
+              <div class="arrow-icon">▼</div>
             </div>
           </div>
-        </div>
 
-        <!-- Информация о коэффициентах -->
-        <div class="roulette-info">
-          <h3>Коэффициенты выигрыша:</h3>
-          <div class="multipliers-list">
-            <div class="multiplier-item">
-              <span class="mult-value">x5</span>
-              <span class="mult-desc">Редкий</span>
-            </div>
-            <div class="multiplier-item">
-              <span class="mult-value">x2</span>
-              <span class="mult-desc">Необычный</span>
-            </div>
-            <div class="multiplier-item">
-              <span class="mult-value">x1</span>
-              <span class="mult-desc">Обычный</span>
-            </div>
-            <div class="multiplier-item">
-              <span class="mult-value">x0.5</span>
-              <span class="mult-desc">Низкий</span>
-            </div>
-            <div class="multiplier-item">
-              <span class="mult-value">x0</span>
-              <span class="mult-desc">Проигрыш</span>
-            </div>
+          <!-- Центральная кнопка КРУТИТЬ -->
+          <div class="spin-button-container">
+            <button id="spinButton" class="gta-spin-button" onclick="startGTARoulette()">
+              <span class="spin-text">КРУТИТЬ</span>
+              <div class="spin-glow"></div>
+            </button>
+          </div>
+
+          <!-- Анимация начисления ставки -->
+          <div class="bet-animation-container" id="betAnimationContainer">
+            <!-- Анимация будет добавлена динамически -->
           </div>
         </div>
 
-        <!-- История игр -->
+        <!-- Информация о текущей игре -->
+        <div class="game-info">
+          <div class="info-item">
+            <span class="info-label">Текущий коэффициент:</span>
+            <span id="currentMultiplier" class="info-value">x1.2</span>
+          </div>
+          <div class="info-item">
+            <span class="info-label">Возможный выигрыш:</span>
+            <span id="potentialWin" class="info-value">0 Souls</span>
+          </div>
+          <div class="info-item">
+            <span class="info-label">Статус:</span>
+            <span id="gameStatus" class="info-value">Ожидание ставки</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
         <div class="roulette-history">
           <h3 data-i18n="roulette_history_title">История игр</h3>
           <div class="history-container">
@@ -6277,6 +6670,372 @@ ${motivation}`;
     }
   }
 
+  // GTA RP Roulette Variables
+let gtaIsSpinning = false;
+let selectedMultiplier = 1.2;
+let autoSpinEnabled = false;
+let autoSpinInterval = null;
+let gtaMultiplierStrip = null;
+let gtaMultiplierItems = [];
+let gtaCurrentPosition = 0;
+let gtaTargetPosition = 0;
+let gtaAnimationId = null;
+
+// Initialize GTA Roulette
+function initGTARoulette() {
+  const savedUser = JSON.parse(localStorage.getItem('steam_user'));
+  if (!savedUser) {
+    // Disable roulette for non-authenticated users
+    const spinButton = document.getElementById('spinButton');
+    const betInput = document.getElementById('betAmount');
+    if (spinButton) spinButton.disabled = true;
+    if (betInput) betInput.disabled = true;
+    showToast('Авторизуйтесь через Steam для игры в рулетку');
+    return;
+  }
+
+  // Generate multiplier strip
+  generateGTAMultipliers();
+  
+  // Set default multiplier
+  selectMultiplier(1.2);
+  
+  // Update potential win display
+  updatePotentialWin();
+  
+  // Add bet input listener
+  const betInput = document.getElementById('betAmount');
+  if (betInput) {
+    betInput.addEventListener('input', updatePotentialWin);
+  }
+}
+
+// Generate multiplier items for the strip
+function generateGTAMultipliers() {
+  const strip = document.getElementById('multiplierStrip');
+  if (!strip) return;
+  
+  const multipliers = [1.2, 1.5, 2, 3, 5, 10];
+  const items = [];
+  
+  // Create 3 sets for seamless scrolling
+  for (let set = 0; set < 3; set++) {
+    multipliers.forEach(mult => {
+      const item = document.createElement('div');
+      item.className = 'multiplier-item';
+      item.textContent = `x${mult}`;
+      item.dataset.multiplier = mult;
+      strip.appendChild(item);
+      items.push(item);
+    });
+  }
+  
+  gtaMultiplierItems = items;
+  gtaMultiplierStrip = strip;
+}
+
+// Select multiplier
+function selectMultiplier(mult) {
+  selectedMultiplier = mult;
+  
+  // Update UI
+  const buttons = document.querySelectorAll('.mult-btn');
+  buttons.forEach(btn => {
+    btn.classList.remove('active');
+    if (parseFloat(btn.dataset.mult) === mult) {
+      btn.classList.add('active');
+    }
+  });
+  
+  // Update display
+  const currentMultEl = document.getElementById('currentMultiplier');
+  if (currentMultEl) {
+    currentMultEl.textContent = `x${mult}`;
+  }
+  
+  updatePotentialWin();
+}
+
+// Update potential win display
+function updatePotentialWin() {
+  const betInput = document.getElementById('betAmount');
+  const potentialWinEl = document.getElementById('potentialWin');
+  
+  if (!betInput || !potentialWinEl) return;
+  
+  const bet = parseInt(betInput.value) || 0;
+  const potentialWin = Math.floor(bet * selectedMultiplier);
+  
+  potentialWinEl.textContent = `${potentialWin} Souls`;
+}
+
+// Toggle auto-spin
+function toggleAutoSpin() {
+  const toggle = document.getElementById('autoSpinToggle');
+  autoSpinEnabled = toggle.checked;
+  
+  if (autoSpinEnabled) {
+    startAutoSpin();
+  } else {
+    stopAutoSpin();
+  }
+}
+
+// Start auto-spin
+function startAutoSpin() {
+  stopAutoSpin(); // Clear any existing interval
+  
+  autoSpinInterval = setInterval(() => {
+    if (!gtaIsSpinning) {
+      startGTARoulette();
+    }
+  }, 30000); // 30 seconds
+  
+  // Start first spin immediately
+  setTimeout(() => {
+    if (!gtaIsSpinning) {
+      startGTARoulette();
+    }
+  }, 1000);
+}
+
+// Stop auto-spin
+function stopAutoSpin() {
+  if (autoSpinInterval) {
+    clearInterval(autoSpinInterval);
+    autoSpinInterval = null;
+  }
+}
+
+// Start GTA Roulette spin
+async function startGTARoulette() {
+  if (gtaIsSpinning) return;
+  
+  const savedUser = JSON.parse(localStorage.getItem('steam_user'));
+  if (!savedUser) {
+    showToast('Авторизуйтесь через Steam для игры');
+    return;
+  }
+  
+  const betInput = document.getElementById('betAmount');
+  const bet = parseInt(betInput?.value) || 0;
+  
+  // Validation
+  if (!bet || bet <= 0) {
+    showToast('Введите корректную ставку', 'error');
+    return;
+  }
+  
+  const currentBalance = parseInt(loadSouls(savedUser.id)) || 0;
+  if (bet > currentBalance) {
+    showToast('Недостаточно Souls', 'error');
+    return;
+  }
+  
+  // Start spinning
+  gtaIsSpinning = true;
+  const spinButton = document.getElementById('spinButton');
+  if (spinButton) spinButton.disabled = true;
+  
+  // Update status
+  const statusEl = document.getElementById('gameStatus');
+  if (statusEl) statusEl.textContent = 'Вращение...';
+  
+  // Deduct bet immediately
+  saveSouls(savedUser.id, currentBalance - bet);
+  updateBalanceUI(savedUser.id);
+  
+  // Show bet animation
+  showBetAnimation(bet);
+  
+  // Determine result (random multiplier)
+  const multipliers = [1.2, 1.5, 2, 3, 5, 10];
+  const weights = [30, 25, 20, 15, 8, 2]; // Probability weights
+  const resultMultiplier = getWeightedRandom(multipliers, weights);
+  
+  // Calculate win amount
+  const winAmount = Math.floor(bet * resultMultiplier);
+  
+  // Start animation
+  animateGTASpin(resultMultiplier, () => {
+    // Animation complete
+    const newBalance = parseInt(loadSouls(savedUser.id)) || 0;
+    const finalBalance = newBalance + winAmount;
+    
+    // Save new balance
+    saveSouls(savedUser.id, finalBalance);
+    updateBalanceUI(savedUser.id);
+    
+    // Update status
+    const statusEl = document.getElementById('gameStatus');
+    if (statusEl) {
+      if (resultMultiplier > 1) {
+        statusEl.textContent = `Выигрыш! x${resultMultiplier}`;
+        showToast(`Выиграли ${winAmount} Souls!`, 'success');
+      } else {
+        statusEl.textContent = 'Ставка проиграна';
+        showToast('Ставка проиграна', 'error');
+      }
+    }
+    
+    // Save to history
+    const result = {
+      bet: bet,
+      multiplier: resultMultiplier,
+      winAmount: winAmount,
+      isWin: resultMultiplier > 1,
+      timestamp: Date.now()
+    };
+    saveRouletteResult(savedUser.id, result);
+    
+    // Re-enable button
+    gtaIsSpinning = false;
+    if (spinButton) spinButton.disabled = false;
+    
+    // Continue auto-spin if enabled
+    if (autoSpinEnabled && !gtaIsSpinning) {
+      setTimeout(() => {
+        if (autoSpinEnabled && !gtaIsSpinning) {
+          startGTARoulette();
+        }
+      }, 5000); // 5 second delay between auto-spins
+    }
+  });
+}
+
+// Get weighted random result
+function getWeightedRandom(items, weights) {
+  const totalWeight = weights.reduce((a, b) => a + b, 0);
+  let random = Math.random() * totalWeight;
+  
+  for (let i = 0; i < items.length; i++) {
+    random -= weights[i];
+    if (random <= 0) {
+      return items[i];
+    }
+  }
+  
+  return items[items.length - 1];
+}
+
+// Animate GTA Roulette spin
+function animateGTASpin(targetMultiplier, onComplete) {
+  if (!gtaMultiplierStrip) return;
+  
+  // Find target item
+  const targetIndex = gtaMultiplierItems.findIndex(item => 
+    parseFloat(item.dataset.multiplier) === targetMultiplier
+  );
+  
+  if (targetIndex === -1) return;
+  
+  // Calculate target position
+  const itemWidth = 140; // 120px + 10px margin * 2
+  const stripWidth = gtaMultiplierStrip.offsetWidth;
+  const centerOffset = stripWidth / 2;
+  const targetPosition = -(targetIndex * itemWidth) + centerOffset;
+  
+  // Animation settings
+  const duration = 4000; // 4 seconds
+  const startTime = Date.now();
+  const startPosition = gtaCurrentPosition;
+  const distance = targetPosition - startPosition;
+  
+  // Add extra spins for effect
+  const extraSpins = 3;
+  const finalTarget = targetPosition - (extraSpins * itemWidth * 6); // 6 items per set
+  
+  // Highlight arrow during spin
+  const arrow = document.querySelector('.roulette-arrow');
+  if (arrow) arrow.classList.add('spinning');
+  
+  function animate() {
+    const now = Date.now();
+    const elapsed = now - startTime;
+    const progress = Math.min(elapsed / duration, 1);
+    
+    // Easing function for smooth deceleration
+    const easeOut = 1 - Math.pow(1 - progress, 3);
+    
+    // Calculate current position
+    gtaCurrentPosition = startPosition + (finalTarget - startPosition) * easeOut;
+    gtaMultiplierStrip.style.transform = `translateX(${gtaCurrentPosition}px)`;
+    
+    // Highlight current item
+    const currentIndex = Math.round(-gtaCurrentPosition / itemWidth);
+    gtaMultiplierItems.forEach((item, index) => {
+      item.classList.toggle('highlight', index === currentIndex);
+    });
+    
+    if (progress < 1) {
+      gtaAnimationId = requestAnimationFrame(animate);
+    } else {
+      // Animation complete
+      gtaCurrentPosition = targetPosition;
+      gtaMultiplierStrip.style.transform = `translateX(${gtaCurrentPosition}px)`;
+      
+      // Remove arrow highlight
+      if (arrow) arrow.classList.remove('spinning');
+      
+      // Highlight final result
+      gtaMultiplierItems.forEach((item, index) => {
+        item.classList.toggle('highlight', index === targetIndex);
+      });
+      
+      // Play sound effect (if available)
+      playRouletteSound();
+      
+      // Call completion callback
+      setTimeout(onComplete, 500);
+    }
+  }
+  
+  animate();
+}
+
+// Show bet animation
+function showBetAnimation(bet) {
+  const container = document.getElementById('betAnimationContainer');
+  if (!container) return;
+  
+  const savedUser = JSON.parse(localStorage.getItem('steam_user'));
+  const avatar = savedUser?.avatar || '';
+  
+  const animation = document.createElement('div');
+  animation.className = 'bet-animation';
+  animation.innerHTML = avatar ? 
+    `<img src="${avatar}" class="steam-avatar">${bet} Souls` : 
+    `${bet} Souls`;
+  
+  // Position at center
+  animation.style.left = '50%';
+  animation.style.top = '50%';
+  animation.style.transform = 'translate(-50%, -50%)';
+  
+  container.appendChild(animation);
+  
+  // Remove after animation
+  setTimeout(() => {
+    if (animation.parentNode) {
+      animation.parentNode.removeChild(animation);
+    }
+  }, 2000);
+}
+
+// Play roulette sound (placeholder)
+function playRouletteSound() {
+  // Sound implementation would go here
+  console.log('Roulette sound effect');
+}
+
+// Cleanup on page unload
+window.addEventListener('beforeunload', () => {
+  stopAutoSpin();
+  if (gtaAnimationId) {
+    cancelAnimationFrame(gtaAnimationId);
+  }
+});
+
   function startQuenta(){
     if(!ensureSteamForQuenta()) return;
     setQuentaStep(1);
@@ -7751,6 +8510,7 @@ function hideSlotsCooldown() {
     checkSteamAuth();
     initGratitudeAnimation();
     initRoulette();
+    initGTARoulette(); // Initialize GTA Roulette
   });
 </script>
 
