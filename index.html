@@ -2267,6 +2267,17 @@ header nav a:hover, .rules-trigger-btn:hover {
         <p id="passportRoleDesc" style="margin-top:16px"></p>
       </div>
 
+      <div class="card manifest" style="margin-top:20px">
+        <h2 class="synd-title">Промокод</h2>
+        <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-top:10px">
+          <input id="promoCodeInput" type="text" placeholder="Введите промокод" style="flex:1;min-width:220px;padding:10px 12px;background:#0a0a0a;border:1px solid #222;border-radius:12px;color:#fff"/>
+          <div class="trace-container" style="display:inline-block">
+            <div class="trace-line"><svg><rect class="comet-1"></rect><rect class="comet-2"></rect></svg></div>
+            <button class="btn-cta btn-cta-inner" type="button" onclick="redeemPromoCode()">Активировать</button>
+          </div>
+        </div>
+      </div>
+
       <div class="logout-container">
         <div class="trace-container logout-btn-box" style="display:inline-block">
           <div class="trace-line"><svg><rect class="comet-1"></rect><rect class="comet-2"></rect></svg></div>
@@ -4845,6 +4856,46 @@ ${motivation}`;
     t.textContent = msg;
     t.classList.add('show');
     setTimeout(() => t.classList.remove('show'), 3000);
+  }
+
+  async function redeemPromoCode() {
+    const savedUser = JSON.parse(localStorage.getItem('steam_user'));
+    if (!savedUser) {
+      showToast('Авторизуйтесь через Steam, чтобы использовать промокоды.');
+      return;
+    }
+    const input = document.getElementById('promoCodeInput');
+    if (!input) return;
+    const raw = input.value.trim();
+    if (!raw) {
+      showToast('Введите промокод.');
+      return;
+    }
+    try {
+      const res = await fetch('https://xauroriax.statkevichyt.workers.dev/redeem-code', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ steamId: savedUser.id, code: raw })
+      });
+      if (!res.ok) {
+        showToast('Ошибка при проверке промокода. Попробуйте позже.');
+        return;
+      }
+      const data = await res.json();
+      if (data && data.ok) {
+        if (typeof data.newSouls === 'number') {
+          saveSouls(savedUser.id, data.newSouls);
+          updateSoulsUI(savedUser.id);
+        }
+        showToast(data.message || 'Промокод успешно активирован.');
+        input.value = '';
+      } else {
+        showToast((data && data.message) || 'Промокод недействителен или уже использован.');
+      }
+    } catch (e) {
+      console.error(e);
+      showToast('Не удалось связаться с сервером промокодов.');
+    }
   }
 
   function logout() {
