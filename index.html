@@ -5304,31 +5304,46 @@ ${motivation}`;
   }
 
   function computeExamRole(stats) {
-    if (!stats || !stats.firstPassAttempt || stats.passed <= 0) {
-      return { id: null, name: "—", desc: "" };
-    }
-    const failsBeforeFirst = (stats.firstPassAttempt || 1) - 1;
-    const firstScore = stats.firstPassScore || 0;
-    if (stats.firstPassAttempt === 1 && firstScore === 20) {
-      return { id: "oracle", name: "Оракул Зоны", desc: "Сдал экзамен с первого раза и без ошибок. Зона шепчет тебе ответы." };
-    }
-    if (failsBeforeFirst === 0) {
-      return { id: "archivist", name: "Архивариус Кодекса", desc: "С первого раза понял законы Зоны, пусть и не идеально." };
-    }
-    const map = [
+    const rolesMap = [
+      { id: "oracle", name: "Оракул Зоны", desc: "Сдал экзамен с первого раза и без ошибок. Зона шепчет тебе ответы." },
+      { id: "archivist", name: "Архивариус Кодекса", desc: "С первого раза понял законы Зоны, пусть и не идеально." },
       { id: "interpreter", name: "Интерпретатор Правил", desc: "Ошибся один раз, но быстро разобрался в кодексе." },
       { id: "investigator", name: "Следователь Зоны", desc: "Через пару провалов дошёл до сути правил." },
       { id: "chronicler", name: "Хронист Нарушений", desc: "Изучил ошибки, чтобы больше не повторять их." },
       { id: "redeemed", name: "Исправленный Нарушитель", desc: "Много раз падал на экзамене, но всё‑таки поднялся." },
       { id: "recruit", name: "Упрямый Рекрут", desc: "Типичный новичок, которого Зона долго воспитывала." },
       { id: "doubter", name: "Сомневающийся Сталкер", desc: "Долго не верил в правила, но принял их." },
-      { id: "deaf", name: "Глухой к Шёпоту Зоны", desc: "Зона объясняла правила очень настойчиво." }
+      { id: "deaf", name: "Глухой к Шёпоту Зоны", desc: "Зона объясняла правила очень настойчиво." },
+      { id: "survivor", name: "Выживший Учебки", desc: "Десять раз наступал на грабли, но всё‑таки сдал экзамен." }
     ];
-    if (failsBeforeFirst >= 8) {
-      return { id: "survivor", name: "Выживший Учебки", desc: "Десять раз наступал на грабли, но всё‑таки сдал экзамен." };
+
+    // Если роль уже установлена вручную (например, через админку), возвращаем её
+    if (stats && stats.roleId && stats.roleId !== 'none') {
+      const found = rolesMap.find(r => r.id === stats.roleId);
+      if (found) return found;
     }
-    const idx = Math.max(0, Math.min(map.length - 1, failsBeforeFirst - 1));
-    return map[idx];
+
+    if (!stats || !stats.firstPassAttempt || stats.passed <= 0) {
+      return { id: null, name: "—", desc: "" };
+    }
+
+    const failsBeforeFirst = (stats.firstPassAttempt || 1) - 1;
+    const firstScore = stats.firstPassScore || 0;
+
+    if (stats.firstPassAttempt === 1 && firstScore === 20) {
+      return rolesMap[0]; // oracle
+    }
+    if (failsBeforeFirst === 0) {
+      return rolesMap[1]; // archivist
+    }
+
+    const failsMap = rolesMap.slice(2); // Все остальные роли
+    if (failsBeforeFirst >= 8) {
+      return rolesMap[rolesMap.length - 1]; // survivor
+    }
+
+    const idx = Math.max(0, Math.min(failsMap.length - 1, failsBeforeFirst - 1));
+    return failsMap[idx];
   }
 
   /* Admin Tools Logic */
