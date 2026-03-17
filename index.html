@@ -306,6 +306,34 @@ header.hidden + #navToggleBtn {
   word-wrap: break-word;
   }
 
+  function getSoulsStorageKey(steamId) {
+    return 'souls_' + (steamId || 'guest');
+  }
+  function loadSouls(steamId) {
+    const key = getSoulsStorageKey(steamId);
+    const raw = localStorage.getItem(key);
+    if (!raw) return 0;
+    const n = parseInt(raw, 10);
+    if (Number.isNaN(n) || n < 0) return 0;
+    return n;
+  }
+  function saveSouls(steamId, amount) {
+    const key = getSoulsStorageKey(steamId);
+    const safe = Math.max(0, Math.floor(amount||0));
+    localStorage.setItem(key, String(safe));
+  }
+  function initSoulsForUser(steamId) {
+    const current = loadSouls(steamId);
+    if (current < 0 || !Number.isFinite(current)) {
+      saveSouls(steamId, 0);
+    }
+  }
+  function updateSoulsUI(steamId) {
+    const value = loadSouls(steamId);
+    const el = document.getElementById('statsSouls');
+    if (el) el.textContent = value;
+  }
+
 .hero p{
 opacity:.75;
 margin-top:10px;
@@ -2224,6 +2252,10 @@ header nav a:hover, .rules-trigger-btn:hover {
             <span id="statsBest" class="stat-value">0/20</span>
           </div>
           <div class="stat-card">
+            <span data-i18n="stat_souls">Души</span>
+            <span id="statsSouls" class="stat-value">0</span>
+          </div>
+          <div class="stat-card">
             <span>Статус квенты</span>
             <span id="quentaStatusValue" class="stat-value">—</span>
             <div id="profileQuentaActions" style="display:none; margin-top:10px; width: 100%; text-align: right;">
@@ -3188,6 +3220,7 @@ links_twitch_desc:"Живые трансляции и атмосферные с�
   stat_passed: "Экзаменов сдано",
   stat_failed: "Экзаменов провалено",
   stat_best: "Лучший результат",
+  stat_souls: "Души",
   passport_title: "Паспорт сталкера",
   passport_role: "Роль по экзамену",
   logout: "Выйти",
@@ -3258,6 +3291,7 @@ en: {
   stat_best: "Best Score",
   passport_title: "Stalker Passport",
   passport_role: "Exam Role",
+  stat_souls: "Souls",
   logout: "Logout",
   sb_law1: "1.0 Core Law — Roleplay",
   sb_language2: "2.0 Language of the Zone",
@@ -4239,7 +4273,9 @@ window.addEventListener('DOMContentLoaded', () => {
         </div>
       `;
 
-      // Start global polling if not already started
+      initSoulsForUser(savedUser.id);
+      updateSoulsUI(savedUser.id);
+
       startGlobalPolling(savedUser.id);
       
       // Update profile page
