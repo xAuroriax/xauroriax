@@ -6695,9 +6695,17 @@ function initRoulette() {
   if (savedUser) {
     currentBalance = parseInt(loadSouls(savedUser.id)) || 0;
     updateRouletteBalance();
+  } else {
+    // Если пользователь не авторизован, устанавливаем баланс 0
+    currentBalance = 0;
+    updateRouletteBalance();
   }
   
-  generateRouletteCards();
+  // Проверяем, существует ли элемент для карточек
+  const strip = document.getElementById('rouletteStrip');
+  if (strip && strip.children.length === 0) {
+    generateRouletteCards();
+  }
   updateRouletteBalance();
 }
 
@@ -6711,6 +6719,13 @@ function generateRouletteCards() {
     { value: 5, class: 'mult-x5', weight: 5 }
   ];
   
+  // Очищаем предыдущие карточки
+  rouletteCards = [];
+  const strip = document.getElementById('rouletteStrip');
+  if (strip) {
+    strip.innerHTML = '';
+  }
+  
   // Создаем массив карточек с учетом веса
   const cardPool = [];
   multipliers.forEach(mult => {
@@ -6721,7 +6736,6 @@ function generateRouletteCards() {
   
   // Перемешиваем и создаем карточки
   const shuffled = cardPool.sort(() => Math.random() - 0.5);
-  const strip = document.getElementById('rouletteStrip');
   
   // Создаем 3 набора карточек для бесшовной прокрутки
   for (let set = 0; set < 3; set++) {
@@ -6730,7 +6744,9 @@ function generateRouletteCards() {
       card.className = `roulette-card ${mult.class}`;
       card.textContent = `x${mult.value}`;
       card.dataset.multiplier = mult.value;
-      strip.appendChild(card);
+      if (strip) {
+        strip.appendChild(card);
+      }
       rouletteCards.push(card);
     });
   }
@@ -7094,6 +7110,7 @@ function getCurrentUserId() {
   window.addEventListener('DOMContentLoaded', () => {
     checkSteamAuth();
     initGratitudeAnimation();
+    initRoulette();
   });
 </script>
 
