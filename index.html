@@ -791,6 +791,41 @@ margin-top:auto;
     }
   
   }
+  /* Admin Styles */
+  .admin-link-btn {
+    background: transparent;
+    border: 1px solid #ff7b00;
+    color: #ff7b00;
+    border-radius: 8px;
+    padding: 4px 8px;
+    cursor: pointer;
+    margin-right: 10px;
+    font-size: 16px;
+    transition: 0.3s;
+  }
+  .admin-link-btn:hover {
+    background: #ff7b00;
+    color: #000;
+  }
+  #adminUserPanel label {
+    display: block;
+    font-size: 12px;
+    color: #888;
+    margin-bottom: 4px;
+  }
+  .admin-field input, .admin-field select {
+    outline: none;
+    transition: 0.3s;
+  }
+  .admin-field input:focus, .admin-field select:focus {
+    border-color: #ff7b00;
+    box-shadow: 0 0 5px rgba(255, 123, 0, 0.3);
+  }
+  .admin-search-box h3 {
+    margin: 0;
+    color: #ff7b00;
+    font-size: 18px;
+  }
 </style>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
@@ -2380,6 +2415,84 @@ input, textarea, select {
 </div>
 </div>
 
+<div class="page" id="admin">
+  <div class="card">
+    <h2 class="synd-title">Панель управления (Admin Tools)</h2>
+    <div class="admin-grid">
+      <!-- Search Box -->
+      <div class="card admin-search-box">
+        <h3>Поиск игрока</h3>
+        <div style="display:flex; gap:10px; margin-top:10px;">
+          <input id="adminSearchId" type="text" placeholder="SteamID64" style="flex:1; padding:10px; background:#0a0a0a; border:1px solid #222; border-radius:12px; color:#fff">
+          <button class="btn-cta-inner" onclick="adminSearchUser()">Найти</button>
+        </div>
+      </div>
+
+      <!-- User Info & Edit -->
+      <div id="adminUserPanel" class="card" style="display:none; margin-top:20px;">
+        <div style="display:flex; gap:20px; align-items:center; margin-bottom:20px;">
+          <img id="adminUserAvatar" src="" style="width:64px; height:64px; border-radius:12px; border:1px solid #ff7b00;">
+          <div>
+            <h2 id="adminUserName" style="margin:0; color:#ff7b00;"></h2>
+            <p id="adminUserSteamId" style="margin:5px 0 0 0; opacity:0.6; font-size:14px;"></p>
+          </div>
+        </div>
+
+        <div class="admin-edit-grid" style="display:grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap:20px;">
+          <!-- Souls -->
+          <div class="admin-field">
+            <label>Души (валюта)</label>
+            <input id="adminUserSouls" type="number" style="width:100%; padding:8px; background:#111; border:1px solid #333; color:#fff; border-radius:8px; margin-top:5px;">
+          </div>
+          <!-- Exam Stats -->
+          <div class="admin-field">
+            <label>Сдано экзаменов</label>
+            <input id="adminUserPassed" type="number" style="width:100%; padding:8px; background:#111; border:1px solid #333; color:#fff; border-radius:8px; margin-top:5px;">
+          </div>
+          <div class="admin-field">
+            <label>Провалено экзаменов</label>
+            <input id="adminUserFailed" type="number" style="width:100%; padding:8px; background:#111; border:1px solid #333; color:#fff; border-radius:8px; margin-top:5px;">
+          </div>
+          <div class="admin-field">
+            <label>Лучший результат</label>
+            <input id="adminUserBest" type="number" max="20" style="width:100%; padding:8px; background:#111; border:1px solid #333; color:#fff; border-radius:8px; margin-top:5px;">
+          </div>
+          <!-- Role -->
+          <div class="admin-field">
+            <label>Роль по экзамену</label>
+            <select id="adminUserRole" style="width:100%; padding:8px; background:#111; border:1px solid #333; color:#fff; border-radius:8px; margin-top:5px;">
+              <option value="none">—</option>
+              <option value="oracle">Оракул Зоны</option>
+              <option value="archivist">Архивариус Кодекса</option>
+              <option value="interpreter">Интерпретатор Правил</option>
+              <option value="investigator">Следователь Зоны</option>
+              <option value="chronicler">Хронист Нарушений</option>
+              <option value="redeemed">Исправленный Нарушитель</option>
+              <option value="recruit">Упрямый Рекрут</option>
+              <option value="doubter">Сомневающийся Сталкер</option>
+              <option value="deaf">Глухой к Шёпоту Зоны</option>
+              <option value="survivor">Выживший Учебки</option>
+            </select>
+          </div>
+          <!-- Ban -->
+          <div class="admin-field">
+            <label>Статус доступа</label>
+            <select id="adminUserBan" style="width:100%; padding:8px; background:#111; border:1px solid #333; color:#fff; border-radius:8px; margin-top:5px;">
+              <option value="0">Активен</option>
+              <option value="1">ЗАБАНЕН НА САЙТЕ</option>
+            </select>
+          </div>
+        </div>
+
+        <div style="margin-top:20px; display:flex; gap:10px;">
+          <button class="btn-cta-inner" onclick="adminUpdateUser()" style="background:#ff7b00; color:#000; font-weight:bold;">Сохранить изменения</button>
+          <button class="btn-cta-inner" onclick="adminResetUser()" style="background:#444;">Сбросить всё</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
 <div class="page" id="links">
 <div class="card links-card">
 <h2 class="synd-title" data-i18n="links_title">Сообщество</h2>
@@ -3031,15 +3144,17 @@ let activeNav=navLinks.find(a=> {
   return onclick && onclick.includes(`'${id}'`);
 });
 
-if(activeNav){
-  activeNav.classList.add('active');
-  // If it's inside a submenu, highlight the trigger too
-  const trigger = activeNav.closest('.nav-dropdown')?.querySelector('.rules-trigger-btn');
-  if (trigger) trigger.classList.add('active');
-} else if (id === 'rules') {
-  const rulesTrigger = document.querySelector('.rules-trigger-btn');
-  if (rulesTrigger) rulesTrigger.classList.add('active');
-}
+if (activeNav) {
+    activeNav.classList.add('active');
+    // If it's inside a submenu, highlight the trigger too
+    const trigger = activeNav.closest('.nav-dropdown')?.querySelector('.rules-trigger-btn');
+    if (trigger) trigger.classList.add('active');
+  } else if (id === 'rules') {
+    const rulesTrigger = document.querySelector('.rules-trigger-btn');
+    if (rulesTrigger) rulesTrigger.classList.add('active');
+  } else if (id === 'admin') {
+    // Admin page has no nav link by default
+  }
 
 // Auto-hide header after selection
 const header = document.querySelector('header');
@@ -4396,8 +4511,12 @@ window.addEventListener('DOMContentLoaded', () => {
     const loginContainer = document.querySelector('.steam-login-container');
     
     if (savedUser && loginContainer) {
+      // Admin check
+      const isAdmin = (savedUser.id === '76561199427395346');
+      
       // Re-inject HTML to keep notification bell and login button
       loginContainer.innerHTML = `
+        ${isAdmin ? `<button class="admin-link-btn" onclick="showPage('admin')" title="Admin Tools">🛠️</button>` : ''}
         <!-- Notification Bell -->
         <div id="notifBell" class="notification-bell-container" style="display:flex;" onclick="toggleNotifPopup(event)">
           <i class="fas fa-bell"></i>
@@ -5140,6 +5259,101 @@ ${motivation}`;
     }
     const idx = Math.max(0, Math.min(map.length - 1, failsBeforeFirst - 1));
     return map[idx];
+  }
+
+  /* Admin Tools Logic */
+  async function adminSearchUser() {
+    const steamId = document.getElementById('adminSearchId').value.trim();
+    if (!steamId) return showToast('Введите SteamID', 'error');
+
+    showToast('Поиск игрока...', 'success');
+    try {
+      // Запрашиваем данные сразу из двух воркеров
+      const [soulsRes, quentaRes] = await Promise.all([
+        fetch(`https://xauroriax.statkevichyt.workers.dev/admin-get-user?steamId=${steamId}&adminId=76561199427395346`),
+        fetch(`https://discordwebhookurl.statkevichyt.workers.dev/get-quenta-data?steamId=${steamId}`)
+      ]);
+
+      if (!soulsRes.ok) throw new Error('Игрок не найден в базе душ');
+      
+      const soulsData = await soulsRes.json();
+      const quentaData = quentaRes.ok ? await quentaRes.json() : null;
+
+      // Показываем панель
+      document.getElementById('adminUserPanel').style.display = 'block';
+      document.getElementById('adminUserName').textContent = soulsData.name || 'Неизвестный сталкер';
+      document.getElementById('adminUserSteamId').textContent = `ID: ${steamId}`;
+      document.getElementById('adminUserAvatar').src = soulsData.avatar || 'favicon.png';
+
+      // Заполняем поля
+      document.getElementById('adminUserSouls').value = soulsData.souls || 0;
+      document.getElementById('adminUserPassed').value = soulsData.stats?.passed || 0;
+      document.getElementById('adminUserFailed').value = soulsData.stats?.failed || 0;
+      document.getElementById('adminUserBest').value = soulsData.stats?.best || 0;
+      document.getElementById('adminUserRole').value = soulsData.stats?.roleId || 'none';
+      document.getElementById('adminUserBan').value = soulsData.isBanned ? "1" : "0";
+
+      showToast('Данные загружены', 'success');
+    } catch (e) {
+      console.error(e);
+      showToast('Ошибка: ' + e.message, 'error');
+    }
+  }
+
+  async function adminUpdateUser() {
+    const steamId = document.getElementById('adminSearchId').value.trim();
+    const payload = {
+      adminId: '76561199427395346',
+      steamId: steamId,
+      souls: parseInt(document.getElementById('adminUserSouls').value),
+      stats: {
+        passed: parseInt(document.getElementById('adminUserPassed').value),
+        failed: parseInt(document.getElementById('adminUserFailed').value),
+        best: parseInt(document.getElementById('adminUserBest').value),
+        roleId: document.getElementById('adminUserRole').value
+      },
+      isBanned: document.getElementById('adminUserBan').value === "1"
+    };
+
+    showToast('Сохранение...', 'success');
+    try {
+      const res = await fetch(`https://xauroriax.statkevichyt.workers.dev/admin-update-user`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+
+      if (res.ok) {
+        showToast('Данные игрока обновлены!', 'success');
+      } else {
+        throw new Error('Ошибка сервера при сохранении');
+      }
+    } catch (e) {
+      showToast(e.message, 'error');
+    }
+  }
+
+  async function adminResetUser() {
+    showCustomConfirm('Сбросить ВСЕ данные этого игрока (души, стата, квента)?', async () => {
+      const steamId = document.getElementById('adminSearchId').value.trim();
+      showToast('Сброс...', 'success');
+      try {
+        await fetch(`https://xauroriax.statkevichyt.workers.dev/admin-reset-user`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ adminId: '76561199427395346', steamId })
+        });
+        await fetch(`https://discordwebhookurl.statkevichyt.workers.dev/delete-quenta`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ steamId })
+        });
+        showToast('Игрок полностью сброшен', 'success');
+        adminSearchUser(); // Refresh
+      } catch (e) {
+        showToast('Ошибка при сбросе', 'error');
+      }
+    });
   }
 
   window.addEventListener('DOMContentLoaded', () => {
