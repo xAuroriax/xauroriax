@@ -4895,12 +4895,12 @@ function updateBalanceUI(steamId) {
     const currentValue = parseInt(balanceEl.textContent) || 0;
     const newValue = parseInt(value) || 0;
     
-    // Если значение изменилось, запускаем анимации
-    if (currentValue !== newValue) {
+    // Если значение изменилось, запускаем анимации (только если не пропущено)
+    if (currentValue !== newValue && !window.skipBalanceAnimation) {
       const difference = newValue - currentValue;
       
-      // Показываем всплывающий текст (только если это не автоматическое обновление)
-      if (window.showBalanceChangePopup && !window.skipBalanceAnimation) {
+      // Показываем всплывающий текст
+      if (window.showBalanceChangePopup) {
         showBalanceChangePopup(difference);
       }
       
@@ -4910,6 +4910,9 @@ function updateBalanceUI(steamId) {
       // Анимируем счётчик
       animateBalanceCounter(balanceEl, currentValue, newValue);
     }
+    
+    // Всегда обновляем текст, даже если анимации пропущены
+    balanceEl.textContent = newValue;
   }
   
   // Обновляем баланс в рулетке (если он отличается)
@@ -7399,6 +7402,9 @@ let rouletteStateInterval = null; // Poll server state
 
 // Initialize GTA Auto-Roulette
 function initGTARoulette() {
+  // Skip balance animations on initial load
+  window.skipBalanceAnimation = true;
+  
   // Generate multiplier strip
   generateGTAMultipliers();
   
@@ -7432,7 +7438,10 @@ function initGTARoulette() {
   }
   
   // Load server balance ONCE on initialization
-  loadServerBalance();
+  loadServerBalance().then(() => {
+    // Re-enable balance animations after initial load
+    window.skipBalanceAnimation = false;
+  });
 }
 
 // Poll server for roulette state
@@ -7484,8 +7493,25 @@ function startServerStatePolling() {
 
 // Update roulette based on server state
 function updateRouletteFromServerState(state) {
+  // Store server state for timer calculations
+  window.lastServerState = state;
+  
+  // Handle spinning status
+  if (state.status === "spinning" && !gtaIsSpinning) {
+    gtaIsSpinning = true;
+    canPlaceBet = false;
+    
+    // Start spinning animation
+    if (state.targetMultiplier && !gtaAnimationId) {
+      animateGTASpin(state.targetMultiplier, () => {
+        // Animation complete callback
+        gtaAnimationId = null;
+      });
+    }
+  }
+  
   // Update countdown from nextSpin field
-  if (!state.isSpinning && state.nextSpin) {
+  if (!gtaIsSpinning && state.nextSpin) {
     const now = Date.now();
     const timeUntilSpin = Math.max(0, Math.ceil((state.nextSpin - now) / 1000));
     autoSpinCountdown = timeUntilSpin;
@@ -7493,7 +7519,7 @@ function updateRouletteFromServerState(state) {
   }
   
   // Update spinning state
-  gtaIsSpinning = state.isSpinning || false;
+  gtaIsSpinning = state.status === "spinning" || state.isSpinning || false;
   canPlaceBet = state.canPlaceBet !== false;
   
   // Update status
@@ -7507,15 +7533,6 @@ function updateRouletteFromServerState(state) {
     } else {
       statusEl.textContent = 'Ожидание ставок...';
     }
-  }
-  
-  // Handle spin start
-  if (state.isSpinning && state.spinStart && !gtaAnimationId) {
-    // Start spinning animation
-    animateGTASpin(state.targetMultiplier, () => {
-      // Animation complete callback
-      gtaAnimationId = null;
-    });
   }
   
   // Handle spin result
@@ -7728,8 +7745,16 @@ async function placeBet(multiplier) {
     
     // Update local balance from server response only
     if (result.new_balance !== undefined) {
+      const oldBalance = serverBalance;
       serverBalance = result.new_balance;
       updateBalanceUI(savedUser.id);
+      
+      // Show balance change animation only once with correct amount
+      const balanceChange = result.new_balance - oldBalance;
+      if (balanceChange !== 0 && window.showBalanceChangePopup) {
+        showBalanceChangePopup(balanceChange);
+        addBalanceGlow(document.getElementById('userBalance'), balanceChange);
+      }
     }
     
     // Add to local bets for UI
@@ -7866,10 +7891,20 @@ function updateCountdownDisplay() {
       timerEl.textContent = '0';
       progressEl.style.width = '0%';
     } else {
-      // Normal countdown display
-      timerEl.textContent = Math.max(0, autoSpinCountdown);
-      const progress = ((30 - Math.max(0, autoSpinCountdown)) / 30) * 100;
-      progressEl.style.width = `${progress}%`;
+      // Calculate countdown from nextSpin if available, otherwise use autoSpinCountdown
+      const savedUser = JSON.parse(localStorage.getItem('steam_user'));
+      if (savedUser && window.lastServerState && window.lastServerState.nextSpin) {
+        const now = Date.now();
+        const timeUntilSpin = Math.max(0, Math.ceil((window.lastServerState.nextSpin - now) / 1000));
+        timerEl.textContent = timeUntilSpin;
+        const progress = ((30 - timeUntilSpin) / 30) * 100;
+        progressEl.style.width = `${progress}%`;
+      } else {
+        // Fallback to autoSpinCountdown
+        timerEl.textContent = Math.max(0, autoSpinCountdown);
+        const progress = ((30 - Math.max(0, autoSpinCountdown)) / 30) * 100;
+        progressEl.style.width = `${progress}%`;
+      }
     }
   }
 }
