@@ -7242,11 +7242,14 @@ window.addEventListener('DOMContentLoaded', () => {
       // Разблокируем слоты для авторизованных пользователей
       enableSlots();
       
-      // Show and update balance
+      // Show and update balance - ЗАГРУЖАЕМ С СЕРВЕРА
       const balanceEl = document.getElementById('userBalance');
       if (balanceEl) {
         balanceEl.style.display = 'flex';
-        updateBalanceUI(savedUser.id);
+        // Сначала загружаем баланс с сервера, потом обновляем UI
+        loadServerBalance().then(() => {
+          updateBalanceUI(savedUser.id);
+        });
       }
 
       startGlobalPolling(savedUser.id);
@@ -7785,6 +7788,38 @@ function initGTARoulette() {
     // Re-enable balance animations after initial load
     window.skipBalanceAnimation = false;
   });
+}
+
+// Enable roulette for authenticated users
+function enableRoulette() {
+  const betInput = document.getElementById('betAmountInput');
+  const betButtons = document.querySelectorAll('.mult-btn');
+  if (betInput) betInput.disabled = false;
+  betButtons.forEach(btn => btn.disabled = false);
+}
+
+// Enable slots for authenticated users
+function enableSlots() {
+  const slotsBetInput = document.getElementById('slotsBetAmount');
+  const slotsSpinButton = document.getElementById('slotsSpinButton');
+  if (slotsBetInput) slotsBetInput.disabled = false;
+  if (slotsSpinButton) slotsSpinButton.disabled = false;
+}
+
+// Disable roulette when logging out
+function disableRoulette() {
+  const betInput = document.getElementById('betAmountInput');
+  const betButtons = document.querySelectorAll('.mult-btn');
+  if (betInput) betInput.disabled = true;
+  betButtons.forEach(btn => btn.disabled = true);
+}
+
+// Disable slots when logging out
+function disableSlots() {
+  const slotsBetInput = document.getElementById('slotsBetAmount');
+  const slotsSpinButton = document.getElementById('slotsSpinButton');
+  if (slotsBetInput) slotsBetInput.disabled = true;
+  if (slotsSpinButton) slotsSpinButton.disabled = true;
 }
 
 // Poll server for roulette state
