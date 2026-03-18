@@ -7626,8 +7626,14 @@ function getRandomMultiplier() {
 
 // Новая функция для ставки на множитель - ИСПРАВЛЕНО
 async function placeBetOnMultiplier(multiplier) {
+  const betAmount = parseInt(document.getElementById('betAmountInput').value);
   console.log('placeBetOnMultiplier called with', multiplier, 'amount', betAmount);
   
+  if (!betAmount || betAmount <= 0) {
+    showToast('Введите корректную сумму ставки', 'error');
+    return;
+  }
+
   if (!canPlaceBet || gtaIsSpinning) {
     showToast('Ставки в данный момент заблокированы', 'error');
     return;
@@ -7639,28 +7645,9 @@ async function placeBetOnMultiplier(multiplier) {
     return;
   }
 
-  const betAmountInput = document.getElementById('betAmountInput');
-  const betAmount = parseInt(betAmountInput.value);
-  
-  if (!betAmount || betAmount <= 0) {
-    showToast('Введите корректную сумму ставки', 'error');
-    return;
-  }
-  
-  // ПРОВЕРКА БАЛАНСА НА СЕРВЕРЕ, а не локально
-  try {
-    const balanceResponse = await fetch(`https://stalker-api.xauroriax.ru/balance?steam_id=${savedUser.id}`);
-    if (!balanceResponse.ok) throw new Error('Failed to check balance');
-    
-    const balanceData = await balanceResponse.json();
-    const currentServerBalance = parseInt(balanceData.balance) || 0;
-    
-    if (betAmount > currentServerBalance) {
-      showToast('Недостаточно Souls для ставки', 'error');
-      return;
-    }
-  } catch (error) {
-    showToast('Ошибка проверки баланса', 'error');
+  // Проверка баланса через serverBalance (обновляется в loadServerBalance)
+  if (betAmount > serverBalance) {
+    showToast('Недостаточно Souls для ставки', 'error');
     return;
   }
 
