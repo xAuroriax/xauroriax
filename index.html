@@ -4886,32 +4886,21 @@ function updateSoulsUI(steamId) {
 }
 
 function updateBalanceUI(steamId) {
-  // Use serverBalance if available, otherwise load from storage
   const value = serverBalance || loadSouls(steamId);
   const balanceEl = document.getElementById('balanceAmount');
   const balanceContainer = document.getElementById('userBalance');
-  
-  if (balanceEl && balanceContainer) {
-    const currentValue = parseInt(balanceEl.textContent) || 0;
-    const newValue = parseInt(value) || 0;
-    
-    // Если значение изменилось, запускаем анимации (только если не пропущено)
-    if (currentValue !== newValue && !window.skipBalanceAnimation) {
-      const difference = newValue - currentValue;
-      
-      // Показываем всплывающий текст
-      if (window.showBalanceChangePopup) {
-        showBalanceChangePopup(difference);
-      }
-      
-      // Добавляем glow эффект
+  if (!balanceEl || !balanceContainer) return;
+
+  const currentValue = parseInt(balanceEl.textContent) || 0;
+  const newValue = parseInt(value) || 0;
+
+  if (currentValue !== newValue) {
+    const difference = newValue - currentValue;
+    if (!window.skipBalanceAnimation) {
+      showBalanceChangePopup(difference);
       addBalanceGlow(balanceContainer, difference);
-      
-      // Анимируем счётчик
       animateBalanceCounter(balanceEl, currentValue, newValue);
     }
-    
-    // Всегда обновляем текст, даже если анимации пропущены
     balanceEl.textContent = newValue;
   }
   
@@ -7507,10 +7496,10 @@ function updateRouletteFromServerState(state) {
     gtaIsSpinning = true;
     canPlaceBet = false;
     
-    // Start spinning animation
     if (!gtaAnimationId) {
-      animateGTASpin(state.targetMultiplier || getRandomMultiplier(), () => {
-        // Animation complete callback
+      // Если сервер прислал targetMultiplier — используем его, иначе берём случайный
+      const targetMult = state.targetMultiplier || getRandomMultiplier();
+      animateGTASpin(targetMult, () => {
         gtaAnimationId = null;
       });
     }
@@ -7892,26 +7881,19 @@ function updateBetsDisplay(serverBets) {
 function updateCountdownDisplay() {
   const timerEl = document.getElementById('timerDisplay');
   const progressEl = document.getElementById('timerProgress');
-  
-  if (timerEl && progressEl) {
-    if (gtaIsSpinning) {
-      // Freeze timer at 0 during spin
-      timerEl.textContent = '0';
-      progressEl.style.width = '0%';
-    } else {
-      // Calculate countdown from nextSpin if available
-      if (window.lastServerState && window.lastServerState.nextSpin) {
-        const timeLeft = Math.max(0, Math.floor((window.lastServerState.nextSpin - Date.now()) / 1000));
-        timerEl.textContent = timeLeft;
-        const progress = ((30 - timeLeft) / 30) * 100;
-        progressEl.style.width = `${progress}%`;
-      } else {
-        // Fallback to autoSpinCountdown
-        timerEl.textContent = Math.max(0, autoSpinCountdown);
-        const progress = ((30 - Math.max(0, autoSpinCountdown)) / 30) * 100;
-        progressEl.style.width = `${progress}%`;
-      }
-    }
+  if (!timerEl || !progressEl) return;
+
+  if (gtaIsSpinning) {
+    timerEl.textContent = '0';
+    progressEl.style.width = '0%';
+  } else if (window.lastServerState && window.lastServerState.nextSpin) {
+    const timeLeft = Math.max(0, Math.floor((window.lastServerState.nextSpin - Date.now()) / 1000));
+    timerEl.textContent = timeLeft;
+    const progress = ((30 - timeLeft) / 30) * 100;
+    progressEl.style.width = `${progress}%`;
+  } else {
+    timerEl.textContent = autoSpinCountdown;
+    progressEl.style.width = ((30 - autoSpinCountdown) / 30) * 100 + '%';
   }
 }
 
@@ -9303,6 +9285,9 @@ function hideSlotsCooldown() {
 
   function logout() {
     localStorage.removeItem('steam_user');
+    // Clear roulette history
+    localStorage.removeItem('rouletteHistory');
+    localStorage.removeItem('localHistory');
     // Hide balance when logging out
     const balanceEl = document.getElementById('userBalance');
     if (balanceEl) {
