@@ -7448,7 +7448,7 @@ function startServerStatePolling() {
   // Poll every 1 second
   rouletteStateInterval = setInterval(async () => {
     try {
-      const response = await fetch('https://stalker-api.xauroriax.ru/roulette-state');
+      const response = await fetch('https://stalker-api.xauroriax.ru/roulette-state-improved');
       if (!response.ok) throw new Error('Failed to fetch state');
       const state = await response.json();
       updateRouletteFromServerState(state);
@@ -7484,9 +7484,11 @@ function startServerStatePolling() {
 
 // Update roulette based on server state
 function updateRouletteFromServerState(state) {
-  // Update countdown only if not spinning
-  if (!state.isSpinning) {
-    autoSpinCountdown = state.countdown || 30;
+  // Update countdown from nextSpin field
+  if (!state.isSpinning && state.nextSpin) {
+    const now = Date.now();
+    const timeUntilSpin = Math.max(0, Math.ceil((state.nextSpin - now) / 1000));
+    autoSpinCountdown = timeUntilSpin;
     updateCountdownDisplay();
   }
   
@@ -7629,8 +7631,8 @@ function generateGTAMultipliers() {
   const multipliers = [1.2, 1.5, 2, 3, 5, 10];
   const items = [];
   
-  // Create 5 sets for seamless scrolling (more sets = smoother infinite loop)
-  for (let set = 0; set < 5; set++) {
+  // Create 10 sets for seamless scrolling (more sets = smoother infinite loop)
+  for (let set = 0; set < 10; set++) {
     multipliers.forEach(mult => {
       const item = document.createElement('div');
       item.className = 'multiplier-item';
@@ -7653,8 +7655,8 @@ function startContinuousAnimation() {
     if (!gtaIsSpinning) {
       // Continuous slow scroll when not spinning
       gtaCurrentPosition -= 0.5; // Smooth continuous movement
-      if (gtaCurrentPosition <= -1400) { 
-        // Smooth reset without teleport
+      if (gtaCurrentPosition <= -2800) { 
+        // Smooth reset without teleport - increased length for seamless loop
         gtaCurrentPosition = 0;
       }
       gtaMultiplierStrip.style.transform = `translateX(${gtaCurrentPosition}px)`;
@@ -9571,7 +9573,7 @@ if (window.innerWidth <= 480) {
     if (now - lastAnimationTime >= animationInterval) {
       if (!gtaIsSpinning && gtaMultiplierStrip) {
         gtaCurrentPosition -= 0.5;
-        if (gtaCurrentPosition <= -840) {
+        if (gtaCurrentPosition <= -1680) { // Adjusted for 10 sets (6 * 10 * 28 = 1680)
           gtaCurrentPosition = 0;
         }
         gtaMultiplierStrip.style.transform = `translateX(${gtaCurrentPosition}px)`;
