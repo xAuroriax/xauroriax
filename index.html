@@ -7225,9 +7225,16 @@ window.addEventListener('DOMContentLoaded', () => {
       if (balanceEl) {
         balanceEl.style.display = 'flex';
         // Загружаем баланс с сервера и обновляем все UI элементы
-        loadServerBalance().then((balance) => {
+        loadServerBalance(savedUser.id).then((balance) => {
           console.log('Balance loaded in updateSteamUI:', balance);
+          // Обновляем баланс во всех местах
           updateBalanceUI(savedUser.id);
+          // Обновляем баланс в рулетке
+          currentBalance = balance;
+          updateRouletteBalance();
+          // Обновляем баланс в слотах
+          slotsBalance = balance;
+          updateSlotsBalance();
         }).catch(error => {
           console.error('Failed to load balance in updateSteamUI:', error);
         });
@@ -7760,7 +7767,7 @@ function initGTARoulette() {
   
   // Load server balance ONCE on initialization
   window.skipBalanceAnimation = true; // Отключаем анимации при загрузке
-  loadServerBalance().then((balance) => {
+  loadServerBalance(savedUser.id).then((balance) => {
     // Убедимся, что баланс присвоен и отображается
     console.log('Initial server balance loaded:', balance);
     serverBalance = balance; // Явно присваиваем
@@ -8066,12 +8073,11 @@ function updateHistoryDisplay() {
 }
 
 // Load server balance with proper error handling
-async function loadServerBalance() {
-  const savedUser = JSON.parse(localStorage.getItem('steam_user'));
-  if (!savedUser) return 0;
+async function loadServerBalance(steamId) {
+  if (!steamId) return 0; // ✅ Проверка на пустой steamId
   
   try {
-    const response = await fetch(`https://stalker-api.xauroriax.ru/balance?steam_id=${savedUser.id}`);
+    const response = await fetch(`https://stalker-api.xauroriax.ru/balance?steam_id=${steamId}`);
     if (!response.ok) throw new Error('Failed to load balance');
     
     const data = await response.json();
@@ -8080,12 +8086,7 @@ async function loadServerBalance() {
     // Update server balance variable
     serverBalance = balance;
     
-    // Обновляем UI для отображения нового баланса
-    const savedUser = JSON.parse(localStorage.getItem('steam_user'));
-    if (savedUser) {
-      updateBalanceUI(savedUser.id);
-    }
-    
+    console.log('Balance loaded from server:', balance);
     return balance;
   } catch (error) {
     console.error('Error loading server balance:', error);
@@ -9534,7 +9535,8 @@ function hideSlotsCooldown() {
         const savedUser = JSON.parse(localStorage.getItem('steam_user'));
         if (savedUser && savedUser.id === steamId) {
           // Load fresh balance from server instead of using local value
-          await loadServerBalance();
+          await loadServerBalance(savedUser.id);
+          updateBalanceUI(savedUser.id); // Обновляем UI
         }
       } else {
         throw new Error(res.statusText || 'Update failed');
@@ -9573,6 +9575,22 @@ function hideSlotsCooldown() {
     initGratitudeAnimation();
     initRoulette();
     initGTARoulette(); // Initialize GTA Auto-Roulette
+    
+    // Принудительная загрузка баланса если пользователь уже авторизован
+    const savedUser = JSON.parse(localStorage.getItem('steam_user'));
+    if (savedUser) {
+      loadServerBalance(savedUser.id).then((balance) => {
+        console.log('Balance loaded on page load:', balance);
+        updateBalanceUI(savedUser.id);
+        // Обновляем баланс в играх
+        currentBalance = balance;
+        updateRouletteBalance();
+        slotsBalance = balance;
+        updateSlotsBalance();
+      }).catch(error => {
+        console.error('Failed to load balance on page load:', error);
+      });
+    }
   });
 
 // Mobile Menu Functions
