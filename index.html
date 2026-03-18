@@ -7779,6 +7779,7 @@ function initGTARoulette() {
   }
   
   // Load server balance ONCE on initialization
+  window.skipBalanceAnimation = true; // Отключаем анимации при загрузке
   loadServerBalance().then((balance) => {
     // Убедимся, что баланс присвоен и отображается
     console.log('Initial server balance loaded:', balance);
@@ -7842,6 +7843,7 @@ function startServerStatePolling() {
       if (!response.ok) throw new Error('Failed to fetch state');
       const state = await response.json();
       updateRouletteFromServerState(state);
+      updateCountdownDisplay(); // Обновляем таймер каждую секунду
       
       // Reset error counter on success
       consecutiveErrors = 0;
@@ -7892,24 +7894,33 @@ function updateRouletteFromServerState(state) {
     }
   }
   
-  // Логика вращения - запускаем ТОЛЬКО если есть ставки и сервер сказал spinning
-  if (state.status === "spinning" && !gtaIsSpinning && hasAnyBets) {
+  // Логика вращения - запускаем при статусе "spinning"
+  if (state.status === "spinning" && !gtaIsSpinning) {
     gtaIsSpinning = true;
     canPlaceBet = false;
-    
     // Блокируем все кнопки ставок
     document.querySelectorAll('.mult-btn').forEach(btn => btn.disabled = true);
-    
+
     if (!gtaAnimationId) {
-      // Используем targetMultiplier от сервера
-      const targetMult = state.targetMultiplier;
-      if (targetMult) {
-        animateGTASpin(targetMult, () => {
-          gtaAnimationId = null;
-          // Включаем подсветку только ПОСЛЕ остановки
-          highlightWinningMultiplier(targetMult);
-        });
-      }
+      const targetMult = state.targetMultiplier || getRandomMultiplier();
+      console.log('Запуск анимации с множителем', targetMult);
+      animateGTASpin(targetMult, () => {
+        gtaAnimationId = null;
+        // Сбрасываем флаг после окончания анимации
+        gtaIsSpinning = false;
+        canPlaceBet = true;
+        
+        // Если есть результат, обрабатываем его
+        if (state.result) {
+          handleSpinResult(state.result);
+        }
+        
+        // Разблокируем кнопки
+        const savedUser = JSON.parse(localStorage.getItem('steam_user'));
+        if (savedUser) {
+          document.querySelectorAll('.mult-btn').forEach(btn => btn.disabled = false);
+        }
+      });
     }
   }
   
@@ -8088,6 +8099,12 @@ async function loadServerBalance() {
     
     // Update server balance variable
     serverBalance = balance;
+    
+    // Обновляем UI для отображения нового баланса
+    const savedUser = JSON.parse(localStorage.getItem('steam_user'));
+    if (savedUser) {
+      updateBalanceUI(savedUser.id);
+    }
     
     return balance;
   } catch (error) {
@@ -8282,9 +8299,6 @@ function updateCountdownDisplay() {
     timerEl.textContent = timeLeft;
     const progress = ((30 - timeLeft) / 30) * 100;
     progressEl.style.width = `${progress}%`;
-  } else {
-    timerEl.textContent = autoSpinCountdown;
-    progressEl.style.width = ((30 - autoSpinCountdown) / 30) * 100 + '%';
   }
 }
 
@@ -9529,6 +9543,9 @@ function hideSlotsCooldown() {
       if (res.ok) {
         const result = await res.json();
         
+        // Обновляем данные на экране
+        adminSearchUser(); // Refresh admin panel
+        
         // Показываем сообщение от сервера или стандартное
         const message = result.message || i18n[localStorage.getItem('lang')||'ru'].toast_admin_updated;
         showToast(message, 'success');
@@ -9539,7 +9556,6 @@ function hideSlotsCooldown() {
           // Load fresh balance from server instead of using local value
           await loadServerBalance();
         }
-        adminSearchUser(); // Refresh admin panel
       } else {
         throw new Error(res.statusText || 'Update failed');
       }
