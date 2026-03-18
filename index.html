@@ -5056,38 +5056,16 @@ STARFALL SYNDICATE | AURORIA
 </footer>
 
 <script>
-function getSoulsStorageKey(steamId) {
-  return `user-souls:${steamId}`;
-}
-function loadSouls(steamId) {
-  const key = getSoulsStorageKey(steamId);
-  const raw = localStorage.getItem(key);
-  if (!raw) return 0;
-  const n = parseInt(raw, 10);
-  if (Number.isNaN(n) || n < 0) return 0;
-  return n;
-}
-function saveSouls(steamId, amount) {
-  const key = getSoulsStorageKey(steamId);
-  const safe = Math.max(0, Math.floor(amount||0));
-  localStorage.setItem(key, String(safe));
-}
-function initSoulsForUser(steamId) {
-  const current = loadSouls(steamId);
-  if (current < 0 || !Number.isFinite(current)) {
-    saveSouls(steamId, 0);
-  }
-}
-
-
-function updateSoulsUI(steamId) {
-  const value = loadSouls(steamId);
-  const el = document.getElementById('statsSouls');
-  if (el) el.textContent = value;
-}
+// УДАЛЕНЫ УСТАРЕВШИЕ ФУНКЦИИ:
+// - getSoulsStorageKey
+// - loadSouls
+// - saveSouls
+// - initSoulsForUser
+// - updateSoulsUI
+// Баланс теперь хранится только в serverBalance и синхронизируется с сервером
 
 function updateBalanceUI(steamId) {
-  const value = serverBalance || loadSouls(steamId);
+  const value = serverBalance || 0; // Берем только из serverBalance
   const balanceEl = document.getElementById('balanceAmount');
   const balanceContainer = document.getElementById('userBalance');
   if (!balanceEl || !balanceContainer) return;
@@ -7233,8 +7211,8 @@ window.addEventListener('DOMContentLoaded', () => {
         </div>
       `;
 
-      initSoulsForUser(savedUser.id);
-      updateSoulsUI(savedUser.id);
+      // УДАЛЕНО: initSoulsForUser(savedUser.id);
+// УДАЛЕНО: updateSoulsUI(savedUser.id);
       
       // Разблокируем рулетку для авторизованных пользователей
       enableRoulette();
@@ -7246,9 +7224,12 @@ window.addEventListener('DOMContentLoaded', () => {
       const balanceEl = document.getElementById('userBalance');
       if (balanceEl) {
         balanceEl.style.display = 'flex';
-        // Сначала загружаем баланс с сервера, потом обновляем UI
-        loadServerBalance().then(() => {
+        // Загружаем баланс с сервера и обновляем все UI элементы
+        loadServerBalance().then((balance) => {
+          console.log('Balance loaded in updateSteamUI:', balance);
           updateBalanceUI(savedUser.id);
+        }).catch(error => {
+          console.error('Failed to load balance in updateSteamUI:', error);
         });
       }
 
@@ -7322,10 +7303,9 @@ window.addEventListener('DOMContentLoaded', () => {
       if (response.ok) {
         const data = await response.json();
         
-        // Обновляем души в localStorage и на экране
+        // Обновляем баланс из ответа сервера
         if (data && typeof data.souls === 'number') {
-          saveSouls(steamId, data.souls);
-          updateSoulsUI(steamId);
+          serverBalance = data.souls;
           updateBalanceUI(steamId); // Обновляем баланс
         }
         
@@ -8848,8 +8828,8 @@ window.addEventListener('beforeunload', () => {
       
       if (res.ok && data && data.ok) {
         if (typeof data.newSouls === 'number') {
-          saveSouls(savedUser.id, data.newSouls);
-          updateSoulsUI(savedUser.id);
+          serverBalance = data.newSouls;
+          updateBalanceUI(savedUser.id);
         }
         showToast(data.message || i18n[localStorage.getItem('lang')||'ru'].toast_promo_success, 'success');
         input.value = '';
@@ -8888,8 +8868,8 @@ const SLOT_SYMBOLS = [
 function initRoulette() {
   const savedUser = JSON.parse(localStorage.getItem('steam_user'));
   if (savedUser) {
-    // Используем основной баланс, а не отдельную переменную
-    currentBalance = parseInt(loadSouls(savedUser.id)) || 0;
+    // Используем serverBalance, а не localStorage
+    currentBalance = parseInt(serverBalance) || 0;
     updateRouletteBalance();
   } else {
     // Если пользователь не авторизован, устанавливаем баланс 0 и блокируем игру
@@ -9046,7 +9026,7 @@ function hideCooldown() {
 function initSlots() {
   const savedUser = JSON.parse(localStorage.getItem('steam_user'));
   if (savedUser) {
-    slotsBalance = parseInt(loadSouls(savedUser.id)) || 0;
+    slotsBalance = parseInt(serverBalance) || 0;
     updateSlotsBalance();
     generateSlotSymbols();
   } else {
@@ -9278,10 +9258,10 @@ function finishSlotsSpin(result, bet, winAmount) {
   slotsBalance += winAmount;
   updateSlotsBalance();
   
-  // Сохраняем на сервере и обновляем UI
+  // Обновляем баланс и UI
   const userId = getCurrentUserId();
   if (userId) {
-    saveSouls(userId, slotsBalance);
+    serverBalance = slotsBalance;
     updateBalanceUI(userId);
     
     // Показываем анимацию изменения баланса
