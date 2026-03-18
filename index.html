@@ -8065,7 +8065,7 @@ async function loadServerBalance(steamId) {
     if (!response.ok) throw new Error('Failed to load balance');
     
     const data = await response.json();
-    const balance = parseInt(data.balance) || 0;
+    const balance = parseInt(data.souls) || 0;
     
     // Update server balance variable
     serverBalance = balance;
