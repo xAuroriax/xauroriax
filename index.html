@@ -7448,7 +7448,7 @@ function startServerStatePolling() {
   // Poll every 1 second
   rouletteStateInterval = setInterval(async () => {
     try {
-      const response = await fetch('https://stalker-api.xaurorix.ru/roulette-state');
+      const response = await fetch('https://stalker-api.xauroriax.ru/roulette-state');
       if (!response.ok) throw new Error('Failed to fetch state');
       const state = await response.json();
       updateRouletteFromServerState(state);
@@ -7459,8 +7459,8 @@ function startServerStatePolling() {
       console.error('Error polling roulette state:', error);
       consecutiveErrors++;
       
-      // If we have consecutive errors, increase polling interval
-      if (consecutiveErrors >= 3) {
+      // If we have consecutive errors, add delay before next request
+      if (consecutiveErrors >= 1) {
         const now = Date.now();
         if (now - lastErrorTime < 3000) {
           // Skip this poll - we're in error recovery mode
@@ -7469,7 +7469,7 @@ function startServerStatePolling() {
         lastErrorTime = now;
         
         // If too many errors, stop polling for a while
-        if (consecutiveErrors >= 10) {
+        if (consecutiveErrors >= 5) {
           clearInterval(rouletteStateInterval);
           setTimeout(() => {
             consecutiveErrors = 0;
@@ -7582,7 +7582,7 @@ async function loadServerBalance() {
   if (!savedUser) return 0;
   
   try {
-    const response = await fetch(`https://stalker-api.xaurorix.ru/balance?steam_id=${savedUser.id}`);
+    const response = await fetch(`https://stalker-api.xauroriax.ru/balance?steam_id=${savedUser.id}`);
     if (!response.ok) throw new Error('Failed to load balance');
     
     const data = await response.json();
@@ -7604,7 +7604,7 @@ async function saveBalanceToServer(amount) {
   if (!savedUser) return;
   
   try {
-    const response = await fetch('https://stalker-api.xaurorix.ru/balance', {
+    const response = await fetch('https://stalker-api.xauroriax.ru/balance', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ 
@@ -7707,7 +7707,7 @@ async function placeBet(multiplier) {
   
   try {
     // Send bet to server with correct format
-    const response = await fetch('https://stalker-api.xaurorix.ru/bet', {
+    const response = await fetch('https://stalker-api.xauroriax.ru/bet', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -9407,7 +9407,7 @@ function hideSlotsCooldown() {
 
     showToast(i18n[localStorage.getItem('lang')||'ru'].toast_admin_saving, 'success');
     try {
-      const res = await fetch(`https://stalker-api.xaurorix.ru/admin/update-user`, {
+      const res = await fetch('https://stalker-api.xauroriax.ru/admin/update-user', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload)
@@ -9437,7 +9437,7 @@ function hideSlotsCooldown() {
       const steamId = document.getElementById('adminSearchId').value.trim();
       showToast(i18n[lang].toast_admin_resetting, 'success');
       try {
-        await fetch(`https://stalker-api.xaurorix.ru/admin/reset-user`, {
+        await fetch(`https://stalker-api.xauroriax.ru/admin/reset-user`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ adminId: '76561199427395346', steamId })
