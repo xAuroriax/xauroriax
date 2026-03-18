@@ -7212,14 +7212,20 @@ window.addEventListener('DOMContentLoaded', () => {
       enableSlots();
       
       // Show and update balance - ЗАГРУЖАЕМ С СЕРВЕРА
-      const balanceEl = document.getElementById('userBalance');
-      if (balanceEl) {
-        balanceEl.style.display = 'flex';
-        loadServerBalance(savedUser.id).then(balance => { 
-          serverBalance = balance; 
-          updateBalanceUI(savedUser.id); 
-          window.skipBalanceAnimation = false;
-        });
+      const savedUser = JSON.parse(localStorage.getItem('steam_user'));
+      if (savedUser && savedUser.id) {
+        console.log('updateSteamUI: found savedUser', savedUser.id);
+        const balanceEl = document.getElementById('userBalance');
+        if (balanceEl) {
+          balanceEl.style.display = 'flex';
+          loadServerBalance(savedUser.id).then(balance => {
+            serverBalance = balance;
+            updateBalanceUI(savedUser.id);
+            window.skipBalanceAnimation = false;
+          }).catch(err => console.error('loadServerBalance error', err));
+        }
+      } else {
+        console.log('updateSteamUI: no savedUser');
       }
 
       startGlobalPolling(savedUser.id);
@@ -7744,13 +7750,16 @@ function initGTARoulette() {
   }
   
   // Load server balance ONCE on initialization
-  if (savedUser) {
+  if (savedUser && savedUser.id) {
+    console.log('initGTARoulette: found savedUser', savedUser.id);
     window.skipBalanceAnimation = true;
     loadServerBalance(savedUser.id).then(balance => {
       serverBalance = balance;
       window.skipBalanceAnimation = false;
       updateBalanceUI(savedUser.id);
-    });
+    }).catch(err => console.error('loadServerBalance error', err));
+  } else {
+    console.log('initGTARoulette: no savedUser');
   }
 }
 
@@ -8047,7 +8056,10 @@ function updateHistoryDisplay() {
 
 // Load server balance with proper error handling
 async function loadServerBalance(steamId) {
-  if (!steamId || steamId === undefined) return 0; // ✅ Проверка на пустой steamId
+  if (!steamId) {
+    console.log('loadServerBalance: no steamId provided');
+    return 0;
+  }
   
   try {
     const response = await fetch(`https://stalker-api.xauroriax.ru/balance?steam_id=${steamId}`);
@@ -8059,10 +8071,10 @@ async function loadServerBalance(steamId) {
     // Update server balance variable
     serverBalance = balance;
     
-    console.log('Balance loaded from server:', balance);
+    console.log('loadServerBalance: balance =', balance);
     return balance;
   } catch (error) {
-    console.error('Error loading server balance:', error);
+    console.error('loadServerBalance error:', error);
     return 0;
   }
 }
