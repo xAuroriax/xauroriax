@@ -7224,16 +7224,7 @@ window.addEventListener('DOMContentLoaded', () => {
       const balanceEl = document.getElementById('userBalance');
       if (balanceEl) {
         balanceEl.style.display = 'flex';
-        loadServerBalance(savedUser.id).then((balance) => {
-          // Обновляем все UI элементы
-          updateBalanceUI(savedUser.id);
-          // Обновляем баланс в рулетке
-          currentBalance = balance;
-          updateRouletteBalance();
-          // Обновляем баланс в слотах
-          slotsBalance = balance;
-          updateSlotsBalance();
-        });
+        loadServerBalance(savedUser.id).then(() => updateBalanceUI(savedUser.id));
       }
 
       startGlobalPolling(savedUser.id);
@@ -7306,11 +7297,7 @@ window.addEventListener('DOMContentLoaded', () => {
       if (response.ok) {
         const data = await response.json();
         
-        // Обновляем баланс из ответа сервера
-        if (data && typeof data.souls === 'number') {
-          serverBalance = data.souls;
-          updateBalanceUI(steamId); // Обновляем баланс
-        }
+        // НЕ обновляем баланс здесь - баланс обновляется только при загрузке, ставках и админке
         
         // Обновляем статистику тестов
         if (data && data.stats) {
@@ -9559,22 +9546,6 @@ function hideSlotsCooldown() {
     initGratitudeAnimation();
     initRoulette();
     initGTARoulette(); // Initialize GTA Auto-Roulette
-    
-    // Принудительная загрузка баланса если пользователь уже авторизован
-    const savedUser = JSON.parse(localStorage.getItem('steam_user'));
-    if (savedUser) {
-      loadServerBalance(savedUser.id).then((balance) => {
-        console.log('Balance loaded on page load:', balance);
-        updateBalanceUI(savedUser.id);
-        // Обновляем баланс в играх
-        currentBalance = balance;
-        updateRouletteBalance();
-        slotsBalance = balance;
-        updateSlotsBalance();
-      }).catch(error => {
-        console.error('Failed to load balance on page load:', error);
-      });
-    }
   });
 
 // Mobile Menu Functions
