@@ -7218,6 +7218,7 @@ window.addEventListener('DOMContentLoaded', () => {
         loadServerBalance(savedUser.id).then(balance => { 
           serverBalance = balance; 
           updateBalanceUI(savedUser.id); 
+          window.skipBalanceAnimation = false;
         });
       }
 
@@ -8046,7 +8047,7 @@ function updateHistoryDisplay() {
 
 // Load server balance with proper error handling
 async function loadServerBalance(steamId) {
-  if (!steamId) return 0; // ✅ Проверка на пустой steamId
+  if (!steamId || steamId === undefined) return 0; // ✅ Проверка на пустой steamId
   
   try {
     const response = await fetch(`https://stalker-api.xauroriax.ru/balance?steam_id=${steamId}`);
