@@ -7645,20 +7645,11 @@ async function placeBetOnMultiplier(multiplier) {
     return;
   }
 
-  // Проверка баланса через serverBalance (обновляется в loadServerBalance)
-  if (betAmount > serverBalance) {
-    showToast('Недостаточно Souls для ставки', 'error');
-    return;
-  }
+  // Проверка баланса УДАЛЕНА - сервер проверит сам
+  console.log('Sending bet request with amount', betAmount, 'multiplier', multiplier);
 
   try {
     // Отправляем ставку на сервер
-    console.log('Sending bet request with:', {
-      steam_id: savedUser.id,
-      amount: betAmount,
-      multiplier: `x${multiplier}`
-    });
-    
     const response = await fetch('https://stalker-api.xauroriax.ru/bet', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
