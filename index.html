@@ -7224,19 +7224,8 @@ window.addEventListener('DOMContentLoaded', () => {
       const balanceEl = document.getElementById('userBalance');
       if (balanceEl) {
         balanceEl.style.display = 'flex';
-        // Загружаем баланс с сервера и обновляем все UI элементы
-        loadServerBalance(savedUser.id).then((balance) => {
-          console.log('Balance loaded in updateSteamUI:', balance);
-          // Обновляем баланс во всех местах
+        loadServerBalance(savedUser.id).then(() => {
           updateBalanceUI(savedUser.id);
-          // Обновляем баланс в рулетке
-          currentBalance = balance;
-          updateRouletteBalance();
-          // Обновляем баланс в слотах
-          slotsBalance = balance;
-          updateSlotsBalance();
-        }).catch(error => {
-          console.error('Failed to load balance in updateSteamUI:', error);
         });
       }
 
@@ -7766,19 +7755,13 @@ function initGTARoulette() {
   }
   
   // Load server balance ONCE on initialization
-  window.skipBalanceAnimation = true; // Отключаем анимации при загрузке
-  loadServerBalance(savedUser.id).then((balance) => {
-    // Убедимся, что баланс присвоен и отображается
-    console.log('Initial server balance loaded:', balance);
-    serverBalance = balance; // Явно присваиваем
-    updateBalanceUI(savedUser.id); // Обновляем UI
-    
-    // Re-enable balance animations after initial load
-    window.skipBalanceAnimation = false;
-  }).catch(error => {
-    console.error('Failed to load initial balance:', error);
-    window.skipBalanceAnimation = false;
-  });
+  if (savedUser) {
+    window.skipBalanceAnimation = true;
+    loadServerBalance(savedUser.id).then(() => {
+      window.skipBalanceAnimation = false;
+      updateBalanceUI(savedUser.id);
+    });
+  }
 }
 
 // Enable roulette for authenticated users
@@ -9522,22 +9505,16 @@ function hideSlotsCooldown() {
       });
 
       if (res.ok) {
-        const result = await res.json();
+        adminSearchUser(); // обновляет панель админки (KV)
         
-        // Обновляем данные на экране
-        adminSearchUser(); // Refresh admin panel
-        
-        // Показываем сообщение от сервера или стандартное
-        const message = result.message || i18n[localStorage.getItem('lang')||'ru'].toast_admin_updated;
-        showToast(message, 'success');
-        
-        // Если админ редактирует СЕБЯ, обновляем баланс с сервера
+        // Если админ редактирует себя – обновляем serverBalance
         const savedUser = JSON.parse(localStorage.getItem('steam_user'));
         if (savedUser && savedUser.id === steamId) {
-          // Load fresh balance from server instead of using local value
-          await loadServerBalance(savedUser.id);
-          updateBalanceUI(savedUser.id); // Обновляем UI
+          loadServerBalance(steamId).then(() => {
+            updateBalanceUI(steamId);
+          });
         }
+        showToast(i18n[localStorage.getItem('lang')||'ru'].toast_admin_updated, 'success');
       } else {
         throw new Error(res.statusText || 'Update failed');
       }
