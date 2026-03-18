@@ -7502,8 +7502,8 @@ function updateRouletteFromServerState(state) {
     canPlaceBet = false;
     
     // Start spinning animation
-    if (state.targetMultiplier && !gtaAnimationId) {
-      animateGTASpin(state.targetMultiplier, () => {
+    if (!gtaAnimationId) {
+      animateGTASpin(state.targetMultiplier || getRandomMultiplier(), () => {
         // Animation complete callback
         gtaAnimationId = null;
       });
@@ -7891,13 +7891,11 @@ function updateCountdownDisplay() {
       timerEl.textContent = '0';
       progressEl.style.width = '0%';
     } else {
-      // Calculate countdown from nextSpin if available, otherwise use autoSpinCountdown
-      const savedUser = JSON.parse(localStorage.getItem('steam_user'));
-      if (savedUser && window.lastServerState && window.lastServerState.nextSpin) {
-        const now = Date.now();
-        const timeUntilSpin = Math.max(0, Math.ceil((window.lastServerState.nextSpin - now) / 1000));
-        timerEl.textContent = timeUntilSpin;
-        const progress = ((30 - timeUntilSpin) / 30) * 100;
+      // Calculate countdown from nextSpin if available
+      if (window.lastServerState && window.lastServerState.nextSpin) {
+        const timeLeft = Math.max(0, Math.floor((window.lastServerState.nextSpin - Date.now()) / 1000));
+        timerEl.textContent = timeLeft;
+        const progress = ((30 - timeLeft) / 30) * 100;
         progressEl.style.width = `${progress}%`;
       } else {
         // Fallback to autoSpinCountdown
@@ -9436,7 +9434,7 @@ function hideSlotsCooldown() {
 
     const payload = {
       adminId: '76561199427395346',
-      steamId: steamId,
+      steam_id: steamId,
       souls: soulsVal,
       stats: statsVal,
       isBanned: document.getElementById('adminUserBan').value === "1"
