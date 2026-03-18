@@ -7379,7 +7379,7 @@ ${motivation}`;
     }
   }
 
-  // GTA RP Auto-Roulette System
+  // GTA RP Auto-Roulette System - Server-based
 let gtaIsSpinning = false;
 let autoSpinInterval = null;
 let autoSpinCountdown = 30;
@@ -7394,6 +7394,7 @@ let localHistory = []; // Local history only
 let canPlaceBet = true;
 let continuousAnimationId = null;
 let serverBalance = 0; // Server-side balance
+let rouletteStateInterval = null; // Poll server state
 
 // Initialize GTA Auto-Roulette
 function initGTARoulette() {
@@ -7414,14 +7415,124 @@ function initGTARoulette() {
   // Load server balance
   loadServerBalance();
   
-  // Start auto-spin timer
-  startAutoSpinTimer();
-  
   // Start continuous animation
   startContinuousAnimation();
   
   // Load local history
   loadLocalHistory();
+  
+  // Start polling server state
+  startServerStatePolling();
+}
+
+// Poll server for roulette state
+function startServerStatePolling() {
+  // Clear existing polling
+  if (rouletteStateInterval) {
+    clearInterval(rouletteStateInterval);
+  }
+  
+  // Poll every 1 second
+  rouletteStateInterval = setInterval(async () => {
+    try {
+      const response = await fetch('https://stalkerapi.xauroriax.ru/roulette-state');
+      if (response.ok) {
+        const state = await response.json();
+        updateRouletteFromServerState(state);
+      }
+    } catch (error) {
+      console.error('Error polling roulette state:', error);
+    }
+  }, 1000);
+}
+
+// Update roulette based on server state
+function updateRouletteFromServerState(state) {
+  // Update countdown
+  autoSpinCountdown = state.countdown || 30;
+  updateCountdownDisplay();
+  
+  // Update spinning state
+  gtaIsSpinning = state.isSpinning || false;
+  canPlaceBet = state.canPlaceBet !== false;
+  
+  // Update status
+  const statusEl = document.getElementById('gameStatus');
+  if (statusEl) {
+    if (gtaIsSpinning) {
+      statusEl.textContent = 'Вращение...';
+    } else if (state.result) {
+      statusEl.textContent = state.result.winAmount > 0 ? 
+        `Выигрыш! x${state.result.multiplier}` : 'Ставки проиграны';
+    } else {
+      statusEl.textContent = 'Ожидание ставок...';
+    }
+  }
+  
+  // Handle spin start
+  if (state.isSpinning && state.spinStart && !gtaAnimationId) {
+    // Start spinning animation
+    animateGTASpin(state.targetMultiplier, () => {
+      // Animation complete callback
+      gtaAnimationId = null;
+    });
+  }
+  
+  // Handle spin result
+  if (state.result && state.result.newRound) {
+    handleSpinResult(state.result);
+  }
+  
+  // Update bets display
+  if (state.bets) {
+    updateBetsDisplay(state.bets);
+  }
+}
+
+// Handle spin result from server
+async function handleSpinResult(result) {
+  const savedUser = JSON.parse(localStorage.getItem('steam_user'));
+  if (!savedUser) return;
+  
+  // Check if user had winning bet
+  const userWinAmount = result.userWins?.[savedUser.id] || 0;
+  
+  // Update balance if user won
+  if (userWinAmount > 0) {
+    serverBalance += userWinAmount;
+    updateBalanceUI(savedUser.id);
+    showBalanceChangePopup(userWinAmount, 'positive');
+    showToast(`Выигрыш! x${result.multiplier} - ${userWinAmount} Souls`, 'success');
+  } else {
+    // Check if user had any bets
+    const hadBets = result.bets?.some(bet => bet.userId === savedUser.id);
+    if (hadBets) {
+      showToast('Ставки проиграны', 'error');
+    }
+  }
+  
+  // Add to history if user participated
+  if (result.bets?.some(bet => bet.userId === savedUser.id)) {
+    const historyItem = {
+      multiplier: result.multiplier,
+      totalBets: result.totalBets || 0,
+      winAmount: userWinAmount,
+      isWin: userWinAmount > 0,
+      timestamp: Date.now()
+    };
+    addToLocalHistory(historyItem);
+  }
+  
+  // Clear bet animations
+  clearBetAnimations();
+  
+  // Reset local bets
+  currentBets.clear();
+  lastBetTime = 0;
+  
+  // Reset UI
+  resetBettingUI();
+  updateTotalBetsDisplay();
 }
 
 // Load server balance with proper error handling
@@ -7430,25 +7541,19 @@ async function loadServerBalance() {
   if (!savedUser) return 0;
   
   try {
-    const response = await fetch(`https://api.xauroriax.ru/get-souls?steamId=${savedUser.id}`);
+    const response = await fetch(`https://stalkerapi.xauroriax.ru/balance?steamId=${savedUser.id}`);
     if (!response.ok) throw new Error('Failed to load balance');
     
     const data = await response.json();
-    const balance = parseInt(data.souls) || 0;
+    const balance = parseInt(data.balance) || 0;
     
     // Update server balance variable
     serverBalance = balance;
     
-    // Update localStorage for backup (but server is primary)
-    saveSouls(savedUser.id, balance);
-    
     return balance;
   } catch (error) {
     console.error('Error loading server balance:', error);
-    // Fallback to localStorage
-    const fallbackBalance = parseInt(loadSouls(savedUser.id)) || 0;
-    serverBalance = fallbackBalance;
-    return fallbackBalance;
+    return 0;
   }
 }
 
@@ -7458,22 +7563,17 @@ async function saveBalanceToServer(amount) {
   if (!savedUser) return;
   
   try {
-    const response = await fetch('https://api.xauroriax.ru/save-souls', {
+    const response = await fetch('https://stalkerapi.xauroriax.ru/balance', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ steamId: savedUser.id, souls: amount })
+      body: JSON.stringify({ steamId: savedUser.id, balance: amount })
     });
     
     if (response.ok) {
       serverBalance = amount;
-      // Also save locally as backup
-      saveSouls(savedUser.id, amount);
     }
   } catch (error) {
     console.error('Error saving balance:', error);
-    // Fallback to local storage
-    saveSouls(savedUser.id, amount);
-    serverBalance = amount;
   }
 }
 
@@ -7521,16 +7621,8 @@ function startContinuousAnimation() {
 
 // Place bet on specific multiplier
 async function placeBet(multiplier) {
-  if (!canPlaceBet) {
-    const remainingTime = Math.ceil((autoSpinCountdown - 25)); // 5 seconds before spin
-    if (remainingTime > 0) {
-      showToast(`Ставки заблокированы. До вращения: ${remainingTime} сек`, 'error');
-      return;
-    }
-  }
-  
-  if (gtaIsSpinning) {
-    showToast('Нельзя делать ставки во время вращения', 'error');
+  if (!canPlaceBet || gtaIsSpinning) {
+    showToast('Ставки в данный момент заблокированы', 'error');
     return;
   }
   
@@ -7563,33 +7655,54 @@ async function placeBet(multiplier) {
     return;
   }
   
-  // Check server balance
-  const totalBets = Array.from(currentBets.values()).reduce((sum, bet) => sum + bet, 0);
-  
-  if (totalBets + betAmount > serverBalance) {
-    showToast('Недостаточно Souls для всех ставок', 'error');
+  if (betAmount > serverBalance) {
+    showToast('Недостаточно Souls для ставки', 'error');
     return;
   }
   
-  // Place bet
-  currentBets.set(multiplier, (currentBets.get(multiplier) || 0) + betAmount);
-  lastBetTime = now;
-  
-  // Deduct from server balance immediately
-  serverBalance -= betAmount;
-  await saveBalanceToServer(serverBalance);
-  updateBalanceUI(savedUser.id);
-  
-  // Show bet animation (persistent until round ends)
-  showBetAnimationOnMultiplier(multiplier, betAmount, true);
-  
-  // Update UI
-  updateTotalBetsDisplay();
-  
-  // Don't disable input - allow multiple bets
-  input.value = '';
-  
-  showToast(`Ставка ${betAmount} Souls на x${multiplier} принята`, 'success');
+  try {
+    // Send bet to server
+    const response = await fetch('https://stalkerapi.xauroriax.ru/bet', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        steamId: savedUser.id,
+        multiplier: multiplier,
+        amount: betAmount,
+        avatar: savedUser.avatar || ''
+      })
+    });
+    
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.message || 'Failed to place bet');
+    }
+    
+    const result = await response.json();
+    
+    // Update local balance
+    serverBalance = result.newBalance;
+    updateBalanceUI(savedUser.id);
+    
+    // Add to local bets for UI
+    currentBets.set(multiplier, (currentBets.get(multiplier) || 0) + betAmount);
+    lastBetTime = now;
+    
+    // Show bet animation (persistent until round ends)
+    showBetAnimationOnMultiplier(multiplier, betAmount, true);
+    
+    // Update UI
+    updateTotalBetsDisplay();
+    
+    // Clear input
+    input.value = '';
+    
+    showToast(`Ставка ${betAmount} Souls на x${multiplier} принята`, 'success');
+    
+  } catch (error) {
+    console.error('Error placing bet:', error);
+    showToast(error.message || 'Ошибка при размещении ставки', 'error');
+  }
 }
 
 // Show bet animation on specific multiplier
@@ -7640,49 +7753,58 @@ function clearBetAnimations() {
   });
 }
 
-// Update total bets display
-function updateTotalBetsDisplay() {
+// Update bets display from server
+function updateBetsDisplay(serverBets) {
+  const savedUser = JSON.parse(localStorage.getItem('steam_user'));
+  if (!savedUser) return;
+  
+  // Clear all existing animations
+  clearBetAnimations();
+  
+  // Group bets by multiplier
+  const betsByMultiplier = {};
+  serverBets.forEach(bet => {
+    if (!betsByMultiplier[bet.multiplier]) {
+      betsByMultiplier[bet.multiplier] = [];
+    }
+    betsByMultiplier[bet.multiplier].push(bet);
+  });
+  
+  // Display bets for each multiplier
+  Object.keys(betsByMultiplier).forEach(multiplier => {
+    const multiplierBets = betsByMultiplier[multiplier];
+    
+    multiplierBets.forEach((bet, index) => {
+      const bettingItem = document.querySelector(`.betting-item[data-mult="${multiplier}"]`);
+      if (!bettingItem) return;
+      
+      const animationsContainer = bettingItem.querySelector('.bet-animations');
+      if (!animationsContainer) return;
+      
+      // Create vertical stack for multiple bets
+      const verticalOffset = index * 25; // 25px per bet
+      
+      const animation = document.createElement('div');
+      animation.className = 'bet-animation-multiplier';
+      animation.dataset.multiplier = multiplier;
+      animation.style.position = 'absolute';
+      animation.style.bottom = `${verticalOffset}px`;
+      animation.style.left = '50%';
+      animation.style.transform = 'translateX(-50%)';
+      animation.innerHTML = bet.avatar ? 
+        `<img src="${bet.avatar}" class="steam-avatar" style="width: 20px; height: 20px; margin-right: 5px;">${bet.amount}` : 
+        `${bet.amount}`;
+      
+      animationsContainer.appendChild(animation);
+    });
+  });
+  
+  // Update total bets display
+  const totalBets = serverBets.reduce((sum, bet) => sum + bet.amount, 0);
   const totalBetsEl = document.getElementById('totalBetsAmount');
-  if (!totalBetsEl) return;
-  
-  const totalBets = Array.from(currentBets.values()).reduce((sum, bet) => sum + bet, 0);
-  totalBetsEl.textContent = `${totalBets} Souls`;
-}
-
-// Start auto-spin timer
-function startAutoSpinTimer() {
-  // Clear existing timer
-  if (autoSpinTimer) {
-    clearInterval(autoSpinTimer);
+  if (totalBetsEl) {
+    totalBetsEl.textContent = `${totalBets} Souls`;
   }
-  
-  // Don't start timer immediately - wait for spin completion
-  autoSpinCountdown = 30;
-  updateCountdownDisplay();
-  
-  autoSpinTimer = setInterval(() => {
-    autoSpinCountdown--;
-    updateCountdownDisplay();
-    
-    // Block bets 5 seconds before spin
-    if (autoSpinCountdown === 5) {
-      canPlaceBet = false;
-      showToast('Ставки заблокированы за 5 секунд до вращения', 'error');
-    }
-    
-    if (autoSpinCountdown <= 0) {
-      // Auto-spin (always spin, even with no bets)
-      executeAutoSpin();
-      // DO NOT reset timer here - will reset after spin completes
-    }
-  }, 1000);
-}
-
-// Reset and restart timer after spin completes
-function resetAutoSpinTimer() {
-  autoSpinCountdown = 30;
-  canPlaceBet = true;
-  updateCountdownDisplay();
 }
 
 // Update countdown display
@@ -7693,85 +7815,19 @@ function updateCountdownDisplay() {
   if (countdownEl) {
     countdownEl.textContent = autoSpinCountdown;
   }
-  
   if (progressEl) {
     const percentage = (autoSpinCountdown / 30) * 100;
     progressEl.style.width = `${percentage}%`;
   }
 }
 
-// Execute auto-spin
-async function executeAutoSpin() {
-  if (gtaIsSpinning) return;
+// Update total bets display (local backup)
+function updateTotalBetsDisplay() {
+  const totalBetsEl = document.getElementById('totalBetsAmount');
+  if (!totalBetsEl) return;
   
-  const savedUser = JSON.parse(localStorage.getItem('steam_user'));
-  if (!savedUser) return;
-  
-  gtaIsSpinning = true;
-  canPlaceBet = false;
-  
-  // Update status
-  const statusEl = document.getElementById('gameStatus');
-  if (statusEl) statusEl.textContent = 'Вращение...';
-  
-  // Calculate total bets (could be 0)
   const totalBets = Array.from(currentBets.values()).reduce((sum, bet) => sum + bet, 0);
-  
-  // Determine result (random multiplier) - ALWAYS determine result
-  const multipliers = [1.2, 1.5, 2, 3, 5, 10];
-  const weights = [30, 25, 20, 15, 8, 2];
-  const resultMultiplier = getWeightedRandom(multipliers, weights);
-  
-  // Calculate total win amount
-  const betOnResult = currentBets.get(resultMultiplier) || 0;
-  const totalWinAmount = Math.floor(betOnResult * resultMultiplier);
-  
-  // Start animation (longer duration - 8-12 seconds)
-  animateGTASpin(resultMultiplier, async () => {
-    // Animation complete
-    
-    // Add winnings to server balance
-    if (totalWinAmount > 0) {
-      serverBalance += totalWinAmount;
-      await saveBalanceToServer(serverBalance);
-      updateBalanceUI(savedUser.id);
-      showBalanceChangePopup(totalWinAmount, 'positive');
-      showToast(`Выигрыш! x${resultMultiplier} - ${totalWinAmount} Souls`, 'success');
-    } else {
-      showToast('Все ставки проиграны', 'error');
-    }
-    
-    // Update status
-    const statusEl = document.getElementById('gameStatus');
-    if (statusEl) {
-      statusEl.textContent = totalWinAmount > 0 ? `Выигрыш! x${resultMultiplier}` : 'Ставки проиграны';
-    }
-    
-    // Save to local history
-    const historyItem = {
-      multiplier: resultMultiplier,
-      totalBets: totalBets,
-      winAmount: totalWinAmount,
-      isWin: totalWinAmount > 0,
-      timestamp: Date.now()
-    };
-    addToLocalHistory(historyItem);
-    
-    // Clear bet animations AFTER spin completes
-    clearBetAnimations();
-    
-    // Reset for next round
-    currentBets.clear();
-    lastBetTime = 0;
-    gtaIsSpinning = false;
-    
-    // Reset UI
-    resetBettingUI();
-    updateTotalBetsDisplay();
-    
-    // NOW reset and restart timer
-    resetAutoSpinTimer();
-  });
+  totalBetsEl.textContent = `${totalBets} Souls`;
 }
 
 // Reset betting UI
