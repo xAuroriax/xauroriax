@@ -1937,12 +1937,13 @@ header nav a:hover, .rules-trigger-btn:hover, .blackmarket-trigger-btn:hover {
 
 .multiplier-display {
   position: relative;
-  height: 120px;
+  height: 180px; /* Увеличил с 120px до 180px */
   margin-bottom: 30px;
-  background: rgba(0,0,0,0.8);
+  background: rgba(0,0,0,0.9);
   border-radius: 15px;
-  border: 2px solid rgba(255,122,24,0.3);
+  border: 3px solid rgba(255,122,24,0.4);
   overflow: hidden;
+  width: 100%; /* На всю ширину контейнера */
 }
 
 .multiplier-track {
@@ -1963,27 +1964,30 @@ header nav a:hover, .rules-trigger-btn:hover, .blackmarket-trigger-btn:hover {
 
 .multiplier-item {
   flex-shrink: 0;
-  width: 120px;
-  height: 80px;
+  width: 160px; /* Увеличил с 120px до 160px */
+  height: 120px; /* Увеличил с 80px до 120px */
   display: flex;
   align-items: center;
   justify-content: center;
-  margin: 0 10px;
-  background: rgba(255,122,24,0.1);
-  border: 2px solid rgba(255,122,24,0.5);
-  border-radius: 10px;
-  font-weight: 700;
-  font-size: 24px;
-  color: #ff7b00;
+  margin: 0 15px; /* Увеличил расстояние с 10px до 15px */
+  background: rgba(255,122,24,0.15); /* Увеличил контрастность */
+  border: 3px solid rgba(255,122,24,0.6); /* Увеличил толщину */
+  border-radius: 12px;
+  font-weight: 900; /* Увеличил жирность */
+  font-size: 32px; /* Увеличил с 24px до 32px */
+  color: #ff9500; /* Сделал ярче */
+  text-shadow: 0 0 15px rgba(255,122,24,0.8); /* Добавил подсветку */
   text-transform: uppercase;
   transition: all 0.3s ease;
+  box-shadow: 0 0 20px rgba(255,122,24,0.2); /* Добавил свечение */
 }
 
 .multiplier-item.highlight {
-  background: rgba(255,122,24,0.3);
-  border-color: #ff7b00;
-  box-shadow: 0 0 20px rgba(255,122,24,0.6);
-  transform: scale(1.1);
+  background: rgba(255,122,24,0.4);
+  border-color: #ff9500;
+  box-shadow: 0 0 30px rgba(255,122,24,0.9);
+  transform: scale(1.05);
+  z-index: 10;
 }
 
 .roulette-arrow {
@@ -1991,16 +1995,16 @@ header nav a:hover, .rules-trigger-btn:hover, .blackmarket-trigger-btn:hover {
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  z-index: 10;
+  z-index: 100; /* Повышен приоритет */
 }
 
 .arrow-icon {
   width: 0;
   height: 0;
-  border-left: 20px solid transparent;
-  border-right: 20px solid transparent;
-  border-top: 30px solid #ff7b00;
-  filter: drop-shadow(0 0 10px rgba(255,122,24,0.8));
+  border-left: 30px solid transparent; /* Увеличил с 20px до 30px */
+  border-right: 30px solid transparent; /* Увеличил с 20px до 30px */
+  border-top: 45px solid #ff9500; /* Увеличил с 30px до 45px, сделал ярче */
+  filter: drop-shadow(0 0 20px rgba(255,122,24,1)); /* Увеличил свечение */
   animation: arrowPulse 2s infinite;
 }
 
@@ -7587,10 +7591,34 @@ let serverBalance = 0; // Server-side balance
 let rouletteStateInterval = null; // Poll server state
 let hasAnyBets = false; // Флаг наличия ставок
 
-// Get random multiplier for animation
+// Get random multiplier with weighted probabilities - СИСТЕМА ВЕРОЯТНОСТЕЙ
 function getRandomMultiplier() {
-  const multipliers = [1.2, 1.5, 2, 3, 5, 10];
-  return multipliers[Math.floor(Math.random() * multipliers.length)];
+  const multipliers = [
+    { value: 1.2, weight: 30 },  // 30%
+    { value: 1.5, weight: 25 },  // 25%
+    { value: 2,   weight: 20 },  // 20%
+    { value: 3,   weight: 12 },  // 12%
+    { value: 5,   weight: 8 },   // 8%
+    { value: 10,  weight: 5 }    // 5%
+  ];
+  
+  // Считаем общий вес
+  const totalWeight = multipliers.reduce((sum, item) => sum + item.weight, 0);
+  
+  // Генерируем случайное число от 0 до totalWeight
+  const random = Math.random() * totalWeight;
+  
+  // Находим подходящий множитель
+  let currentWeight = 0;
+  for (const multiplier of multipliers) {
+    currentWeight += multiplier.weight;
+    if (random <= currentWeight) {
+      return multiplier.value;
+    }
+  }
+  
+  // Fallback
+  return 1.2;
 }
 
 // Новая функция для ставки на множитель
@@ -7806,7 +7834,7 @@ function startServerStatePolling() {
   }, 1000);
 }
 
-// Update roulette based on server state - НОВАЯ ЛОГИКА
+// Update roulette based on server state - ПЕРЕПИСАНО ПОЛНОСТЬЮ
 function updateRouletteFromServerState(state) {
   // Store server state for timer calculations
   window.lastServerState = state;
@@ -7822,12 +7850,12 @@ function updateRouletteFromServerState(state) {
     } else if (hasAnyBets) {
       statusEl.textContent = 'Ставки приняты, ожидание начала игры...';
     } else {
-      statusEl.textContent = 'Только по-сталкерски, ждём сталкера...';
+      statusEl.textContent = 'Ждём сталкера...'; // ИСПРАВЛЕНО
     }
   }
   
-  // Логика вращения - запускаем только если сервер сказал spinning
-  if (state.status === "spinning" && !gtaIsSpinning) {
+  // Логика вращения - запускаем ТОЛЬКО если есть ставки и сервер сказал spinning
+  if (state.status === "spinning" && !gtaIsSpinning && hasAnyBets) {
     gtaIsSpinning = true;
     canPlaceBet = false;
     
@@ -7835,11 +7863,15 @@ function updateRouletteFromServerState(state) {
     document.querySelectorAll('.mult-btn').forEach(btn => btn.disabled = true);
     
     if (!gtaAnimationId) {
-      // Если сервер прислал targetMultiplier — используем его, иначе берём случайный
-      const targetMult = state.targetMultiplier || getRandomMultiplier();
-      animateGTASpin(targetMult, () => {
-        gtaAnimationId = null;
-      });
+      // Используем targetMultiplier от сервера
+      const targetMult = state.targetMultiplier;
+      if (targetMult) {
+        animateGTASpin(targetMult, () => {
+          gtaAnimationId = null;
+          // Включаем подсветку только ПОСЛЕ остановки
+          highlightWinningMultiplier(targetMult);
+        });
+      }
     }
   }
   
@@ -7862,6 +7894,11 @@ function updateRouletteFromServerState(state) {
     
     // Очищаем ставки после завершения раунда
     clearAllBets();
+    
+    // Убираем подсветку
+    document.querySelectorAll('.multiplier-item').forEach(item => {
+      item.classList.remove('highlight');
+    });
   }
   
   // Обновляем таймер только если есть ставки
@@ -7869,6 +7906,9 @@ function updateRouletteFromServerState(state) {
     const now = Date.now();
     const timeUntilSpin = Math.max(0, Math.ceil((state.nextSpin - now) / 1000));
     autoSpinCountdown = timeUntilSpin;
+    
+    // Показываем таймер
+    document.getElementById('timerContainer').style.display = 'block';
     
     // Блокируем ставки за 5 секунд до конца
     if (timeUntilSpin <= 5) {
@@ -7881,10 +7921,27 @@ function updateRouletteFromServerState(state) {
         document.querySelectorAll('.mult-btn').forEach(btn => btn.disabled = false);
       }
     }
+  } else if (!hasAnyBets) {
+    // Скрываем таймер если нет ставок
+    document.getElementById('timerContainer').style.display = 'none';
   }
   
   // Важно: обновляем отображение таймера в конце
   updateCountdownDisplay();
+}
+
+// Функция подсветки выигрышного множителя
+function highlightWinningMultiplier(targetMultiplier) {
+  // Убираем все подсветки
+  document.querySelectorAll('.multiplier-item').forEach(item => {
+    item.classList.remove('highlight');
+  });
+  
+  // Находим и подсвечиваем только выигрышный
+  const winningItem = document.querySelector(`.multiplier-item[data-multiplier="${targetMultiplier}"]`);
+  if (winningItem) {
+    winningItem.classList.add('highlight');
+  }
 }
 
 // Handle spin result from server - НОВАЯ ЛОГИКА
@@ -8024,7 +8081,7 @@ async function saveBalanceToServer(amount) {
   }
 }
 
-// Generate multiplier items for strip
+// Generate multiplier items for strip - ИСПРАВЛЕНО
 function generateGTAMultipliers() {
   const strip = document.getElementById('multiplierStrip');
   if (!strip) return;
@@ -8032,8 +8089,8 @@ function generateGTAMultipliers() {
   const multipliers = [1.2, 1.5, 2, 3, 5, 10];
   const items = [];
   
-  // Create 10 sets for seamless scrolling (more sets = smoother infinite loop)
-  for (let set = 0; set < 10; set++) {
+  // Create 20 sets for seamless scrolling (больше = нет телепортов)
+  for (let set = 0; set < 20; set++) {
     multipliers.forEach(mult => {
       const item = document.createElement('div');
       item.className = 'multiplier-item';
@@ -8048,118 +8105,27 @@ function generateGTAMultipliers() {
   gtaMultiplierStrip = strip;
 }
 
-// Start continuous animation
+// Start continuous animation - ИСПРАВЛЕНО
 function startContinuousAnimation() {
   if (!gtaMultiplierStrip) return;
   
   function animate() {
     if (!gtaIsSpinning) {
-      // Continuous slow scroll when not spinning
-      gtaCurrentPosition -= 0.5; // Smooth continuous movement
-      if (gtaCurrentPosition <= -2800) { 
-        // Smooth reset without teleport - increased length for seamless loop
+      // Continuous slow scroll when not spinning - плавное движение
+      gtaCurrentPosition -= 0.8; // Увеличил скорость для плавности
+      
+      // Рассчитываем позицию сброса (20 наборов * 6 коэффициентов * 160px = 19200px)
+      const totalWidth = gtaMultiplierItems.length * 160;
+      if (gtaCurrentPosition <= -totalWidth) { 
+        // Плавный сброс без телепорта
         gtaCurrentPosition = 0;
       }
+      
       gtaMultiplierStrip.style.transform = `translateX(${gtaCurrentPosition}px)`;
     }
     continuousAnimationId = requestAnimationFrame(animate);
   }
   animate();
-}
-
-// Place bet on specific multiplier
-async function placeBet(multiplier) {
-  if (!canPlaceBet || gtaIsSpinning) {
-    showToast('Ставки в данный момент заблокированы', 'error');
-    return;
-  }
-  
-  const savedUser = JSON.parse(localStorage.getItem('steam_user'));
-  if (!savedUser) {
-    showToast('Авторизуйтесь через Steam для игры', 'error');
-    return;
-  }
-  
-  // Check 5-second timeout
-  const now = Date.now();
-  if (now - lastBetTime < 5000) {
-    const remainingTime = Math.ceil((5000 - (now - lastBetTime)) / 1000);
-    showToast(`Подождите ${remainingTime} секунд перед новой ставкой`, 'error');
-    return;
-  }
-  
-  // Find input and button for this multiplier
-  const bettingItem = document.querySelector(`.betting-item[data-mult="${multiplier}"]`);
-  if (!bettingItem) return;
-  
-  const input = bettingItem.querySelector('.bet-input-small');
-  const button = bettingItem.querySelector('.place-bet-btn');
-  
-  const betAmount = parseInt(input?.value) || 0;
-  
-  // Validation
-  if (!betAmount || betAmount <= 0) {
-    showToast('Введите корректную ставку', 'error');
-    return;
-  }
-  
-  if (betAmount > serverBalance) {
-    showToast('Недостаточно Souls для ставки', 'error');
-    return;
-  }
-  
-  try {
-    // Send bet to server with correct format
-    const response = await fetch('https://stalker-api.xauroriax.ru/bet', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        steam_id: savedUser.id, // Use steam_id instead of steamId
-        amount: betAmount,
-        multiplier: `x${multiplier}` // Format as "x2", "x3", etc.
-      })
-    });
-    
-    if (!response.ok) {
-      const error = await response.json();
-      throw new Error(error.message || 'Failed to place bet');
-    }
-    
-    const result = await response.json();
-    
-    // Update local balance from server response only
-    if (result.new_balance !== undefined) {
-      const oldBalance = serverBalance;
-      serverBalance = result.new_balance;
-      updateBalanceUI(savedUser.id);
-      
-      // Show balance change animation only once with correct amount
-      const balanceChange = result.new_balance - oldBalance;
-      if (balanceChange !== 0 && window.showBalanceChangePopup) {
-        showBalanceChangePopup(balanceChange);
-        addBalanceGlow(document.getElementById('userBalance'), balanceChange);
-      }
-    }
-    
-    // Add to local bets for UI
-    currentBets.set(multiplier, (currentBets.get(multiplier) || 0) + betAmount);
-    lastBetTime = now;
-    
-    // Show bet animation (persistent until round ends)
-    showBetAnimationOnMultiplier(multiplier, betAmount, true);
-    
-    // Update UI
-    updateTotalBetsDisplay();
-    
-    // Clear input
-    input.value = '';
-    
-    showToast(`Ставка ${betAmount} Souls на x${multiplier} принята`, 'success');
-    
-  } catch (error) {
-    console.error('Error placing bet:', error);
-    showToast(error.message || 'Ошибка при размещении ставки', 'error');
-  }
 }
 
 // Show bet animation on specific multiplier
@@ -8326,7 +8292,7 @@ function animateGTASpin(targetMultiplier, onComplete) {
   if (targetIndex === -1) return;
   
   // Calculate target position with precise centering
-  const itemWidth = 140; // 120px + 10px margin * 2
+  const itemWidth = 190; // 160px + 15px margin * 2
   const stripWidth = gtaMultiplierStrip.offsetWidth;
   const centerOffset = stripWidth / 2;
   const itemCenterOffset = itemWidth / 2;
