@@ -7624,8 +7624,10 @@ function getRandomMultiplier() {
   return 1.2;
 }
 
-// Новая функция для ставки на множитель
+// Новая функция для ставки на множитель - ИСПРАВЛЕНО
 async function placeBetOnMultiplier(multiplier) {
+  console.log('placeBetOnMultiplier called with', multiplier, 'amount', betAmount);
+  
   if (!canPlaceBet || gtaIsSpinning) {
     showToast('Ставки в данный момент заблокированы', 'error');
     return;
@@ -7645,13 +7647,31 @@ async function placeBetOnMultiplier(multiplier) {
     return;
   }
   
-  if (betAmount > serverBalance) {
-    showToast('Недостаточно Souls для ставки', 'error');
+  // ПРОВЕРКА БАЛАНСА НА СЕРВЕРЕ, а не локально
+  try {
+    const balanceResponse = await fetch(`https://stalker-api.xauroriax.ru/balance?steam_id=${savedUser.id}`);
+    if (!balanceResponse.ok) throw new Error('Failed to check balance');
+    
+    const balanceData = await balanceResponse.json();
+    const currentServerBalance = parseInt(balanceData.balance) || 0;
+    
+    if (betAmount > currentServerBalance) {
+      showToast('Недостаточно Souls для ставки', 'error');
+      return;
+    }
+  } catch (error) {
+    showToast('Ошибка проверки баланса', 'error');
     return;
   }
 
   try {
     // Отправляем ставку на сервер
+    console.log('Sending bet request with:', {
+      steam_id: savedUser.id,
+      amount: betAmount,
+      multiplier: `x${multiplier}`
+    });
+    
     const response = await fetch('https://stalker-api.xauroriax.ru/bet', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -7664,12 +7684,15 @@ async function placeBetOnMultiplier(multiplier) {
     
     if (!response.ok) {
       const error = await response.json();
-      throw new Error(error.message || 'Failed to place bet');
+      console.error('Bet failed:', error);
+      showToast(error.message || 'Ошибка при размещении ставки', 'error');
+      return;
     }
     
     const result = await response.json();
+    console.log('Bet response:', result);
     
-    // Обновляем баланс
+    // Обновляем баланс из ответа сервера
     if (result.new_balance !== undefined) {
       const oldBalance = serverBalance;
       serverBalance = result.new_balance;
@@ -7683,7 +7706,7 @@ async function placeBetOnMultiplier(multiplier) {
       }
     }
     
-    // Добавляем визуальное отображение ставки
+    // Добавляем визуальное отображение ставки ТОЛЬКО после успешного ответа
     addBetToUI(multiplier, savedUser, betAmount);
     
     // Обновляем флаг наличия ставок
