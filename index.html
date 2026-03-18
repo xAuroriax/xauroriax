@@ -5056,12 +5056,6 @@ STARFALL SYNDICATE | AURORIA
 </footer>
 
 <script>
-// УДАЛЕНЫ УСТАРЕВШИЕ ФУНКЦИИ:
-// - getSoulsStorageKey
-// - loadSouls
-// - saveSouls
-// - initSoulsForUser
-// - updateSoulsUI
 // Баланс теперь хранится только в serverBalance и синхронизируется с сервером
 
 function updateBalanceUI(steamId) {
@@ -7210,9 +7204,6 @@ window.addEventListener('DOMContentLoaded', () => {
           </div>
         </div>
       `;
-
-      // УДАЛЕНО: initSoulsForUser(savedUser.id);
-// УДАЛЕНО: updateSoulsUI(savedUser.id);
       
       // Разблокируем рулетку для авторизованных пользователей
       enableRoulette();
@@ -7260,7 +7251,6 @@ window.addEventListener('DOMContentLoaded', () => {
       const savedStatus = localStorage.getItem(`quenta_status_${savedUser.id}`);
       renderQuentaStatus(savedStatus);
 
-      // Update result page stats if present
       const resP = document.getElementById('resStatsPassed');
       if (resP) resP.textContent = stats.passed;
       const resF = document.getElementById('resStatsFailed');
@@ -7755,7 +7745,8 @@ function initGTARoulette() {
   // Load server balance ONCE on initialization
   if (savedUser) {
     window.skipBalanceAnimation = true;
-    loadServerBalance(savedUser.id).then(() => {
+    loadServerBalance(savedUser.id).then(balance => {
+      serverBalance = balance;
       window.skipBalanceAnimation = false;
       updateBalanceUI(savedUser.id);
     });
