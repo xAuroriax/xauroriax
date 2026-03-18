@@ -7431,7 +7431,7 @@ function initGTARoulette() {
     return;
   }
   
-  // Load server balance for authenticated users
+  // Load server balance ONCE on initialization
   loadServerBalance();
 }
 
@@ -7442,6 +7442,9 @@ function startServerStatePolling() {
     clearInterval(rouletteStateInterval);
   }
   
+  let lastErrorTime = 0;
+  let consecutiveErrors = 0;
+  
   // Poll every 1 second
   rouletteStateInterval = setInterval(async () => {
     try {
@@ -7449,8 +7452,32 @@ function startServerStatePolling() {
       if (!response.ok) throw new Error('Failed to fetch state');
       const state = await response.json();
       updateRouletteFromServerState(state);
+      
+      // Reset error counter on success
+      consecutiveErrors = 0;
     } catch (error) {
       console.error('Error polling roulette state:', error);
+      consecutiveErrors++;
+      
+      // If we have consecutive errors, increase polling interval
+      if (consecutiveErrors >= 3) {
+        const now = Date.now();
+        if (now - lastErrorTime < 3000) {
+          // Skip this poll - we're in error recovery mode
+          return;
+        }
+        lastErrorTime = now;
+        
+        // If too many errors, stop polling for a while
+        if (consecutiveErrors >= 10) {
+          clearInterval(rouletteStateInterval);
+          setTimeout(() => {
+            consecutiveErrors = 0;
+            startServerStatePolling();
+          }, 30000); // Restart after 30 seconds
+          return;
+        }
+      }
     }
   }, 1000);
 }
@@ -7508,10 +7535,13 @@ async function handleSpinResult(result) {
   // Check if user had winning bet
   const userWinAmount = result.userWins?.[savedUser.id] || 0;
   
-  // Update balance if user won
+  // Update balance if user won (only from server response)
   if (userWinAmount > 0) {
-    serverBalance += userWinAmount;
-    updateBalanceUI(savedUser.id);
+    // Update balance from server response to avoid jumps
+    if (result.new_balance !== undefined) {
+      serverBalance = result.new_balance;
+      updateBalanceUI(savedUser.id);
+    }
     showBalanceChangePopup(userWinAmount, 'positive');
     showToast(`Выигрыш! x${result.multiplier} - ${userWinAmount} Souls`, 'success');
   } else {
@@ -7694,9 +7724,11 @@ async function placeBet(multiplier) {
     
     const result = await response.json();
     
-    // Update local balance from server response
-    serverBalance = result.new_balance || serverBalance - betAmount;
-    updateBalanceUI(savedUser.id);
+    // Update local balance from server response only
+    if (result.new_balance !== undefined) {
+      serverBalance = result.new_balance;
+      updateBalanceUI(savedUser.id);
+    }
     
     // Add to local bets for UI
     currentBets.set(multiplier, (currentBets.get(multiplier) || 0) + betAmount);
@@ -9387,14 +9419,12 @@ function hideSlotsCooldown() {
         // Если админ редактирует СЕБЯ, обновляем баланс с сервера
         const savedUser = JSON.parse(localStorage.getItem('steam_user'));
         if (savedUser && savedUser.id === steamId) {
-          // Load fresh balance from server
+          // Load fresh balance from server instead of using local value
           await loadServerBalance();
-          localStorage.setItem('exam_stats', JSON.stringify(statsVal));
-          updateSoulsUI(steamId);
-          updateSteamUI();
         }
+        adminSearchUser(); // Refresh admin panel
       } else {
-        throw new Error('Ошибка сервера при сохранении');
+        throw new Error(res.statusText || 'Update failed');
       }
     } catch (e) {
       showToast(i18n[localStorage.getItem('lang')||'ru'].toast_admin_error + e.message, 'error');
@@ -9412,7 +9442,7 @@ function hideSlotsCooldown() {
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ adminId: '76561199427395346', steamId })
         });
-        await fetch(`https://stalker-api.xaurorix.ru/delete-quenta`, {
+        await fetch(`https://discord.xauroriax.ru/delete-quenta`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ steamId })
