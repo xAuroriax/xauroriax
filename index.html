@@ -7212,7 +7212,6 @@ window.addEventListener('DOMContentLoaded', () => {
       enableSlots();
       
       // Show and update balance - ЗАГРУЖАЕМ С СЕРВЕРА
-      const savedUser = JSON.parse(localStorage.getItem('steam_user'));
       if (savedUser && savedUser.id) {
         console.log('updateSteamUI: found savedUser', savedUser.id);
         const balanceEl = document.getElementById('userBalance');
