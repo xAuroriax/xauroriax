@@ -7224,8 +7224,15 @@ window.addEventListener('DOMContentLoaded', () => {
       const balanceEl = document.getElementById('userBalance');
       if (balanceEl) {
         balanceEl.style.display = 'flex';
-        loadServerBalance(savedUser.id).then(() => {
+        loadServerBalance(savedUser.id).then((balance) => {
+          // Обновляем все UI элементы
           updateBalanceUI(savedUser.id);
+          // Обновляем баланс в рулетке
+          currentBalance = balance;
+          updateRouletteBalance();
+          // Обновляем баланс в слотах
+          slotsBalance = balance;
+          updateSlotsBalance();
         });
       }
 
