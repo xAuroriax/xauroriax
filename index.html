@@ -7224,7 +7224,10 @@ window.addEventListener('DOMContentLoaded', () => {
       const balanceEl = document.getElementById('userBalance');
       if (balanceEl) {
         balanceEl.style.display = 'flex';
-        loadServerBalance(savedUser.id).then(() => updateBalanceUI(savedUser.id));
+        loadServerBalance(savedUser.id).then(balance => { 
+          serverBalance = balance; 
+          updateBalanceUI(savedUser.id); 
+        });
       }
 
       startGlobalPolling(savedUser.id);
@@ -7645,6 +7648,7 @@ async function placeBetOnMultiplier(multiplier) {
     if (result.new_balance !== undefined) {
       const oldBalance = serverBalance;
       serverBalance = result.new_balance; // СТРОГОЕ обновление из ответа
+      console.log('Balance after bet:', result.new_balance);
       updateBalanceUI(savedUser.id); // ОБНОВЛЯЕМ ВСЕ ЭЛЕМЕНТЫ
     }
     
