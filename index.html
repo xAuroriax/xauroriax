@@ -7911,6 +7911,7 @@ function updateRouletteFromServerState(state) {
         // Если есть результат, обрабатываем его
         if (state.result) {
           handleSpinResult(state.result);
+          clearAllBets(); // очищаем ставки после обработки результата
         }
         
         // Разблокируем кнопки
@@ -8042,49 +8043,35 @@ async function handleSpinResult(result) {
 }
 
 // Функция добавления в локальную историю
-function addToLocalHistory(historyItem) {
-  // Загружаем текущую историю
-  let history = JSON.parse(localStorage.getItem('rouletteHistory') || '[]');
-  
-  // Добавляем новый элемент в начало
-  history.unshift(historyItem);
-  
-  // Ограничиваем историю до 50 элементов
-  if (history.length > 50) {
-    history = history.slice(0, 50);
-  }
-  
-  // Сохраняем историю
+function addToLocalHistory(item) {
+  let history = JSON.parse(localStorage.getItem('rouletteHistory')) || [];
+  history.unshift(item);
+  if (history.length > 50) history = history.slice(0, 50);
   localStorage.setItem('rouletteHistory', JSON.stringify(history));
-  
-  // Обновляем отображение истории
   updateHistoryDisplay();
 }
 
 // Функция обновления отображения истории
 function updateHistoryDisplay() {
-  const historyList = document.getElementById('rouletteHistoryList');
-  if (!historyList) return;
-  
-  const history = JSON.parse(localStorage.getItem('rouletteHistory') || '[]');
-  
+  const container = document.getElementById('rouletteHistoryList');
+  if (!container) return;
+  const history = JSON.parse(localStorage.getItem('rouletteHistory')) || [];
   if (history.length === 0) {
-    historyList.innerHTML = '<div class="history-empty">Нет истории игр</div>';
+    container.innerHTML = '<div class="history-empty">Нет истории игр</div>';
     return;
   }
-  
-  historyList.innerHTML = history.map(item => 
-    `<div class="history-item ${item.isWin ? 'win' : 'lose'}">
-      <img src="${item.user.avatar || 'favicon.png'}" class="history-avatar" alt="${item.user.name}">
+  container.innerHTML = history.map(item => `
+    <div class="history-item ${item.isWin ? 'win' : 'lose'}">
+      <img src="${item.user.avatar}" class="history-avatar" alt="${item.user.name}">
       <div class="history-info">
         <div class="history-name">${item.user.name}</div>
         <div class="history-mult">x${item.multiplier}</div>
       </div>
       <div class="history-result ${item.isWin ? 'win' : 'lose'}">
-        ${item.isWin ? '+' : '-'}${item.isWin ? item.winAmount : 'Проигрыш'}
+        ${item.isWin ? `+${item.winAmount}` : 'Проигрыш'}
       </div>
-    </div>`
-  ).join('');
+    </div>
+  `).join('');
 }
 
 // Load server balance with proper error handling
@@ -8290,15 +8277,15 @@ function updateCountdownDisplay() {
   const progressEl = document.getElementById('timerProgress');
   if (!timerEl || !progressEl) return;
 
-  if (gtaIsSpinning) {
+  if (gtaIsSpinning || !window.lastServerState?.nextSpin) {
     timerEl.textContent = '0';
     progressEl.style.width = '0%';
-  } else if (window.lastServerState && window.lastServerState.nextSpin) {
-    const timeLeft = Math.max(0, Math.floor((window.lastServerState.nextSpin - Date.now()) / 1000));
-    timerEl.textContent = timeLeft;
-    const progress = ((30 - timeLeft) / 30) * 100;
-    progressEl.style.width = `${progress}%`;
+    return;
   }
+  const timeLeft = Math.max(0, Math.floor((window.lastServerState.nextSpin - Date.now()) / 1000));
+  timerEl.textContent = timeLeft;
+  const progress = ((30 - timeLeft) / 30) * 100;
+  progressEl.style.width = `${progress}%`;
 }
 
 // Reset betting UI
@@ -8333,94 +8320,59 @@ function getWeightedRandom(items, weights) {
 
 // Animate GTA Roulette spin
 function animateGTASpin(targetMultiplier, onComplete) {
-  if (!gtaMultiplierStrip) return;
+  if (!gtaMultiplierItems.length) return;
   
-  // Проверка и пересоздание полосы если нужно
-  if (!gtaMultiplierItems || gtaMultiplierItems.length === 0) {
-    initGTARoulette();
-    return;
-  }
-  
-  // Find target item
-  const targetIndex = gtaMultiplierItems.findIndex(item => 
-    parseFloat(item.dataset.multiplier) === targetMultiplier
+  const itemWidth = 190; // ширина элемента + отступы
+  const targetIndex = gtaMultiplierItems.findIndex(
+    item => parseFloat(item.dataset.multiplier) === targetMultiplier
   );
-  
   if (targetIndex === -1) return;
-  
-  // Calculate target position with precise centering
-  const itemWidth = 220; // 180px + 20px margin * 2
+
+  // Центрируем целевой элемент под стрелкой
   const stripWidth = gtaMultiplierStrip.offsetWidth;
-  const centerOffset = stripWidth / 2;
-  const itemCenterOffset = itemWidth / 2;
-  const targetPosition = -(targetIndex * itemWidth) + centerOffset - itemCenterOffset;
+  const targetPos = -(targetIndex * itemWidth) + (stripWidth / 2) - (itemWidth / 2);
   
-  // Animation settings - much longer duration (8-12 seconds)
-  const duration = 8000 + Math.random() * 4000; // 8-12 seconds for realistic feel
+  // Добавляем несколько полных оборотов
+  const extraSpins = 8;
+  const totalSetWidth = itemWidth * 6; // 6 множителей в наборе
+  const finalTarget = targetPos - (extraSpins * totalSetWidth);
+
+  const startPos = gtaCurrentPosition;
   const startTime = Date.now();
-  const startPosition = gtaCurrentPosition;
-  const distance = targetPosition - startPosition;
-  
-  // Add extra spins for effect
-  const extraSpins = 6 + Math.floor(Math.random() * 3); // 6-8 spins
-  const finalTarget = targetPosition - (extraSpins * itemWidth * 6); // 6 items per set
-  
-  // Highlight arrow during spin
+  const duration = 10000; // 10 секунд
+
+  if (gtaAnimationId) cancelAnimationFrame(gtaAnimationId);
+
   const arrow = document.querySelector('.roulette-arrow');
   if (arrow) arrow.classList.add('spinning');
-  
-  let animationId;
-  const animate = () => {
+
+  function animate() {
     const elapsed = Date.now() - startTime;
     const progress = Math.min(elapsed / duration, 1);
+    const easeOut = 1 - Math.pow(1 - progress, 6); // плавное замедление
+    gtaCurrentPosition = startPos + (finalTarget - startPos) * easeOut;
     
-    // Easing function for smooth deceleration - улучшенная кривая
-    const easeOutQuint = 1 - Math.pow(1 - progress, 5);
-    const currentPos = startPosition + (distance * easeOutQuint);
-    
-    // Apply final target with extra spins
-    const finalPos = currentPos + (extraSpins * itemWidth * 6);
-    gtaMultiplierStrip.style.transform = `translateX(${finalPos}px)`;
-    gtaCurrentPosition = finalPos;
-    
+    gtaMultiplierStrip.style.transform = `translateX(${gtaCurrentPosition}px)`;
+
     if (progress < 1) {
-      animationId = requestAnimationFrame(animate);
+      gtaAnimationId = requestAnimationFrame(animate);
     } else {
-      // Animation complete
+      // финальная позиция
+      gtaCurrentPosition = targetPos;
+      gtaMultiplierStrip.style.transform = `translateX(${gtaCurrentPosition}px)`;
+      
+      if (arrow) arrow.classList.remove('spinning');
       gtaAnimationId = null;
       gtaIsSpinning = false;
-      canPlaceBet = true;
       
-      // Remove highlight from arrow
-      if (arrow) arrow.classList.remove('spinning');
+      // подсвечиваем только целевой элемент
+      gtaMultiplierItems.forEach(item => item.classList.remove('highlight'));
+      const targetItem = gtaMultiplierItems[targetIndex];
+      if (targetItem) targetItem.classList.add('highlight');
       
-      // Highlight final result precisely
-      gtaMultiplierItems.forEach((item, index) => {
-        const isTarget = parseFloat(item.dataset.multiplier) === targetMultiplier;
-        item.classList.toggle('highlight', isTarget);
-        
-        // Add glow effect to winner
-        if (isTarget) {
-          item.style.boxShadow = '0 0 30px rgba(255,122,24,0.8)';
-          item.style.transform = 'scale(1.1)';
-        }
-      });
-      
-      // Play sound effect
-      playRouletteSound();
-      
-      // Call completion callback
-      setTimeout(() => {
-        // Remove glow effect after delay
-        gtaMultiplierItems.forEach(item => {
-          item.style.boxShadow = '';
-          item.style.transform = '';
-        });
-        onComplete();
-      }, 1000);
+      onComplete?.();
     }
   }
-  
   animate();
 }
 
@@ -9547,12 +9499,25 @@ function hideSlotsCooldown() {
 
       if (res.ok) {
         adminSearchUser(); // обновляет панель админки
-        
+
         const savedUser = JSON.parse(localStorage.getItem('steam_user'));
         if (savedUser && savedUser.id === steamId) {
+          // Загружаем свежие данные с сервера (KV) через существующую syncUserData
           await syncUserData(steamId);
-          updateSteamUI();
-          loadServerBalance(steamId).then(() => updateBalanceUI(steamId));
+          
+          // Обновляем все элементы профиля
+          const stats = JSON.parse(localStorage.getItem('exam_stats')) || { passed: 0, failed: 0, best: 0 };
+          document.getElementById('statsPassed').textContent = stats.passed;
+          document.getElementById('statsFailed').textContent = stats.failed;
+          document.getElementById('statsBest').textContent = `${stats.best}/20`;
+          
+          const role = computeExamRole(stats);
+          document.getElementById('passportRole').textContent = role.name;
+          document.getElementById('passportRoleDesc').textContent = role.desc;
+          
+          // Баланс обновляем отдельно
+          await loadServerBalance(steamId);
+          updateBalanceUI(steamId);
         }
         showToast(i18n[localStorage.getItem('lang')||'ru'].toast_admin_updated, 'success');
       } else {
