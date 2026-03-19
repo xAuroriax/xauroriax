@@ -9502,22 +9502,22 @@ function hideSlotsCooldown() {
 
         const savedUser = JSON.parse(localStorage.getItem('steam_user'));
         if (savedUser && savedUser.id === steamId) {
-          // Загружаем свежие данные с сервера (KV) через существующую syncUserData
-          await syncUserData(steamId);
-          
-          // Обновляем все элементы профиля
-          const stats = JSON.parse(localStorage.getItem('exam_stats')) || { passed: 0, failed: 0, best: 0 };
-          document.getElementById('statsPassed').textContent = stats.passed;
-          document.getElementById('statsFailed').textContent = stats.failed;
-          document.getElementById('statsBest').textContent = `${stats.best}/20`;
-          
-          const role = computeExamRole(stats);
-          document.getElementById('passportRole').textContent = role.name;
-          document.getElementById('passportRoleDesc').textContent = role.desc;
-          
-          // Баланс обновляем отдельно
-          await loadServerBalance(steamId);
-          updateBalanceUI(steamId);
+          // Загружаем свежие данные через syncUserData
+          syncUserData(steamId).then(() => {
+            // Обновляем все элементы профиля
+            const stats = JSON.parse(localStorage.getItem('exam_stats')) || { passed: 0, failed: 0, best: 0 };
+            document.getElementById('statsPassed').textContent = stats.passed;
+            document.getElementById('statsFailed').textContent = stats.failed;
+            document.getElementById('statsBest').textContent = `${stats.best}/20`;
+            
+            // Роль пересчитываем (или берем из stats.roleId)
+            const role = computeExamRole(stats);
+            document.getElementById('passportRole').textContent = role.name;
+            document.getElementById('passportRoleDesc').textContent = role.desc;
+            
+            // Баланс обновляем отдельно
+            loadServerBalance(steamId).then(() => updateBalanceUI(steamId));
+          });
         }
         showToast(i18n[localStorage.getItem('lang')||'ru'].toast_admin_updated, 'success');
       } else {
