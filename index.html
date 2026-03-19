@@ -9497,7 +9497,7 @@ function hideSlotsCooldown() {
 
     showToast(i18n[localStorage.getItem('lang')||'ru'].toast_admin_saving, 'success');
     try {
-      const res = await fetch('https://stalker-api.xauroriax.ru/admin/update-user', {
+      const res = await fetch('https://api.xauroriax.ru/admin-update-user', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload)
