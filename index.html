@@ -1640,8 +1640,8 @@ header nav a:hover, .rules-trigger-btn:hover, .blackmarket-trigger-btn:hover {
 
 .bets-container {
   flex: 1;
-  min-height: 80px;
-  max-height: 120px;
+  min-height: 120px; /* Увеличил с 80px до 120px */
+  max-height: 150px; /* Увеличил для большего количества ставок */
   overflow-y: auto;
   margin: 10px 0;
   display: flex;
@@ -1656,7 +1656,7 @@ header nav a:hover, .rules-trigger-btn:hover, .blackmarket-trigger-btn:hover {
   display: flex;
   align-items: center;
   gap: 8px;
-  padding: 4px 6px;
+  padding: 3px 5px; /* Уменьшил для компактности */
   background: rgba(255,122,24,0.1);
   border-radius: 4px;
   font-size: 12px;
@@ -1901,11 +1901,12 @@ header nav a:hover, .rules-trigger-btn:hover, .blackmarket-trigger-btn:hover {
 
 .timer-value {
   color: #ff7b00;
-  font-size: 24px;
+  font-size: 32px; /* Увеличил с 24px до 32px */
   font-weight: 700;
   font-family: 'Orbitron', monospace;
   min-width: 40px;
   text-align: center;
+  text-shadow: 0 0 10px rgba(255,122,24,0.8); /* Добавил свечение */
 }
 
 .timer-unit {
@@ -1928,6 +1929,7 @@ header nav a:hover, .rules-trigger-btn:hover, .blackmarket-trigger-btn:hover {
   border-radius: 3px;
   transition: width 1s linear;
   width: 100%;
+  box-shadow: 0 0 10px rgba(255,122,24,0.5); /* Добавил свечение */
 }
 
 .roulette-main {
@@ -1937,7 +1939,7 @@ header nav a:hover, .rules-trigger-btn:hover, .blackmarket-trigger-btn:hover {
 
 .multiplier-display {
   position: relative;
-  height: 180px; /* Увеличил с 120px до 180px */
+  height: 200px; /* Увеличил с 180px до 200px */
   margin-bottom: 30px;
   background: rgba(0,0,0,0.9);
   border-radius: 15px;
@@ -1964,17 +1966,17 @@ header nav a:hover, .rules-trigger-btn:hover, .blackmarket-trigger-btn:hover {
 
 .multiplier-item {
   flex-shrink: 0;
-  width: 160px; /* Увеличил с 120px до 160px */
-  height: 120px; /* Увеличил с 80px до 120px */
+  width: 180px; /* Увеличил с 160px до 180px */
+  height: 140px; /* Увеличил с 120px до 140px */
   display: flex;
   align-items: center;
   justify-content: center;
-  margin: 0 15px; /* Увеличил расстояние с 10px до 15px */
+  margin: 0 20px; /* Увеличил расстояние с 15px до 20px */
   background: rgba(255,122,24,0.15); /* Увеличил контрастность */
   border: 3px solid rgba(255,122,24,0.6); /* Увеличил толщину */
   border-radius: 12px;
   font-weight: 900; /* Увеличил жирность */
-  font-size: 32px; /* Увеличил с 24px до 32px */
+  font-size: 40px; /* Увеличил с 32px до 40px */
   color: #ff9500; /* Сделал ярче */
   text-shadow: 0 0 15px rgba(255,122,24,0.8); /* Добавил подсветку */
   text-transform: uppercase;
@@ -2167,6 +2169,13 @@ header nav a:hover, .rules-trigger-btn:hover, .blackmarket-trigger-btn:hover {
   .betting-grid {
     grid-template-columns: repeat(2, 1fr);
     gap: 10px;
+  }
+  
+  .multiplier-item {
+    width: 120px; /* Уменьшил для мобильных */
+    height: 100px; /* Уменьшил для мобильных */
+    font-size: 24px; /* Уменьшил для мобильных */
+    margin: 0 10px; /* Уменьшил отступы */
   }
   
   .game-status {
@@ -5062,6 +5071,7 @@ function updateBalanceUI(steamId) {
   const value = serverBalance || 0; // Берем только из serverBalance
   const balanceEl = document.getElementById('balanceAmount');
   const balanceContainer = document.getElementById('userBalance');
+  const statsSoulsEl = document.getElementById('statsSouls');
   if (!balanceEl || !balanceContainer) return;
 
   const currentValue = parseInt(balanceEl.textContent) || 0;
@@ -5075,6 +5085,11 @@ function updateBalanceUI(steamId) {
       animateBalanceCounter(balanceEl, currentValue, newValue);
     }
     balanceEl.textContent = newValue;
+  }
+  
+  // Обновляем баланс в профиле (statsSouls)
+  if (statsSoulsEl) {
+    statsSoulsEl.textContent = newValue;
   }
   
   // Обновляем баланс в рулетке (если он отличается)
@@ -7223,6 +7238,9 @@ window.addEventListener('DOMContentLoaded', () => {
             window.skipBalanceAnimation = false;
           }).catch(err => console.error('loadServerBalance error', err));
         }
+        
+        // Синхронизируем данные пользователя один раз при загрузке
+        syncUserData(savedUser.id);
       } else {
         console.log('updateSteamUI: no savedUser');
       }
@@ -8110,8 +8128,8 @@ function generateGTAMultipliers() {
   const multipliers = [1.2, 1.5, 2, 3, 5, 10];
   const items = [];
   
-  // Create 20 sets for seamless scrolling (больше = нет телепортов)
-  for (let set = 0; set < 20; set++) {
+  // Create 30 sets for seamless scrolling (очень длинная лента без видимого конца)
+  for (let set = 0; set < 30; set++) {
     multipliers.forEach(mult => {
       const item = document.createElement('div');
       item.className = 'multiplier-item';
@@ -8316,7 +8334,7 @@ function animateGTASpin(targetMultiplier, onComplete) {
   if (targetIndex === -1) return;
   
   // Calculate target position with precise centering
-  const itemWidth = 190; // 160px + 15px margin * 2
+  const itemWidth = 220; // 180px + 20px margin * 2
   const stripWidth = gtaMultiplierStrip.offsetWidth;
   const centerOffset = stripWidth / 2;
   const itemCenterOffset = itemWidth / 2;
@@ -8341,9 +8359,9 @@ function animateGTASpin(targetMultiplier, onComplete) {
     const elapsed = Date.now() - startTime;
     const progress = Math.min(elapsed / duration, 1);
     
-    // Easing function for smooth deceleration
-    const easeOut = 1 - Math.pow(1 - progress, 3);
-    const currentPos = startPosition + (distance * easeOut);
+    // Easing function for smooth deceleration - улучшенная кривая
+    const easeOutQuint = 1 - Math.pow(1 - progress, 5);
+    const currentPos = startPosition + (distance * easeOutQuint);
     
     // Apply final target with extra spins
     const finalPos = currentPos + (extraSpins * itemWidth * 6);
@@ -9510,13 +9528,16 @@ function hideSlotsCooldown() {
       });
 
       if (res.ok) {
-        adminSearchUser(); // обновляет панель админки (KV)
+        adminSearchUser(); // обновляем поля в панели админки
         
-        // Если админ редактирует себя – обновляем serverBalance
+        // Если редактируется текущий пользователь, обновляем данные в localStorage и интерфейсе
         const savedUser = JSON.parse(localStorage.getItem('steam_user'));
         if (savedUser && savedUser.id === steamId) {
-          loadServerBalance(steamId).then(() => {
-            updateBalanceUI(steamId);
+          // Загружаем свежие данные из KV через API
+          syncUserData(steamId).then(() => {
+            // Обновляем отображение профиля и баланса
+            updateSteamUI();
+            loadServerBalance(steamId).then(() => updateBalanceUI(steamId));
           });
         }
         showToast(i18n[localStorage.getItem('lang')||'ru'].toast_admin_updated, 'success');
