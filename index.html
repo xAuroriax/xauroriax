@@ -7324,12 +7324,15 @@ window.addEventListener('DOMContentLoaded', () => {
       if (response.ok) {
         const data = await response.json();
         
+        console.log('syncUserData: raw response data', data);
+        
         // НЕ обновляем баланс здесь - баланс обновляется только при загрузке, ставках и админке
         
         // Обновляем статистику тестов
         if (data && data.stats) {
           console.log('syncUserData: stats сохранены', data.stats);
           localStorage.setItem('exam_stats', JSON.stringify(data.stats));
+          console.log('syncUserData: stats after save', JSON.parse(localStorage.getItem('exam_stats')));
         }
         
         // Проверка бана
