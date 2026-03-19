@@ -7241,7 +7241,17 @@ window.addEventListener('DOMContentLoaded', () => {
         }
         
         // Синхронизируем данные пользователя один раз при загрузке
-        syncUserData(savedUser.id);
+        syncUserData(savedUser.id).then(() => {
+          // обновляем интерфейс
+          const stats = JSON.parse(localStorage.getItem('exam_stats')) || { passed: 0, failed: 0, best: 0 };
+          document.getElementById('statsPassed').textContent = stats.passed;
+          document.getElementById('statsFailed').textContent = stats.failed;
+          document.getElementById('statsBest').textContent = `${stats.best}/20`;
+          // роль вычисляется функцией computeExamRole, которая использует stats
+          const role = computeExamRole(stats);
+          document.getElementById('passportRole').textContent = role.name;
+          document.getElementById('passportRoleDesc').textContent = role.desc;
+        });
       } else {
         console.log('updateSteamUI: no savedUser');
       }
@@ -8026,6 +8036,9 @@ async function handleSpinResult(result) {
     addToLocalHistory(historyItem);
     updateHistoryDisplay();
   }
+  
+  // Очищаем все ставки после обработки результата
+  clearAllBets();
 }
 
 // Функция добавления в локальную историю
@@ -9535,21 +9548,11 @@ function hideSlotsCooldown() {
       if (res.ok) {
         adminSearchUser(); // обновляет панель админки
         
-        // Если редактируется текущий пользователь, обновляем его данные в localStorage и интерфейсе
         const savedUser = JSON.parse(localStorage.getItem('steam_user'));
         if (savedUser && savedUser.id === steamId) {
-          // Загружаем свежие данные из KV
-          syncUserData(steamId).then(() => {
-            // Обновляем весь интерфейс, связанный с пользователем
-            updateSteamUI();
-            // Баланс уже должен быть обновлён, но можно перестраховаться
-            const oldBalance = serverBalance;
-            loadServerBalance(steamId).then(newBalance => {
-              const diff = newBalance - oldBalance;
-              serverBalance = newBalance;
-              updateBalanceUI(steamId, diff); // передаём разницу отдельно
-            });
-          });
+          await syncUserData(steamId);
+          updateSteamUI();
+          loadServerBalance(steamId).then(() => updateBalanceUI(steamId));
         }
         showToast(i18n[localStorage.getItem('lang')||'ru'].toast_admin_updated, 'success');
       } else {
