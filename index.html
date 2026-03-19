@@ -7244,6 +7244,7 @@ window.addEventListener('DOMContentLoaded', () => {
         syncUserData(savedUser.id).then(() => {
           // обновляем интерфейс
           const stats = JSON.parse(localStorage.getItem('exam_stats')) || { passed: 0, failed: 0, best: 0 };
+          console.log('updateSteamUI: stats из localStorage:', stats);
           document.getElementById('statsPassed').textContent = stats.passed;
           document.getElementById('statsFailed').textContent = stats.failed;
           document.getElementById('statsBest').textContent = `${stats.best}/20`;
@@ -7330,6 +7331,7 @@ window.addEventListener('DOMContentLoaded', () => {
         
         // Обновляем статистику тестов
         if (data && data.stats) {
+          console.log('syncUserData: stats сохранены', data.stats);
           localStorage.setItem('exam_stats', JSON.stringify(data.stats));
         }
         
@@ -9390,6 +9392,7 @@ function hideSlotsCooldown() {
   }
 
   function computeExamRole(stats) {
+    console.log('computeExamRole stats:', stats);
     const lang = localStorage.getItem('lang') || 'ru';
     const rolesMap = [
       { id: "oracle", name: i18n[lang].role_oracle, desc: i18n[lang].role_oracle_desc },
@@ -9507,6 +9510,7 @@ function hideSlotsCooldown() {
           syncUserData(steamId).then(() => {
             // Обновляем все элементы профиля
             const stats = JSON.parse(localStorage.getItem('exam_stats')) || { passed: 0, failed: 0, best: 0 };
+            console.log('Обновление профиля после админки, stats:', stats);
             document.getElementById('statsPassed').textContent = stats.passed;
             document.getElementById('statsFailed').textContent = stats.failed;
             document.getElementById('statsBest').textContent = `${stats.best}/20`;
