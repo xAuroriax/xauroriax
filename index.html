@@ -7256,6 +7256,9 @@ window.addEventListener('DOMContentLoaded', () => {
 
       startGlobalPolling(savedUser.id);
       
+      // Connect to SSE for real-time updates
+      connectSSE();
+      
       // Update profile page
       const avatarEl = document.getElementById('profileAvatar');
       const nameEl = document.getElementById('profileName');
@@ -7592,7 +7595,6 @@ let localHistory = []; // Local history only
 let canPlaceBet = true;
 let continuousAnimationId = null;
 let serverBalance = 0; // Server-side balance
-let rouletteStateInterval = null; // Poll server state
 let hasAnyBets = false; // Флаг наличия ставок
 
 // Get random multiplier with weighted probabilities - СИСТЕМА ВЕРОЯТНОСТЕЙ
@@ -7758,8 +7760,8 @@ function initGTARoulette() {
   // Initialize history display
   updateHistoryDisplay();
   
-  // Start polling server state
-  startServerStatePolling();
+  // Start SSE connection instead of polling
+  connectSSE();
   
   // Check if user is authenticated for betting
   const savedUser = JSON.parse(localStorage.getItem('steam_user'));
@@ -7827,52 +7829,154 @@ function disableSlots() {
   if (slotsSpinButton) slotsSpinButton.disabled = true;
 }
 
-// Poll server for roulette state
-function startServerStatePolling() {
-  // Clear existing polling
-  if (rouletteStateInterval) {
-    clearInterval(rouletteStateInterval);
-  }
-  
-  let lastErrorTime = 0;
-  let consecutiveErrors = 0;
-  
-  // Poll every 10 seconds
-  rouletteStateInterval = setInterval(async () => {
+// SSE connection replaces polling
+
+function connectSSE() {
+  const savedUser = JSON.parse(localStorage.getItem('steam_user'));
+  if (!savedUser) return;
+
+  // Закрываем предыдущее соединение, если было
+  if (window.eventSource) window.eventSource.close();
+
+  const eventSource = new EventSource('https://sse.xauroriax.ru/connect');
+  window.eventSource = eventSource;
+
+  eventSource.addEventListener('message', (e) => {
     try {
-      const response = await fetch('https://stalker-api.xauroriax.ru/roulette-state-improved');
-      if (!response.ok) throw new Error('Failed to fetch state');
-      const state = await response.json();
-      updateRouletteFromServerState(state);
-      updateCountdownDisplay(); // Обновляем таймер каждую секунду
-      
-      // Reset error counter on success
-      consecutiveErrors = 0;
-    } catch (error) {
-      console.error('Error polling roulette state:', error);
-      consecutiveErrors++;
-      
-      // If we have consecutive errors, add delay before next request
-      if (consecutiveErrors >= 1) {
-        const now = Date.now();
-        if (now - lastErrorTime < 3000) {
-          // Skip this poll - we're in error recovery mode
-          return;
-        }
-        lastErrorTime = now;
-        
-        // If too many errors, stop polling for a while
-        if (consecutiveErrors >= 5) {
-          clearInterval(rouletteStateInterval);
-          setTimeout(() => {
-            consecutiveErrors = 0;
-            startServerStatePolling();
-          }, 30000); // Restart after 30 seconds
-          return;
-        }
+      const { event, data } = JSON.parse(e.data);
+      console.log('SSE event:', event, data);
+
+      switch (event) {
+        case 'bet':
+          handleSSEBet(data);
+          break;
+        case 'spin-start':
+          handleSSESpinStart(data);
+          break;
+        case 'spin-result':
+          handleSSESpinResult(data);
+          break;
+        // можно добавить другие события, например 'balance-update'
+        default:
+          // игнор
       }
+    } catch (err) {
+      console.error('SSE parse error', err);
     }
-  }, 10000);
+  });
+
+  eventSource.onerror = () => {
+    console.warn('SSE connection lost, reconnecting...');
+    // браузер переподключается автоматически
+  };
+}
+
+// SSE event handlers
+function handleSSEBet(data) {
+  const savedUser = JSON.parse(localStorage.getItem('steam_user'));
+  if (!savedUser) return;
+
+  if (data.userId === savedUser.id) {
+    serverBalance = data.newBalance;
+    updateBalanceUI(savedUser.id, -data.amount);
+  }
+  showToast(`Ставка ${data.amount} Souls`, 'info');
+}
+
+function handleSSESpinStart(data) {
+  gtaIsSpinning = true;
+  canPlaceBet = false;
+  document.querySelectorAll('.mult-btn').forEach(btn => btn.disabled = true);
+  startSpinTimer(10000); // 10 секунд вращения
+  animateGTASpinGeneric();
+}
+
+function handleSSESpinResult(data) {
+  stopSpinAnimation();
+  const multiplierValue = parseFloat(data.result.replace('x',''));
+  highlightWinningMultiplier(multiplierValue);
+
+  const savedUser = JSON.parse(localStorage.getItem('steam_user'));
+  if (savedUser) {
+    addToLocalHistory({
+      user: savedUser,
+      multiplier: multiplierValue,
+      isWin: false,
+      winAmount: 0
+    });
+    updateHistoryDisplay();
+  }
+
+  gtaIsSpinning = false;
+  canPlaceBet = true;
+  document.querySelectorAll('.mult-btn').forEach(btn => btn.disabled = false);
+  clearAllBets();
+}
+
+function updateBetsDisplay(bets) {
+  // Обновляем отображение текущих ставок
+  const betsContainer = document.getElementById('currentBets');
+  if (betsContainer) {
+    betsContainer.innerHTML = bets.map(bet => 
+      `<div class="bet-item">${bet.player}: ${bet.amount} souls</div>`
+    ).join('');
+  }
+}
+
+function startSpinTimer(durationMs) {
+  const timerEl = document.getElementById('timerDisplay');
+  const progressEl = document.getElementById('timerProgress');
+  const startTime = Date.now();
+  const endTime = startTime + durationMs;
+
+  function updateTimer() {
+    const now = Date.now();
+    const remaining = Math.max(0, endTime - now);
+    const seconds = Math.ceil(remaining / 1000);
+    if (timerEl) timerEl.textContent = seconds;
+    if (progressEl) {
+      const progress = ((durationMs - remaining) / durationMs) * 100;
+      progressEl.style.width = `${progress}%`;
+    }
+    if (remaining > 0) {
+      requestAnimationFrame(updateTimer);
+    }
+  }
+  updateTimer();
+}
+
+function animateGTASpinGeneric() {
+  if (!gtaMultiplierItems || gtaMultiplierItems.length === 0) return;
+  const duration = 10000;
+  const startPos = gtaCurrentPosition;
+  const startTime = Date.now();
+  const totalWidth = gtaMultiplierItems.length * 160;
+  const extraSpins = 8;
+  const targetPos = startPos - (extraSpins * totalWidth);
+
+  function animate() {
+    const elapsed = Date.now() - startTime;
+    const progress = Math.min(elapsed / duration, 1);
+    const easeOut = 1 - Math.pow(1 - progress, 6);
+    gtaCurrentPosition = startPos + (targetPos - startPos) * easeOut;
+    if (gtaMultiplierStrip) {
+      gtaMultiplierStrip.style.transform = `translateX(${gtaCurrentPosition}px)`;
+    }
+    if (progress < 1) {
+      gtaAnimationId = requestAnimationFrame(animate);
+    } else {
+      gtaAnimationId = null;
+    }
+  }
+  if (gtaAnimationId) cancelAnimationFrame(gtaAnimationId);
+  animate();
+}
+
+function stopSpinAnimation() {
+  if (gtaAnimationId) {
+    cancelAnimationFrame(gtaAnimationId);
+    gtaAnimationId = null;
+  }
 }
 
 // Update roulette based on server state - ПЕРЕПИСАНО ПОЛНОСТЬЮ
@@ -9592,6 +9696,9 @@ function hideSlotsCooldown() {
     checkSteamAuth();
     initGratitudeAnimation();
     initRoulette();
+    
+    // Connect to SSE for real-time updates
+    connectSSE();
     initGTARoulette(); // Initialize GTA Auto-Roulette
   });
 
