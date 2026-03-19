@@ -9489,11 +9489,13 @@ function hideSlotsCooldown() {
     const steamId = document.getElementById('adminSearchId').value.trim();
     const soulsVal = parseInt(document.getElementById('adminUserSouls').value);
     const statsVal = {
-      passed: parseInt(document.getElementById('adminUserPassed').value),
-      failed: parseInt(document.getElementById('adminUserFailed').value),
-      best: parseInt(document.getElementById('adminUserBest').value),
+      passed: parseInt(document.getElementById('adminUserPassed').value) || 0,
+      failed: parseInt(document.getElementById('adminUserFailed').value) || 0,
+      best: parseInt(document.getElementById('adminUserBest').value) || 0,
       roleId: document.getElementById('adminUserRole').value
     };
+
+    console.log('Sending stats:', statsVal);
 
     const payload = {
       adminId: '76561199427395346',
@@ -9516,6 +9518,15 @@ function hideSlotsCooldown() {
 
         const savedUser = JSON.parse(localStorage.getItem('steam_user'));
         if (savedUser && savedUser.id === steamId) {
+          // Принудительное обновление профиля из отправленных данных
+          localStorage.setItem('exam_stats', JSON.stringify(statsVal));
+          document.getElementById('statsPassed').textContent = statsVal.passed;
+          document.getElementById('statsFailed').textContent = statsVal.failed;
+          document.getElementById('statsBest').textContent = `${statsVal.best}/20`;
+          const role = computeExamRole(statsVal);
+          document.getElementById('passportRole').textContent = role.name;
+          document.getElementById('passportRoleDesc').textContent = role.desc;
+          
           // Загружаем свежие данные через syncUserData
           syncUserData(steamId).then(() => {
             // Обновляем все элементы профиля
