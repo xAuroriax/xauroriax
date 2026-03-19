@@ -5067,7 +5067,7 @@ STARFALL SYNDICATE | AURORIA
 <script>
 // Баланс теперь хранится только в serverBalance и синхронизируется с сервером
 
-function updateBalanceUI(steamId) {
+function updateBalanceUI(steamId, diff) {
   const value = serverBalance || 0; // Берем только из serverBalance
   const balanceEl = document.getElementById('balanceAmount');
   const balanceContainer = document.getElementById('userBalance');
@@ -5078,7 +5078,8 @@ function updateBalanceUI(steamId) {
   const newValue = parseInt(value) || 0;
 
   if (currentValue !== newValue) {
-    const difference = newValue - currentValue;
+    // Используем переданную разницу или вычисляем её
+    const difference = diff !== undefined ? diff : newValue - currentValue;
     if (!window.skipBalanceAnimation) {
       showBalanceChangePopup(difference);
       addBalanceGlow(balanceContainer, difference);
@@ -7663,7 +7664,8 @@ async function placeBetOnMultiplier(multiplier) {
       const oldBalance = serverBalance;
       serverBalance = result.new_balance; // СТРОГОЕ обновление из ответа
       console.log('Balance after bet:', result.new_balance);
-      updateBalanceUI(savedUser.id); // ОБНОВЛЯЕМ ВСЕ ЭЛЕМЕНТЫ
+      const diff = result.new_balance - oldBalance;
+      updateBalanceUI(savedUser.id, diff); // ОБНОВЛЯЕМ ВСЕ ЭЛЕМЕНТЫ с разницей
     }
     
     // Добавляем визуальное отображение ставки ТОЛЬКО после успешного ответа
@@ -7991,10 +7993,10 @@ async function handleSpinResult(result) {
   if (result.new_balance !== undefined) {
     const oldBalance = serverBalance;
     serverBalance = result.new_balance;
-    updateBalanceUI(savedUser.id);
-    
-    // Показываем анимацию изменения баланса
     const balanceChange = result.new_balance - oldBalance;
+    updateBalanceUI(savedUser.id, balanceChange);
+    
+    // Показываем анимацию изменения баланса (дополнительная, если нужно)
     if (balanceChange !== 0 && window.showBalanceChangePopup) {
       showBalanceChangePopup(balanceChange);
       addBalanceGlow(document.getElementById('userBalance'), balanceChange);
@@ -8835,8 +8837,10 @@ window.addEventListener('beforeunload', () => {
       
       if (res.ok && data && data.ok) {
         if (typeof data.newSouls === 'number') {
+          const oldBalance = serverBalance;
           serverBalance = data.newSouls;
-          updateBalanceUI(savedUser.id);
+          const diff = data.newSouls - oldBalance;
+          updateBalanceUI(savedUser.id, diff);
         }
         showToast(data.message || i18n[localStorage.getItem('lang')||'ru'].toast_promo_success, 'success');
         input.value = '';
@@ -9150,7 +9154,7 @@ function startSlotsSpin() {
   // Списываем ставку
   slotsBalance -= bet;
   updateSlotsBalance();
-  updateBalanceUI(getCurrentUserId());
+  updateBalanceUI(getCurrentUserId(), -bet); // передаём разницу (отрицательную)
   
   // Скрываем предыдущий результат
   const resultDiv = document.getElementById('slotsResult');
@@ -9269,7 +9273,8 @@ function finishSlotsSpin(result, bet, winAmount) {
   const userId = getCurrentUserId();
   if (userId) {
     serverBalance = slotsBalance;
-    updateBalanceUI(userId);
+    const diff = winAmount - bet; // чистый выигрыш
+    updateBalanceUI(userId, diff);
     
     // Показываем анимацию изменения баланса
     if (winAmount > bet) {
@@ -9528,16 +9533,22 @@ function hideSlotsCooldown() {
       });
 
       if (res.ok) {
-        adminSearchUser(); // обновляем поля в панели админки
+        adminSearchUser(); // обновляет панель админки
         
-        // Если редактируется текущий пользователь, обновляем данные в localStorage и интерфейсе
+        // Если редактируется текущий пользователь, обновляем его данные в localStorage и интерфейсе
         const savedUser = JSON.parse(localStorage.getItem('steam_user'));
         if (savedUser && savedUser.id === steamId) {
-          // Загружаем свежие данные из KV через API
+          // Загружаем свежие данные из KV
           syncUserData(steamId).then(() => {
-            // Обновляем отображение профиля и баланса
+            // Обновляем весь интерфейс, связанный с пользователем
             updateSteamUI();
-            loadServerBalance(steamId).then(() => updateBalanceUI(steamId));
+            // Баланс уже должен быть обновлён, но можно перестраховаться
+            const oldBalance = serverBalance;
+            loadServerBalance(steamId).then(newBalance => {
+              const diff = newBalance - oldBalance;
+              serverBalance = newBalance;
+              updateBalanceUI(steamId, diff); // передаём разницу отдельно
+            });
           });
         }
         showToast(i18n[localStorage.getItem('lang')||'ru'].toast_admin_updated, 'success');
