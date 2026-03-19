@@ -7241,7 +7241,7 @@ window.addEventListener('DOMContentLoaded', () => {
         }
         
         // Принудительное обновление профиля из localStorage
-        const stats = JSON.parse(localStorage.getItem('exam_stats')) || { passed: 0, failed: 0, best: 0 };
+        const stats = JSON.parse(localStorage.getItem('exam_stats')) || { passed: 0, failed: 0, best: 0, roleId: 'none' };
         console.log('updateSteamUI: stats из localStorage', stats);
         document.getElementById('statsPassed').textContent = stats.passed;
         document.getElementById('statsFailed').textContent = stats.failed;
@@ -9525,9 +9525,15 @@ function hideSlotsCooldown() {
           
           // Фоновая синхронизация с сервером (для гарантии)
           syncUserData(steamId).then(() => {
-            const serverStats = JSON.parse(localStorage.getItem('exam_stats'));
+            const serverStats = JSON.parse(localStorage.getItem('exam_stats')) || { passed: 0, failed: 0, best: 0 };
             console.log('syncUserData after admin:', serverStats);
-            // Можно повторно обновить интерфейс, если нужно
+            // Обновляем интерфейс из serverStats (на всякий случай)
+            document.getElementById('statsPassed').textContent = serverStats.passed;
+            document.getElementById('statsFailed').textContent = serverStats.failed;
+            document.getElementById('statsBest').textContent = `${serverStats.best}/20`;
+            const role = computeExamRole(serverStats);
+            document.getElementById('passportRole').textContent = role.name;
+            document.getElementById('passportRoleDesc').textContent = role.desc;
           });
         }
         showToast(i18n[localStorage.getItem('lang')||'ru'].toast_admin_updated, 'success');
