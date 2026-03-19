@@ -8004,6 +8004,7 @@ async function handleSpinResult(result) {
       timestamp: Date.now()
     };
     addToLocalHistory(historyItem);
+    updateHistoryDisplay();
   }
 }
 
@@ -8039,18 +8040,19 @@ function updateHistoryDisplay() {
     return;
   }
   
-  historyList.innerHTML = history.map(item => `
-    <div class="history-item ${item.isWin ? 'win' : 'lose'}">
+  historyList.innerHTML = history.map(item => 
+    `<div class="history-item ${item.isWin ? 'win' : 'lose'}">
       <img src="${item.user.avatar || 'favicon.png'}" class="history-avatar" alt="${item.user.name}">
       <div class="history-info">
         <div class="history-name">${item.user.name}</div>
         <div class="history-mult">x${item.multiplier}</div>
       </div>
       <div class="history-result ${item.isWin ? 'win' : 'lose'}">
-        ${item.isWin ? `+${item.winAmount}` : 'Проигрыш'}
+        ${item.isWin ? '+' : '-'}${item.isWin ? item.winAmount : 'Проигрыш'}
       </div>
-    </div>
-  `).join('');
+    </div>`
+  ).join('');
+}
 }
 
 // Load server balance with proper error handling
@@ -8301,6 +8303,12 @@ function getWeightedRandom(items, weights) {
 function animateGTASpin(targetMultiplier, onComplete) {
   if (!gtaMultiplierStrip) return;
   
+  // Проверка и пересоздание полосы если нужно
+  if (!gtaMultiplierItems || gtaMultiplierItems.length === 0) {
+    initGTARoulette();
+    return;
+  }
+  
   // Find target item
   const targetIndex = gtaMultiplierItems.findIndex(item => 
     parseFloat(item.dataset.multiplier) === targetMultiplier
@@ -8329,32 +8337,29 @@ function animateGTASpin(targetMultiplier, onComplete) {
   const arrow = document.querySelector('.roulette-arrow');
   if (arrow) arrow.classList.add('spinning');
   
-  function animate() {
-    const now = Date.now();
-    const elapsed = now - startTime;
+  let animationId;
+  const animate = () => {
+    const elapsed = Date.now() - startTime;
     const progress = Math.min(elapsed / duration, 1);
     
-    // Very smooth easing function for realistic deceleration
-    const easeOut = 1 - Math.pow(1 - progress, 6); // Power 6 for very smooth end
+    // Easing function for smooth deceleration
+    const easeOut = 1 - Math.pow(1 - progress, 3);
+    const currentPos = startPosition + (distance * easeOut);
     
-    // Calculate current position
-    gtaCurrentPosition = startPosition + (finalTarget - startPosition) * easeOut;
-    gtaMultiplierStrip.style.transform = `translateX(${gtaCurrentPosition}px)`;
-    
-    // Highlight current item
-    const currentIndex = Math.round(-gtaCurrentPosition / itemWidth);
-    gtaMultiplierItems.forEach((item, index) => {
-      item.classList.toggle('highlight', index === currentIndex);
-    });
+    // Apply final target with extra spins
+    const finalPos = currentPos + (extraSpins * itemWidth * 6);
+    gtaMultiplierStrip.style.transform = `translateX(${finalPos}px)`;
+    gtaCurrentPosition = finalPos;
     
     if (progress < 1) {
-      gtaAnimationId = requestAnimationFrame(animate);
+      animationId = requestAnimationFrame(animate);
     } else {
-      // Animation complete - snap to exact position
-      gtaCurrentPosition = targetPosition;
-      gtaMultiplierStrip.style.transform = `translateX(${gtaCurrentPosition}px)`;
+      // Animation complete
+      gtaAnimationId = null;
+      gtaIsSpinning = false;
+      canPlaceBet = true;
       
-      // Remove arrow highlight
+      // Remove highlight from arrow
       if (arrow) arrow.classList.remove('spinning');
       
       // Highlight final result precisely
