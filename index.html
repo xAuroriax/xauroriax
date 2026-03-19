@@ -9516,6 +9516,13 @@ function hideSlotsCooldown() {
           
           console.log('Принудительное обновление профиля из statsVal:', statsVal);
           
+          // Обновление баланса
+          serverBalance = soulsVal;
+          updateBalanceUI(steamId);
+          const statsSoulsEl = document.getElementById('statsSouls');
+          if (statsSoulsEl) statsSoulsEl.textContent = soulsVal;
+          console.log('Баланс обновлён:', soulsVal);
+          
           // syncUserData(steamId); // временно убрано, пока не починим воркер
         }
         showToast(i18n[localStorage.getItem('lang')||'ru'].toast_admin_updated, 'success');
