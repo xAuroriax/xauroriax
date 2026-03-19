@@ -9523,7 +9523,11 @@ function hideSlotsCooldown() {
           if (statsSoulsEl) statsSoulsEl.textContent = soulsVal;
           console.log('Баланс обновлён:', soulsVal);
           
-          // syncUserData(steamId); // временно убрано, пока не починим воркер
+          // Фоновая синхронизация с сервером (для гарантии)
+          syncUserData(steamId).then(() => {
+            console.log('Данные после серверной синхронизации:', JSON.parse(localStorage.getItem('exam_stats')));
+            // Можно повторно обновить интерфейс, если нужно
+          });
         }
         showToast(i18n[localStorage.getItem('lang')||'ru'].toast_admin_updated, 'success');
         showToast(i18n[localStorage.getItem('lang')||'ru'].toast_admin_updated, 'success');
