@@ -9538,6 +9538,21 @@ function hideSlotsCooldown() {
             document.getElementById('passportRole').textContent = role.name;
             document.getElementById('passportRoleDesc').textContent = role.desc;
           });
+          
+          // Синхронизация баланса с stalker-api
+          try {
+            await fetch('https://stalker-api.xauroriax.ru/admin/update-user', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                steam_id: steamId,
+                souls: soulsVal
+              })
+            });
+            console.log('Баланс синхронизирован с stalker-api');
+          } catch (e) {
+            console.error('Ошибка синхронизации баланса:', e);
+          }
         }
         showToast(i18n[localStorage.getItem('lang')||'ru'].toast_admin_updated, 'success');
         showToast(i18n[localStorage.getItem('lang')||'ru'].toast_admin_updated, 'success');
