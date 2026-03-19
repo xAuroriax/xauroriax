@@ -9527,24 +9527,11 @@ function hideSlotsCooldown() {
           document.getElementById('passportRole').textContent = role.name;
           document.getElementById('passportRoleDesc').textContent = role.desc;
           
-          // Загружаем свежие данные через syncUserData
-          syncUserData(steamId).then(() => {
-            // Обновляем все элементы профиля
-            const stats = JSON.parse(localStorage.getItem('exam_stats')) || { passed: 0, failed: 0, best: 0 };
-            console.log('Обновление профиля после админки, stats:', stats);
-            document.getElementById('statsPassed').textContent = stats.passed;
-            document.getElementById('statsFailed').textContent = stats.failed;
-            document.getElementById('statsBest').textContent = `${stats.best}/20`;
-            
-            // Роль пересчитываем (или берем из stats.roleId)
-            const role = computeExamRole(stats);
-            document.getElementById('passportRole').textContent = role.name;
-            document.getElementById('passportRoleDesc').textContent = role.desc;
-            
-            // Баланс обновляем отдельно
-            loadServerBalance(steamId).then(() => updateBalanceUI(steamId));
-          });
+          console.log('Принудительное обновление профиля из statsVal:', statsVal);
+          
+          // syncUserData(steamId); // временно убрано, пока не починим воркер
         }
+        showToast(i18n[localStorage.getItem('lang')||'ru'].toast_admin_updated, 'success');
         showToast(i18n[localStorage.getItem('lang')||'ru'].toast_admin_updated, 'success');
       } else {
         throw new Error(res.statusText || 'Update failed');
