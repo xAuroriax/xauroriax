@@ -7240,6 +7240,16 @@ window.addEventListener('DOMContentLoaded', () => {
           }).catch(err => console.error('loadServerBalance error', err));
         }
         
+        // Принудительное обновление профиля из localStorage
+        const stats = JSON.parse(localStorage.getItem('exam_stats')) || { passed: 0, failed: 0, best: 0 };
+        console.log('updateSteamUI: принудительное обновление stats:', stats);
+        document.getElementById('statsPassed').textContent = stats.passed;
+        document.getElementById('statsFailed').textContent = stats.failed;
+        document.getElementById('statsBest').textContent = `${stats.best}/20`;
+        const role = computeExamRole(stats);
+        document.getElementById('passportRole').textContent = role.name;
+        document.getElementById('passportRoleDesc').textContent = role.desc;
+        
         // Синхронизируем данные пользователя один раз при загрузке
         syncUserData(savedUser.id).then(() => {
           // обновляем интерфейс
