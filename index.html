@@ -7246,23 +7246,10 @@ window.addEventListener('DOMContentLoaded', () => {
         document.getElementById('statsPassed').textContent = stats.passed;
         document.getElementById('statsFailed').textContent = stats.failed;
         document.getElementById('statsBest').textContent = `${stats.best}/20`;
+        // роль вычисляется функцией computeExamRole, которая использует stats
         const role = computeExamRole(stats);
         document.getElementById('passportRole').textContent = role.name;
         document.getElementById('passportRoleDesc').textContent = role.desc;
-        
-        // Синхронизируем данные пользователя один раз при загрузке
-        syncUserData(savedUser.id).then(() => {
-          // обновляем интерфейс
-          const stats = JSON.parse(localStorage.getItem('exam_stats')) || { passed: 0, failed: 0, best: 0 };
-          console.log('updateSteamUI: stats из localStorage:', stats);
-          document.getElementById('statsPassed').textContent = stats.passed;
-          document.getElementById('statsFailed').textContent = stats.failed;
-          document.getElementById('statsBest').textContent = `${stats.best}/20`;
-          // роль вычисляется функцией computeExamRole, которая использует stats
-          const role = computeExamRole(stats);
-          document.getElementById('passportRole').textContent = role.name;
-          document.getElementById('passportRoleDesc').textContent = role.desc;
-        });
       } else {
         console.log('updateSteamUI: no savedUser');
       }
@@ -7361,7 +7348,7 @@ window.addEventListener('DOMContentLoaded', () => {
     // Immediate initial checks
     checkQuentaStatus(steamId);
     fetchNotifications(steamId);
-    syncUserData(steamId); // Синхронизируем души и стату сразу
+    // syncUserData(steamId); // временно убрано, чтобы не перезаписывать профиль
 
     // Set interval for real-time updates every 5 seconds
     statusCheckInterval = setInterval(() => {
@@ -7369,7 +7356,7 @@ window.addEventListener('DOMContentLoaded', () => {
       if (currentUser && currentUser.id === steamId) {
         checkQuentaStatus(steamId);
         fetchNotifications(steamId);
-        syncUserData(steamId); // И каждые 5 секунд
+        // syncUserData(steamId); // временно убрано, чтобы не перезаписывать профиль
       } else {
         // User logged out or changed
         clearInterval(statusCheckInterval);
