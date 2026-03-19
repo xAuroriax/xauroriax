@@ -7242,7 +7242,7 @@ window.addEventListener('DOMContentLoaded', () => {
         
         // Принудительное обновление профиля из localStorage
         const stats = JSON.parse(localStorage.getItem('exam_stats')) || { passed: 0, failed: 0, best: 0 };
-        console.log('updateSteamUI: принудительное обновление stats:', stats);
+        console.log('updateSteamUI: stats из localStorage', stats);
         document.getElementById('statsPassed').textContent = stats.passed;
         document.getElementById('statsFailed').textContent = stats.failed;
         document.getElementById('statsBest').textContent = `${stats.best}/20`;
@@ -9525,7 +9525,8 @@ function hideSlotsCooldown() {
           
           // Фоновая синхронизация с сервером (для гарантии)
           syncUserData(steamId).then(() => {
-            console.log('Данные после серверной синхронизации:', JSON.parse(localStorage.getItem('exam_stats')));
+            const serverStats = JSON.parse(localStorage.getItem('exam_stats'));
+            console.log('syncUserData after admin:', serverStats);
             // Можно повторно обновить интерфейс, если нужно
           });
         }
