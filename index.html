@@ -7834,7 +7834,7 @@ function startServerStatePolling() {
   let lastErrorTime = 0;
   let consecutiveErrors = 0;
   
-  // Poll every 1 second
+  // Poll every 10 seconds
   rouletteStateInterval = setInterval(async () => {
     try {
       const response = await fetch('https://stalker-api.xauroriax.ru/roulette-state-improved');
@@ -7869,7 +7869,7 @@ function startServerStatePolling() {
         }
       }
     }
-  }, 1000);
+  }, 10000);
 }
 
 // Update roulette based on server state - ПЕРЕПИСАНО ПОЛНОСТЬЮ
