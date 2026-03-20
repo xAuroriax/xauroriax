@@ -7667,9 +7667,10 @@ async function placeBetOnMultiplier(multiplier) {
       showToast(error.message || 'Ошибка при размещении ставки', 'error');
       return; // не обновляем баланс, не очищаем поле
     }
+    const oldBalance = serverBalance;
     const result = await response.json();
     const newBalance = Number(result.new_balance);
-    const diff = newBalance - serverBalance;
+    const diff = newBalance - oldBalance;
     serverBalance = newBalance;
     updateBalanceUI(savedUser.id, diff);
     document.getElementById('betAmountInput').value = '';
@@ -7918,16 +7919,27 @@ function handleSSESpinResult(data) {
       }
     }
     
-    const historyItem = {
-      user: savedUser,
-      multiplier: data.multiplier,
-      isWin: userWon,
-      winAmount: winAmount
-    };
-    
-    console.log('Adding to history:', historyItem);
-    addToLocalHistory(historyItem);
-    updateHistoryDisplay();
+    let userHadBet = false;
+    if (savedUser && currentBets.size > 0) {
+      for (const [mult, bets] of currentBets) {
+        if (bets.some(bet => bet.user.id === savedUser.id)) {
+          userHadBet = true;
+          break;
+        }
+      }
+    }
+    if (userHadBet) {
+      const historyItem = {
+        user: savedUser,
+        multiplier: data.multiplier,
+        isWin: userWon,
+        winAmount: winAmount
+      };
+      
+      console.log('Adding to history:', historyItem);
+      addToLocalHistory(historyItem);
+      updateHistoryDisplay();
+    }
   }
   console.log('SSE spin result: unlocking betting');
   gtaIsSpinning = false;
@@ -7993,7 +8005,6 @@ function animateGTASpinGeneric() {
       gtaAnimationId = requestAnimationFrame(animate);
     } else {
       gtaAnimationId = null;
-      resetStripPosition();
     }
   }
   if (gtaAnimationId) cancelAnimationFrame(gtaAnimationId);
@@ -8044,13 +8055,14 @@ function updateRouletteUI(state) {
   }
 
   if (state.status === 'waiting' && state.endTime) {
+    const endTime = Number(state.endTime);
     const timerContainer = document.getElementById('timerContainer');
     if (timerContainer) timerContainer.style.display = 'block';
     if (!window.timerInterval) {
       window.timerInterval = setInterval(() => {
-        const endTime = window.currentState?.endTime;
-        if (endTime && Date.now() < endTime) {
-          const timeLeft = Math.max(0, Math.floor((endTime - Date.now()) / 1000));
+        const now = Date.now();
+        if (endTime && now < endTime) {
+          const timeLeft = Math.max(0, Math.floor((endTime - now) / 1000));
           document.getElementById('timerDisplay').textContent = timeLeft;
           document.getElementById('timerProgress').style.width = `${(1 - timeLeft/30)*100}%`;
         } else {
@@ -8198,14 +8210,11 @@ function updateHistoryDisplay() {
     return;
   }
   // Отображаем историю
-  container.innerHTML = history.map((item, index) => `
+  container.innerHTML = history.map(item => `
     <div class="history-item ${item.isWin ? 'win' : 'lose'}">
-      <span class="history-multiplier">x${item.multiplier}</span>
-      <span class="history-result">${item.isWin ? 'Выигрыш' : 'Проигрыш'}</span>
-      <span class="history-amount">${item.winAmount} Souls</span>
       <div class="history-name">${item.user.name}</div>
       <div class="history-mult">x${item.multiplier}</div>
-      <div class="history-result ${item.isWin ? 'win' : 'lose'}">
+      <div class="history-amount ${item.isWin ? 'win' : 'lose'}">
         ${item.isWin ? `+${item.winAmount}` : 'Проигрыш'}
       </div>
     </div>
@@ -8290,19 +8299,11 @@ function generateGTAMultipliers() {
 // Start continuous animation - ИСПРАВЛЕНО
 function startContinuousAnimation() {
   if (!gtaMultiplierStrip) return;
-  
   function animate() {
     if (!gtaIsSpinning) {
-      // Continuous slow scroll when not spinning - плавное движение
-      gtaCurrentPosition -= 0.8; // Увеличил скорость для плавности
-      
-      // Рассчитываем позицию сброса (20 наборов * 6 коэффициентов * 160px = 19200px)
+      gtaCurrentPosition -= 0.8;
       const totalWidth = gtaMultiplierItems.length * 160;
-      if (gtaCurrentPosition <= -totalWidth) { 
-        // Плавный сброс без телепорта
-        gtaCurrentPosition = 0;
-      }
-      
+      if (gtaCurrentPosition <= -totalWidth) gtaCurrentPosition = 0;
       gtaMultiplierStrip.style.transform = `translateX(${gtaCurrentPosition}px)`;
     }
     continuousAnimationId = requestAnimationFrame(animate);
