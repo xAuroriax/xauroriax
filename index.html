@@ -7648,7 +7648,8 @@ async function placeBetOnMultiplier(multiplier) {
     });
     if (!response.ok) {
       const error = await response.json();
-      return showToast(error.message || 'Ошибка при размещении ставки', 'error');
+      showToast(error.message || 'Ошибка при размещении ставки', 'error');
+      return; // не обновляем баланс, не очищаем поле
     }
     const result = await response.json();
     serverBalance = result.new_balance;
@@ -7842,15 +7843,17 @@ function handleSSEBet(data) {
   }
   // Показываем ставку на множителе
   const container = document.getElementById(`bets-${data.multiplier}`);
-  if (container) {
-    const betBlock = document.createElement('div');
-    betBlock.className = 'bet-block';
-    betBlock.innerHTML = `
-      <img src="${data.avatar || 'favicon.png'}" class="bet-avatar" alt="${data.name}">
-      <span class="bet-amount">${data.amount}</span>
-    `;
-    container.appendChild(betBlock);
+  if (!container) {
+    console.warn('Container not found for multiplier', data.multiplier);
+    return;
   }
+  const betBlock = document.createElement('div');
+  betBlock.className = 'bet-block';
+  betBlock.innerHTML = `
+    <img src="${data.avatar || 'favicon.png'}" class="bet-avatar" alt="${data.name}">
+    <span class="bet-amount">${data.amount}</span>
+  `;
+  container.appendChild(betBlock);
 }
 
 function handleSSESpinStart(data) {
