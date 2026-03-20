@@ -7878,6 +7878,17 @@ function handleSSESpinResult(data) {
     const userBet = data.winningBets.find(bet => bet.userId === savedUser.id);
     const winAmount = userWon ? userBet.amount * data.multiplier : 0;
     
+    // Начисление выигрыша
+    if (data.winningBets && data.winningBets.length) {
+      const myWin = data.winningBets.find(bet => bet.userId === savedUser.id);
+      if (myWin) {
+        const winAmount = myWin.amount * data.multiplier;
+        serverBalance += winAmount;
+        updateBalanceUI(savedUser.id, winAmount);
+        showToast(`Вы выиграли ${winAmount} Souls!`, 'success');
+      }
+    }
+    
     const historyItem = {
       user: savedUser,
       multiplier: data.multiplier,
@@ -7887,7 +7898,6 @@ function handleSSESpinResult(data) {
     
     console.log('Adding to history:', historyItem);
     addToLocalHistory(historyItem);
-    console.log('History added, calling updateHistoryDisplay');
     updateHistoryDisplay();
   }
   console.log('SSE spin result: unlocking betting');
@@ -8122,14 +8132,11 @@ async function handleSpinResult(result) {
 
 // Функция добавления в локальную историю
 function addToLocalHistory(item) {
-  console.log('addToLocalHistory called with:', item);
   let history = JSON.parse(localStorage.getItem('rouletteHistory')) || [];
-  console.log('Current history length:', history.length);
   history.unshift(item);
   if (history.length > 50) history = history.slice(0, 50);
   localStorage.setItem('rouletteHistory', JSON.stringify(history));
-  console.log('History saved to localStorage, new length:', history.length);
-  updateHistoryDisplay();
+  console.log('History saved:', history);
 }
 
 // Функция обновления отображения истории
