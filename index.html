@@ -7652,8 +7652,10 @@ async function placeBetOnMultiplier(multiplier) {
       return; // не обновляем баланс, не очищаем поле
     }
     const result = await response.json();
-    serverBalance = result.new_balance;
-    updateBalanceUI(savedUser.id, -betAmount);
+    const newBalance = result.new_balance;
+    const diff = newBalance - serverBalance;
+    serverBalance = newBalance;
+    updateBalanceUI(savedUser.id, diff);
     document.getElementById('betAmountInput').value = '';
     showToast(`Ставка ${betAmount} Souls на x${multiplier} принята!`, 'success');
   } catch (error) {
@@ -7872,6 +7874,11 @@ function handleSSESpinStart(data) {
 function handleSSESpinResult(data) {
   stopSpinAnimation();
   highlightWinningMultiplier(data.multiplier);
+  
+  // Сброс позиции ленты после остановки
+  gtaCurrentPosition = 0;
+  if (gtaMultiplierStrip) gtaMultiplierStrip.style.transform = 'translateX(0px)';
+  
   const savedUser = JSON.parse(localStorage.getItem('steam_user'));
   if (savedUser) {
     const userWon = data.winningBets.some(bet => bet.userId === savedUser.id);
@@ -8002,6 +8009,9 @@ function stopSpinAnimation() {
 
 // Update roulette UI from connected state
 function updateRouletteUI(state) {
+  // Сохраняем текущее состояние для таймера
+  window.currentState = state;
+  
   const statusEl = document.getElementById('gameStatus');
   if (!statusEl) return;
 
@@ -8012,10 +8022,20 @@ function updateRouletteUI(state) {
   }
 
   if (state.status === 'waiting' && state.endTime) {
-    const timeLeft = Math.max(0, Math.floor((state.endTime - Date.now()) / 1000));
-    document.getElementById('timerDisplay').textContent = timeLeft;
-    document.getElementById('timerProgress').style.width = `${(1 - timeLeft/30)*100}%`;
     document.getElementById('timerContainer').style.display = 'block';
+    if (!window.timerInterval) {
+      window.timerInterval = setInterval(() => {
+        const endTime = window.currentState?.endTime;
+        if (endTime && Date.now() < endTime) {
+          const timeLeft = Math.max(0, Math.floor((endTime - Date.now()) / 1000));
+          document.getElementById('timerDisplay').textContent = timeLeft;
+          document.getElementById('timerProgress').style.width = `${(1 - timeLeft/30)*100}%`;
+        } else {
+          clearInterval(window.timerInterval);
+          window.timerInterval = null;
+        }
+      }, 100);
+    }
     statusEl.textContent = 'Ставки принимаются';
   } else if (state.status === 'spinning') {
     statusEl.textContent = 'Вращение...';
@@ -8143,32 +8163,29 @@ function addToLocalHistory(item) {
 function updateHistoryDisplay() {
   console.log('updateHistoryDisplay called');
   const container = document.getElementById('rouletteHistoryList');
-  console.log('History container found:', !!container);
   if (!container) {
-    console.error('Container #rouletteHistoryList not found!');
+    console.error('History container not found!');
     return;
   }
   const history = JSON.parse(localStorage.getItem('rouletteHistory')) || [];
-  console.log('History from localStorage:', history);
   if (history.length === 0) {
     container.innerHTML = '<div class="history-empty">Нет истории игр</div>';
-    console.log('No history to display');
-  } else {
-    // Отображаем историю
-    container.innerHTML = history.map((item, index) => `
-      <div class="history-item ${item.isWin ? 'win' : 'lose'}">
-        <span class="history-multiplier">x${item.multiplier}</span>
-        <span class="history-result">${item.isWin ? 'Выигрыш' : 'Проигрыш'}</span>
-        <span class="history-amount">${item.winAmount} Souls</span>
-        <div class="history-name">${item.user.name}</div>
-        <div class="history-mult">x${item.multiplier}</div>
-        <div class="history-result ${item.isWin ? 'win' : 'lose'}">
-          ${item.isWin ? `+${item.winAmount}` : 'Проигрыш'}
-        </div>
-      </div>
-    `).join('');
-    console.log('History rendered with', history.length, 'items');
+    return;
   }
+  // Отображаем историю
+  container.innerHTML = history.map((item, index) => `
+    <div class="history-item ${item.isWin ? 'win' : 'lose'}">
+      <span class="history-multiplier">x${item.multiplier}</span>
+      <span class="history-result">${item.isWin ? 'Выигрыш' : 'Проигрыш'}</span>
+      <span class="history-amount">${item.winAmount} Souls</span>
+      <div class="history-name">${item.user.name}</div>
+      <div class="history-mult">x${item.multiplier}</div>
+      <div class="history-result ${item.isWin ? 'win' : 'lose'}">
+        ${item.isWin ? `+${item.winAmount}` : 'Проигрыш'}
+      </div>
+    </div>
+  `).join('');
+  console.log('History rendered with', history.length, 'items');
 }
 
 // Load server balance with proper error handling
