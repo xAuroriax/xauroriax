@@ -7630,19 +7630,10 @@ function getRandomMultiplier() {
 // Новая функция для ставки на множитель - ИСПРАВЛЕНО
 async function placeBetOnMultiplier(multiplier) {
   const betAmount = parseInt(document.getElementById('betAmountInput').value);
-  if (!betAmount || betAmount <= 0) {
-    showToast('Введите корректную сумму ставки', 'error');
-    return;
-  }
-  if (!canPlaceBet || gtaIsSpinning) {
-    showToast('Ставки в данный момент заблокированы', 'error');
-    return;
-  }
+  if (!betAmount || betAmount <= 0) return showToast('Введите корректную сумму ставки', 'error');
+  if (!canPlaceBet || gtaIsSpinning) return showToast('Ставки в данный момент заблокированы', 'error');
   const savedUser = JSON.parse(localStorage.getItem('steam_user'));
-  if (!savedUser) {
-    showToast('Авторизуйтесь через Steam для игры', 'error');
-    return;
-  }
+  if (!savedUser) return showToast('Авторизуйтесь через Steam для игры', 'error');
   try {
     const response = await fetch('https://stalker-api.xauroriax.ru/bet', {
       method: 'POST',
@@ -7650,16 +7641,16 @@ async function placeBetOnMultiplier(multiplier) {
       body: JSON.stringify({
         steam_id: savedUser.id,
         amount: betAmount,
-        multiplier: `x${multiplier}` 
+        multiplier: `x${multiplier}`,
+        name: savedUser.name,
+        avatar: savedUser.avatar
       })
     });
     if (!response.ok) {
       const error = await response.json();
-      showToast(error.message || 'Ошибка при размещении ставки', 'error');
-      return;
+      return showToast(error.message || 'Ошибка при размещении ставки', 'error');
     }
     const result = await response.json();
-    // Баланс обновится через SSE, но для плавности обновим сразу
     serverBalance = result.new_balance;
     updateBalanceUI(savedUser.id, -betAmount);
     document.getElementById('betAmountInput').value = '';
@@ -7817,6 +7808,11 @@ function connectSSE() {
         case 'bet':
           handleSSEBet(data);
           break;
+        case 'bets-closing':
+          canPlaceBet = false;
+          document.querySelectorAll('.mult-btn').forEach(btn => btn.disabled = true);
+          showToast('Ставки закрываются, игра начинается!', 'info');
+          break;
         case 'spin-start':
           handleSSESpinStart(data);
           break;
@@ -7940,10 +7936,32 @@ function animateGTASpinGeneric() {
       gtaAnimationId = requestAnimationFrame(animate);
     } else {
       gtaAnimationId = null;
+      resetStripPosition();
     }
   }
   if (gtaAnimationId) cancelAnimationFrame(gtaAnimationId);
   animate();
+}
+
+function resetStripPosition() {
+  const startPos = gtaCurrentPosition;
+  const startTime = Date.now();
+  const duration = 300;
+
+  function step() {
+    const elapsed = Date.now() - startTime;
+    const progress = Math.min(elapsed / duration, 1);
+    const eased = 1 - Math.pow(1 - progress, 3);
+    const newPos = startPos * (1 - eased);
+    gtaCurrentPosition = newPos;
+    if (gtaMultiplierStrip) {
+      gtaMultiplierStrip.style.transform = `translateX(${newPos}px)`;
+    }
+    if (progress < 1) {
+      requestAnimationFrame(step);
+    }
+  }
+  requestAnimationFrame(step);
 }
 
 function stopSpinAnimation() {
@@ -7955,18 +7973,29 @@ function stopSpinAnimation() {
 
 // Update roulette UI from connected state
 function updateRouletteUI(state) {
-  // state содержит status, endTime, result, bets
+  const statusEl = document.getElementById('gameStatus');
+  if (!statusEl) return;
+
+  if (state.status === 'idle') {
+    statusEl.textContent = 'Ждём сталкера';
+    document.getElementById('timerContainer').style.display = 'none';
+    return;
+  }
+
   if (state.status === 'waiting') {
     const timeLeft = Math.max(0, Math.floor((state.endTime - Date.now()) / 1000));
     document.getElementById('timerDisplay').textContent = timeLeft;
     document.getElementById('timerProgress').style.width = `${(1 - timeLeft/30)*100}%`;
     document.getElementById('timerContainer').style.display = 'block';
+    statusEl.textContent = 'Ставки принимаются';
   } else if (state.status === 'spinning') {
+    statusEl.textContent = 'Вращение...';
     gtaIsSpinning = true;
     canPlaceBet = false;
     document.querySelectorAll('.mult-btn').forEach(btn => btn.disabled = true);
     animateGTASpinGeneric();
   }
+
   if (state.bets && state.bets.length) {
     renderBets(state.bets);
   }
