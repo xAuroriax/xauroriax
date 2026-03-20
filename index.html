@@ -7630,75 +7630,40 @@ function getRandomMultiplier() {
 // Новая функция для ставки на множитель - ИСПРАВЛЕНО
 async function placeBetOnMultiplier(multiplier) {
   const betAmount = parseInt(document.getElementById('betAmountInput').value);
-  console.log('placeBetOnMultiplier called with', multiplier, 'amount', betAmount);
-  
   if (!betAmount || betAmount <= 0) {
     showToast('Введите корректную сумму ставки', 'error');
     return;
   }
-
   if (!canPlaceBet || gtaIsSpinning) {
     showToast('Ставки в данный момент заблокированы', 'error');
     return;
   }
-
   const savedUser = JSON.parse(localStorage.getItem('steam_user'));
   if (!savedUser) {
     showToast('Авторизуйтесь через Steam для игры', 'error');
     return;
   }
-
-  // Проверка баланса УДАЛЕНА - сервер проверит сам
-  console.log('Sending bet request with amount', betAmount, 'multiplier', multiplier);
-
   try {
-    // Отправляем ставку на сервер
     const response = await fetch('https://stalker-api.xauroriax.ru/bet', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         steam_id: savedUser.id,
         amount: betAmount,
-        multiplier: `x${multiplier}`
+        multiplier: `x${multiplier}` 
       })
     });
-    
     if (!response.ok) {
       const error = await response.json();
-      console.error('Bet failed:', error);
       showToast(error.message || 'Ошибка при размещении ставки', 'error');
       return;
     }
-    
     const result = await response.json();
-    console.log('Bet response:', result);
-    console.log('New balance from server:', result.new_balance);
-    
-    // Обновляем баланс из ответа сервера
-    if (result.new_balance !== undefined) {
-      const oldBalance = serverBalance;
-      serverBalance = result.new_balance; // СТРОГОЕ обновление из ответа
-      console.log('Balance after bet:', result.new_balance);
-      const diff = result.new_balance - oldBalance;
-      updateBalanceUI(savedUser.id, diff); // ОБНОВЛЯЕМ ВСЕ ЭЛЕМЕНТЫ с разницей
-    }
-    
-    // Добавляем визуальное отображение ставки ТОЛЬКО после успешного ответа
-    addBetToUI(multiplier, savedUser, betAmount);
-    
-    // Обновляем флаг наличия ставок
-    hasAnyBets = true;
-    
-    // Показываем таймер если это первая ставка
-    if (hasAnyBets) {
-      document.getElementById('timerContainer').style.display = 'block';
-    }
-    
-    // Очищаем поле ввода
-    betAmountInput.value = '';
-    
+    // Баланс обновится через SSE, но для плавности обновим сразу
+    serverBalance = result.new_balance;
+    updateBalanceUI(savedUser.id, -betAmount);
+    document.getElementById('betAmountInput').value = '';
     showToast(`Ставка ${betAmount} Souls на x${multiplier} принята!`, 'success');
-    
   } catch (error) {
     console.error('Bet error:', error);
     showToast(error.message || 'Ошибка при размещении ставки', 'error');
@@ -7835,7 +7800,6 @@ function connectSSE() {
   const savedUser = JSON.parse(localStorage.getItem('steam_user'));
   if (!savedUser) return;
 
-  // Закрываем предыдущее соединение, если было
   if (window.eventSource) window.eventSource.close();
 
   const eventSource = new EventSource('https://sse.xauroriax.ru/connect');
@@ -7847,6 +7811,9 @@ function connectSSE() {
       console.log('SSE event:', event, data);
 
       switch (event) {
+        case 'connected':
+          updateRouletteUI(data);
+          break;
         case 'bet':
           handleSSEBet(data);
           break;
@@ -7856,7 +7823,6 @@ function connectSSE() {
         case 'spin-result':
           handleSSESpinResult(data);
           break;
-        // можно добавить другие события, например 'balance-update'
         default:
           // игнор
       }
@@ -7867,7 +7833,6 @@ function connectSSE() {
 
   eventSource.onerror = () => {
     console.warn('SSE connection lost, reconnecting...');
-    // браузер переподключается автоматически
   };
 }
 
@@ -7875,12 +7840,21 @@ function connectSSE() {
 function handleSSEBet(data) {
   const savedUser = JSON.parse(localStorage.getItem('steam_user'));
   if (!savedUser) return;
-
   if (data.userId === savedUser.id) {
-    serverBalance = data.newBalance;
+    serverBalance = data.newBalance; // если newBalance приходит в событии – если нет, то баланс обновится отдельно
     updateBalanceUI(savedUser.id, -data.amount);
   }
-  showToast(`Ставка ${data.amount} Souls`, 'info');
+  // Показываем ставку на множителе
+  const container = document.getElementById(`bets-${data.multiplier}`);
+  if (container) {
+    const betBlock = document.createElement('div');
+    betBlock.className = 'bet-block';
+    betBlock.innerHTML = `
+      <img src="${data.avatar || 'favicon.png'}" class="bet-avatar" alt="${data.name}">
+      <span class="bet-amount">${data.amount}</span>
+    `;
+    container.appendChild(betBlock);
+  }
 }
 
 function handleSSESpinStart(data) {
@@ -7893,20 +7867,20 @@ function handleSSESpinStart(data) {
 
 function handleSSESpinResult(data) {
   stopSpinAnimation();
-  const multiplierValue = parseFloat(data.result.replace('x',''));
-  highlightWinningMultiplier(multiplierValue);
-
+  highlightWinningMultiplier(data.multiplier);
   const savedUser = JSON.parse(localStorage.getItem('steam_user'));
   if (savedUser) {
+    const userWon = data.winningBets.some(bet => bet.userId === savedUser.id);
+    const userBet = data.winningBets.find(bet => bet.userId === savedUser.id);
+    const winAmount = userWon ? userBet.amount * data.multiplier : 0;
     addToLocalHistory({
       user: savedUser,
-      multiplier: multiplierValue,
-      isWin: false,
-      winAmount: 0
+      multiplier: data.multiplier,
+      isWin: userWon,
+      winAmount: winAmount
     });
     updateHistoryDisplay();
   }
-
   gtaIsSpinning = false;
   canPlaceBet = true;
   document.querySelectorAll('.mult-btn').forEach(btn => btn.disabled = false);
@@ -7979,110 +7953,40 @@ function stopSpinAnimation() {
   }
 }
 
-// Update roulette based on server state - ПЕРЕПИСАНО ПОЛНОСТЬЮ
-function updateRouletteFromServerState(state) {
-  // Store server state for timer calculations
-  window.lastServerState = state;
-  
-  // Обновляем статус игры
-  const statusEl = document.getElementById('gameStatus');
-  if (statusEl) {
-    if (gtaIsSpinning) {
-      statusEl.textContent = 'Вращение...';
-    } else if (state.result && state.result.newRound) {
-      statusEl.textContent = state.result.winAmount > 0 ? 
-        `Выигрыш! x${state.result.multiplier}` : 'Ставки проиграны';
-    } else if (hasAnyBets) {
-      statusEl.textContent = 'Ставки приняты, ожидание начала игры...';
-    } else {
-      statusEl.textContent = 'Ждём сталкера...'; // ИСПРАВЛЕНО
-    }
-  }
-  
-  // Логика вращения - запускаем при статусе "spinning"
-  if (state.status === "spinning" && !gtaIsSpinning) {
+// Update roulette UI from connected state
+function updateRouletteUI(state) {
+  // state содержит status, endTime, result, bets
+  if (state.status === 'waiting') {
+    const timeLeft = Math.max(0, Math.floor((state.endTime - Date.now()) / 1000));
+    document.getElementById('timerDisplay').textContent = timeLeft;
+    document.getElementById('timerProgress').style.width = `${(1 - timeLeft/30)*100}%`;
+    document.getElementById('timerContainer').style.display = 'block';
+  } else if (state.status === 'spinning') {
     gtaIsSpinning = true;
     canPlaceBet = false;
-    // Блокируем все кнопки ставок
     document.querySelectorAll('.mult-btn').forEach(btn => btn.disabled = true);
+    animateGTASpinGeneric();
+  }
+  if (state.bets && state.bets.length) {
+    renderBets(state.bets);
+  }
+}
 
-    if (!gtaAnimationId) {
-      const targetMult = state.targetMultiplier || getRandomMultiplier();
-      console.log('Запуск анимации с множителем', targetMult);
-      animateGTASpin(targetMult, () => {
-        gtaAnimationId = null;
-        // Сбрасываем флаг после окончания анимации
-        gtaIsSpinning = false;
-        canPlaceBet = true;
-        
-        // Если есть результат, обрабатываем его
-        if (state.result) {
-          handleSpinResult(state.result);
-          clearAllBets(); // очищаем ставки после обработки результата
-        }
-        
-        // Разблокируем кнопки
-        const savedUser = JSON.parse(localStorage.getItem('steam_user'));
-        if (savedUser) {
-          document.querySelectorAll('.mult-btn').forEach(btn => btn.disabled = false);
-        }
-      });
+function renderBets(bets) {
+  // Очистить все контейнеры ставок
+  document.querySelectorAll('.bets-container').forEach(container => container.innerHTML = '');
+  bets.forEach(bet => {
+    const container = document.getElementById(`bets-${bet.multiplier}`);
+    if (container) {
+      const betBlock = document.createElement('div');
+      betBlock.className = 'bet-block';
+      betBlock.innerHTML = `
+        <img src="${bet.avatar || 'favicon.png'}" class="bet-avatar" alt="${bet.name}">
+        <span class="bet-amount">${bet.amount}</span>
+      `;
+      container.appendChild(betBlock);
     }
-  }
-  
-  // Обработка результатов раунда
-  if (state.result && state.result.newRound && !state.result.processed) {
-    handleSpinResult(state.result);
-    state.result.processed = true; // Помечаем как обработанное
-  }
-  
-  // Логика завершения вращения
-  if (gtaIsSpinning && state.status !== "spinning") {
-    gtaIsSpinning = false;
-    canPlaceBet = true;
-    
-    // Разблокируем кнопки если есть баланс
-    const savedUser = JSON.parse(localStorage.getItem('steam_user'));
-    if (savedUser) {
-      document.querySelectorAll('.mult-btn').forEach(btn => btn.disabled = false);
-    }
-    
-    // Очищаем ставки после завершения раунда
-    clearAllBets();
-    
-    // Убираем подсветку
-    document.querySelectorAll('.multiplier-item').forEach(item => {
-      item.classList.remove('highlight');
-    });
-  }
-  
-  // Обновляем таймер только если есть ставки
-  if (hasAnyBets && !gtaIsSpinning && state.nextSpin) {
-    const now = Date.now();
-    const timeUntilSpin = Math.max(0, Math.ceil((state.nextSpin - now) / 1000));
-    autoSpinCountdown = timeUntilSpin;
-    
-    // Показываем таймер
-    document.getElementById('timerContainer').style.display = 'block';
-    
-    // Блокируем ставки за 5 секунд до конца
-    if (timeUntilSpin <= 5) {
-      canPlaceBet = false;
-      document.querySelectorAll('.mult-btn').forEach(btn => btn.disabled = true);
-    } else {
-      canPlaceBet = true;
-      const savedUser = JSON.parse(localStorage.getItem('steam_user'));
-      if (savedUser) {
-        document.querySelectorAll('.mult-btn').forEach(btn => btn.disabled = false);
-      }
-    }
-  } else if (!hasAnyBets) {
-    // Скрываем таймер если нет ставок
-    document.getElementById('timerContainer').style.display = 'none';
-  }
-  
-  // Важно: обновляем отображение таймера в конце
-  updateCountdownDisplay();
+  });
 }
 
 // Функция подсветки выигрышного множителя
@@ -8384,15 +8288,16 @@ function updateCountdownDisplay() {
   const progressEl = document.getElementById('timerProgress');
   if (!timerEl || !progressEl) return;
 
-  if (gtaIsSpinning || !window.lastServerState?.nextSpin) {
+  if (gtaIsSpinning) {
     timerEl.textContent = '0';
     progressEl.style.width = '0%';
     return;
   }
-  const timeLeft = Math.max(0, Math.floor((window.lastServerState.nextSpin - Date.now()) / 1000));
-  timerEl.textContent = timeLeft;
-  const progress = ((30 - timeLeft) / 30) * 100;
-  progressEl.style.width = `${progress}%`;
+  
+  // Таймер теперь управляется через SSE события
+  // Эта функция больше не нужна для расчета времени
+  timerEl.textContent = '0';
+  progressEl.style.width = '0%';
 }
 
 // Reset betting UI
