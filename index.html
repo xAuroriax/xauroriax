@@ -5068,7 +5068,7 @@ STARFALL SYNDICATE | AURORIA
 // Баланс теперь хранится только в serverBalance и синхронизируется с сервером
 
 function updateBalanceUI(steamId, diff) {
-  const value = serverBalance || 0; // Берем только из serverBalance
+  const value = serverBalance || 0;
   const balanceEl = document.getElementById('balanceAmount');
   const balanceContainer = document.getElementById('userBalance');
   const statsSoulsEl = document.getElementById('statsSouls');
@@ -5079,7 +5079,7 @@ function updateBalanceUI(steamId, diff) {
 
   if (currentValue !== newValue) {
     // Используем переданную разницу или вычисляем её
-    const difference = diff !== undefined ? diff : newValue - currentValue;
+    const difference = diff !== undefined ? Number(diff) : newValue - currentValue;
     if (!window.skipBalanceAnimation) {
       showBalanceChangePopup(difference);
       addBalanceGlow(balanceContainer, difference);
@@ -7259,6 +7259,19 @@ window.addEventListener('DOMContentLoaded', () => {
       // Connect to SSE for real-time updates
       connectSSE();
       
+      // Синхронизация данных с сервером
+      syncUserData(savedUser.id).then(() => {
+        // Обновление UI после синхронизации
+        const stats = JSON.parse(localStorage.getItem('exam_stats')) || { passed: 0, failed: 0, best: 0, roleId: 'none' };
+        console.log('updateSteamUI: stats после синхронизации', stats);
+        document.getElementById('statsPassed').textContent = stats.passed;
+        document.getElementById('statsFailed').textContent = stats.failed;
+        document.getElementById('statsBest').textContent = `${stats.best}/20`;
+        const role = computeExamRole(stats);
+        document.getElementById('passportRole').textContent = role.name;
+        document.getElementById('passportRoleDesc').textContent = role.desc;
+      }).catch(err => console.error('syncUserData error:', err));
+      
       // Update profile page
       const avatarEl = document.getElementById('profileAvatar');
       const nameEl = document.getElementById('profileName');
@@ -7864,6 +7877,9 @@ function handleSSEBet(data) {
 }
 
 function handleSSESpinStart(data) {
+  if (!gtaMultiplierItems || gtaMultiplierItems.length === 0) {
+    generateGTAMultipliers();
+  }
   gtaIsSpinning = true;
   canPlaceBet = false;
   document.querySelectorAll('.mult-btn').forEach(btn => btn.disabled = true);
@@ -8022,7 +8038,8 @@ function updateRouletteUI(state) {
   }
 
   if (state.status === 'waiting' && state.endTime) {
-    document.getElementById('timerContainer').style.display = 'block';
+    const timerContainer = document.getElementById('timerContainer');
+    if (timerContainer) timerContainer.style.display = 'block';
     if (!window.timerInterval) {
       window.timerInterval = setInterval(() => {
         const endTime = window.currentState?.endTime;
@@ -8186,6 +8203,8 @@ function updateHistoryDisplay() {
     </div>
   `).join('');
   console.log('History rendered with', history.length, 'items');
+  console.log('Container HTML length:', container.innerHTML.length);
+  console.log('Container visible:', container.offsetParent !== null);
 }
 
 // Load server balance with proper error handling
