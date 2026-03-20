@@ -4679,7 +4679,7 @@ input, textarea, select {
           <div class="game-status">
             <div class="status-info">
               <span class="status-label">Статус:</span>
-              <span id="gameStatus" class="status-text">Только по-сталкерски, ждём сталкера...</span>
+              <span id="gameStatus" class="status-text">Ждём сталкера</span>
             </div>
           </div>
         </div>
@@ -7810,8 +7810,13 @@ function connectSSE() {
           handleSSEBet(data);
           break;
         case 'bets-closing':
+          console.log('SSE: bets-closing event received');
           canPlaceBet = false;
-          document.querySelectorAll('.mult-btn').forEach(btn => btn.disabled = true);
+          console.log('canPlaceBet set to false');
+          const buttons = document.querySelectorAll('.mult-btn');
+          console.log('Found buttons to disable:', buttons.length);
+          buttons.forEach(btn => btn.disabled = true);
+          console.log('All betting buttons disabled');
           showToast('Ставки закрываются, игра начинается!', 'info');
           break;
         case 'spin-start':
@@ -7872,17 +7877,27 @@ function handleSSESpinResult(data) {
     const userWon = data.winningBets.some(bet => bet.userId === savedUser.id);
     const userBet = data.winningBets.find(bet => bet.userId === savedUser.id);
     const winAmount = userWon ? userBet.amount * data.multiplier : 0;
-    addToLocalHistory({
+    
+    const historyItem = {
       user: savedUser,
       multiplier: data.multiplier,
       isWin: userWon,
       winAmount: winAmount
-    });
+    };
+    
+    console.log('Adding to history:', historyItem);
+    addToLocalHistory(historyItem);
+    console.log('History added, calling updateHistoryDisplay');
     updateHistoryDisplay();
   }
+  console.log('SSE spin result: unlocking betting');
   gtaIsSpinning = false;
   canPlaceBet = true;
-  document.querySelectorAll('.mult-btn').forEach(btn => btn.disabled = false);
+  console.log('canPlaceBet set to true');
+  const unlockButtons = document.querySelectorAll('.mult-btn');
+  console.log('Found buttons to enable:', unlockButtons.length);
+  unlockButtons.forEach(btn => btn.disabled = false);
+  console.log('All betting buttons enabled');
   clearAllBets();
 }
 
@@ -7949,12 +7964,13 @@ function animateGTASpinGeneric() {
 function resetStripPosition() {
   const startPos = gtaCurrentPosition;
   const startTime = Date.now();
-  const duration = 300;
+  const duration = 500; // Увеличена длительность для плавности
 
   function step() {
     const elapsed = Date.now() - startTime;
     const progress = Math.min(elapsed / duration, 1);
-    const eased = 1 - Math.pow(1 - progress, 3);
+    // Более плавная ease-out функция
+    const eased = 1 - Math.pow(1 - progress, 4);
     const newPos = startPos * (1 - eased);
     gtaCurrentPosition = newPos;
     if (gtaMultiplierStrip) {
@@ -7985,7 +8001,7 @@ function updateRouletteUI(state) {
     return;
   }
 
-  if (state.status === 'waiting') {
+  if (state.status === 'waiting' && state.endTime) {
     const timeLeft = Math.max(0, Math.floor((state.endTime - Date.now()) / 1000));
     document.getElementById('timerDisplay').textContent = timeLeft;
     document.getElementById('timerProgress').style.width = `${(1 - timeLeft/30)*100}%`;
@@ -8000,15 +8016,31 @@ function updateRouletteUI(state) {
   }
 
   if (state.bets && state.bets.length) {
+    console.log('updateRouletteUI: rendering bets from connected state');
     renderBets(state.bets);
+  } else {
+    console.log('updateRouletteUI: no bets to render, state.bets:', state.bets);
   }
 }
 
 function renderBets(bets) {
+  console.log('renderBets called with:', bets);
+  
   // Очистить все контейнеры ставок
-  document.querySelectorAll('.bets-container').forEach(container => container.innerHTML = '');
-  bets.forEach(bet => {
+  const containers = document.querySelectorAll('.bets-container');
+  console.log('Found containers:', containers.length);
+  containers.forEach(container => container.innerHTML = '');
+  
+  if (!bets || bets.length === 0) {
+    console.log('No bets to render');
+    return;
+  }
+  
+  bets.forEach((bet, index) => {
+    console.log(`Rendering bet ${index}:`, bet);
     const container = document.getElementById(`bets-${bet.multiplier}`);
+    console.log(`Container for multiplier ${bet.multiplier}:`, container);
+    
     if (container) {
       const betBlock = document.createElement('div');
       betBlock.className = 'bet-block';
@@ -8017,6 +8049,9 @@ function renderBets(bets) {
         <span class="bet-amount">${bet.amount}</span>
       `;
       container.appendChild(betBlock);
+      console.log(`Bet added to container bets-${bet.multiplier}`);
+    } else {
+      console.warn(`Container not found for multiplier: ${bet.multiplier}`);
     }
   });
 }
@@ -8087,34 +8122,46 @@ async function handleSpinResult(result) {
 
 // Функция добавления в локальную историю
 function addToLocalHistory(item) {
+  console.log('addToLocalHistory called with:', item);
   let history = JSON.parse(localStorage.getItem('rouletteHistory')) || [];
+  console.log('Current history length:', history.length);
   history.unshift(item);
   if (history.length > 50) history = history.slice(0, 50);
   localStorage.setItem('rouletteHistory', JSON.stringify(history));
+  console.log('History saved to localStorage, new length:', history.length);
   updateHistoryDisplay();
 }
 
 // Функция обновления отображения истории
 function updateHistoryDisplay() {
+  console.log('updateHistoryDisplay called');
   const container = document.getElementById('rouletteHistoryList');
-  if (!container) return;
-  const history = JSON.parse(localStorage.getItem('rouletteHistory')) || [];
-  if (history.length === 0) {
-    container.innerHTML = '<div class="history-empty">Нет истории игр</div>';
+  console.log('History container found:', !!container);
+  if (!container) {
+    console.error('Container #rouletteHistoryList not found!');
     return;
   }
-  container.innerHTML = history.map(item => `
-    <div class="history-item ${item.isWin ? 'win' : 'lose'}">
-      <img src="${item.user.avatar}" class="history-avatar" alt="${item.user.name}">
-      <div class="history-info">
+  const history = JSON.parse(localStorage.getItem('rouletteHistory')) || [];
+  console.log('History from localStorage:', history);
+  if (history.length === 0) {
+    container.innerHTML = '<div class="history-empty">Нет истории игр</div>';
+    console.log('No history to display');
+  } else {
+    // Отображаем историю
+    container.innerHTML = history.map((item, index) => `
+      <div class="history-item ${item.isWin ? 'win' : 'lose'}">
+        <span class="history-multiplier">x${item.multiplier}</span>
+        <span class="history-result">${item.isWin ? 'Выигрыш' : 'Проигрыш'}</span>
+        <span class="history-amount">${item.winAmount} Souls</span>
         <div class="history-name">${item.user.name}</div>
         <div class="history-mult">x${item.multiplier}</div>
+        <div class="history-result ${item.isWin ? 'win' : 'lose'}">
+          ${item.isWin ? `+${item.winAmount}` : 'Проигрыш'}
+        </div>
       </div>
-      <div class="history-result ${item.isWin ? 'win' : 'lose'}">
-        ${item.isWin ? `+${item.winAmount}` : 'Проигрыш'}
-      </div>
-    </div>
-  `).join('');
+    `).join('');
+    console.log('History rendered with', history.length, 'items');
+  }
 }
 
 // Load server balance with proper error handling
