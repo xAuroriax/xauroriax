@@ -5079,7 +5079,10 @@ function updateBalanceUI(steamId, diff) {
 
   if (currentValue !== newValue) {
     // Используем переданную разницу или вычисляем её
-    const difference = diff !== undefined ? Number(diff) : newValue - currentValue;
+    let difference = diff !== undefined ? Number(diff) : newValue - currentValue;
+    if (isNaN(difference)) {
+      difference = newValue - currentValue;
+    }
     if (!window.skipBalanceAnimation) {
       showBalanceChangePopup(difference);
       addBalanceGlow(balanceContainer, difference);
@@ -7665,7 +7668,7 @@ async function placeBetOnMultiplier(multiplier) {
       return; // не обновляем баланс, не очищаем поле
     }
     const result = await response.json();
-    const newBalance = result.new_balance;
+    const newBalance = Number(result.new_balance);
     const diff = newBalance - serverBalance;
     serverBalance = newBalance;
     updateBalanceUI(savedUser.id, diff);
@@ -7840,6 +7843,9 @@ function connectSSE() {
         case 'spin-result':
           handleSSESpinResult(data);
           break;
+        case 'round-start':
+          updateRouletteUI(data);
+          break;
         default:
           // игнор
       }
@@ -7891,9 +7897,9 @@ function handleSSESpinResult(data) {
   stopSpinAnimation();
   highlightWinningMultiplier(data.multiplier);
   
-  // Сброс позиции ленты после остановки
-  gtaCurrentPosition = 0;
-  if (gtaMultiplierStrip) gtaMultiplierStrip.style.transform = 'translateX(0px)';
+  // Сброс позиции ленты после остановки (убрано, т.к. есть в resetStripPosition)
+  // gtaCurrentPosition = 0;
+  // if (gtaMultiplierStrip) gtaMultiplierStrip.style.transform = 'translateX(0px)';
   
   const savedUser = JSON.parse(localStorage.getItem('steam_user'));
   if (savedUser) {
@@ -8173,6 +8179,7 @@ function addToLocalHistory(item) {
   history.unshift(item);
   if (history.length > 50) history = history.slice(0, 50);
   localStorage.setItem('rouletteHistory', JSON.stringify(history));
+  console.log('Saving to localStorage:', history);
   console.log('History saved:', history);
 }
 
@@ -8185,6 +8192,7 @@ function updateHistoryDisplay() {
     return;
   }
   const history = JSON.parse(localStorage.getItem('rouletteHistory')) || [];
+  console.log('History from localStorage:', history);
   if (history.length === 0) {
     container.innerHTML = '<div class="history-empty">Нет истории игр</div>';
     return;
@@ -8517,15 +8525,6 @@ function loadLocalHistory() {
     localHistory = JSON.parse(saved);
     displayLocalHistory();
   }
-}
-
-function addToLocalHistory(item) {
-  localHistory.unshift(item);
-  if (localHistory.length > 50) {
-    localHistory = localHistory.slice(0, 50);
-  }
-  localStorage.setItem('roulette_local_history', JSON.stringify(localHistory));
-  displayLocalHistory();
 }
 
 function displayLocalHistory() {
