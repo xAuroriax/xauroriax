@@ -7242,15 +7242,32 @@ window.addEventListener('beforeunload', () => {
       
       if (res.ok && data && data.ok) {
         if (typeof data.newSouls === 'number') {
-          // Обновляем баланс с сервера
-          await loadServerBalance(savedUser.id);
-          updateBalanceUI(savedUser.id, data.newSouls);
+          // Получаем текущий баланс из DOM (отображаемое значение)
+          const balanceEl = document.getElementById('balanceAmount');
+          const currentBalance = parseInt(balanceEl.textContent) || 0;
+          const newBalance = data.newSouls;
+          const difference = newBalance - currentBalance;
           
-          // Синхронизируем данные пользователя
-          await syncUserData(savedUser.id);
+          // Обновляем глобальную переменную
+          serverBalance = newBalance;
+          
+          // Показываем анимацию с правильной разницей
+          showBalanceChangePopup(difference);
+          addBalanceGlow(document.getElementById('userBalance'), difference);
+          animateBalanceCounter(balanceEl, currentBalance, newBalance);
+          
+          // Обновляем текст баланса
+          balanceEl.textContent = newBalance;
+          
+          // Обновляем баланс в профиле
+          const statsSoulsEl = document.getElementById('statsSouls');
+          if (statsSoulsEl) statsSoulsEl.textContent = newBalance;
         }
         showToast(data.message || i18n[localStorage.getItem('lang')||'ru'].toast_promo_success, 'success');
         input.value = '';
+        
+        // Дополнительно синхронизируем данные пользователя (для статистики, роли)
+        await syncUserData(savedUser.id);
       } else {
         showToast((data && data.message) || i18n[localStorage.getItem('lang')||'ru'].toast_promo_invalid);
       }
