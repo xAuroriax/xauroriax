@@ -6427,43 +6427,53 @@ window.addEventListener('DOMContentLoaded', () => {
     }
 
     const lang = localStorage.getItem('lang') || 'ru';
-    if (status === 'pending') {
-      statusValue.textContent = i18n[lang].quenta_status_pending;
-      statusValue.classList.add('status-pending');
-    } else if (status === 'approved') {
-      statusValue.textContent = i18n[lang].quenta_status_approved;
-      statusValue.classList.add('status-approved');
-    } else if (status === 'rejected') {
-      statusValue.textContent = i18n[lang].quenta_status_rejected;
-      statusValue.classList.add('status-rejected');
-    } else {
-      statusValue.textContent = i18n[lang].quenta_status_none;
-    }
+    const statusText = {
+      'pending': i18n[lang].quenta_status_pending,
+      'approved': i18n[lang].quenta_status_approved,
+      'rejected': i18n[lang].quenta_status_rejected,
+      'none': i18n[lang].quenta_status_none
+    };
+    statusValue.textContent = statusText[status] || i18n[lang].quenta_status_none;
+    statusValue.classList.add(`status-${status}`);
   }
 
-  // Функция для синхронизации данных пользователя с сервера
-async function syncUserData(steamId) {
-  if (!steamId) {
-    console.warn('syncUserData: no steamId provided');
-    return null;
-  }
-  
-  try {
-    const response = await fetchWithRetry(`https://api.xauroriax.ru/get-user-data?steamId=${steamId}`);
-    if (!response.ok) {
-      throw new Error(`Failed to fetch user data: ${response.status}`);
+  async function syncUserData(steamId) {
+    if (!steamId) {
+      console.warn('syncUserData: no steamId provided');
+      return null;
     }
     
-    const data = await response.json();
-    console.log('syncUserData: received data:', data);
-    return data;
-  } catch (error) {
-    console.error('syncUserData error:', error);
-    return null;
+    try {
+      const response = await fetchWithRetry(`https://api.xauroriax.ru/get-user-data?steamId=${steamId}`);
+      if (!response.ok) {
+        throw new Error(`Failed to fetch user data: ${response.status}`);
+      }
+      
+      const data = await response.json();
+      console.log('syncUserData: received data:', data);
+      
+      // Обновляем DOM элементы
+      if (data) {
+        document.getElementById('statsPassed').textContent = data.stats?.passed || 0;
+        document.getElementById('statsFailed').textContent = data.stats?.failed || 0;
+        document.getElementById('statsBest').textContent = `${data.stats?.best || 0}/20`;
+        document.getElementById('statsSouls').textContent = data.souls || 0;
+        const role = computeExamRole(data.stats);
+        document.getElementById('passportRole').textContent = role.name;
+        document.getElementById('passportRoleDesc').textContent = role.desc;
+        // Обновить глобальную переменную serverBalance и баланс в шапке
+        if (typeof serverBalance !== 'undefined') serverBalance = data.souls;
+        updateBalanceUI(steamId);
+      }
+      
+      return data;
+    } catch (error) {
+      console.error('syncUserData error:', error);
+      return null;
+    }
   }
-}
 
-function updateSteamUI() {
+  function updateSteamUI() {
     const savedUser = JSON.parse(localStorage.getItem('steam_user'));
     const loginContainer = document.querySelector('.steam-login-container');
     
@@ -6530,6 +6540,8 @@ function updateSteamUI() {
             if (statsSoulsEl) statsSoulsEl.textContent = serverBalance;
           }).catch(err => console.error('loadServerBalance error', err));
         }
+        // Загружаем полные данные (статы, роль)
+        syncUserData(savedUser.id);
       } else {
         console.log('updateSteamUI: no savedUser');
       }
@@ -7266,17 +7278,16 @@ window.addEventListener('beforeunload', () => {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ steamId, score, passed: score >= 18 })
       });
-      
       if (response.ok) {
-        // После успешного ответа синхронизируем данные и обновляем UI
-        const data = await syncUserData(steamId);
-        const stats = data && data.stats ? data.stats : { passed: 0, failed: 0, best: 0, roleId: 'none' };
-        document.getElementById('statsPassed').textContent = stats.passed;
-        document.getElementById('statsFailed').textContent = stats.failed;
-        document.getElementById('statsBest').textContent = `${stats.best}/20`;
-        const role = computeExamRole(stats);
-        document.getElementById('passportRole').textContent = role.name;
-        document.getElementById('passportRoleDesc').textContent = role.desc;
+        // Перезагружаем данные пользователя с сервера и обновляем UI
+        const freshData = await syncUserData(steamId);
+        if (freshData) {
+          // Дополнительно обновляем баланс (хотя syncUserData уже это сделал)
+          if (typeof serverBalance !== 'undefined') serverBalance = freshData.souls;
+          updateBalanceUI(steamId);
+        }
+      } else {
+        console.error('submit-test failed');
       }
     } catch (e) { 
       console.error("Failed to sync with worker", e); 
@@ -7284,7 +7295,6 @@ window.addEventListener('beforeunload', () => {
   }
 
   function computeExamRole(stats) {
-    console.log('computeExamRole stats:', stats);
     const lang = localStorage.getItem('lang') || 'ru';
     const rolesMap = [
       { id: "oracle", name: i18n[lang].role_oracle, desc: i18n[lang].role_oracle_desc },
@@ -7298,34 +7308,21 @@ window.addEventListener('beforeunload', () => {
       { id: "deaf", name: i18n[lang].role_deaf, desc: i18n[lang].role_deaf_desc },
       { id: "survivor", name: i18n[lang].role_survivor, desc: i18n[lang].role_survivor_desc }
     ];
-
-    // Если роль уже установлена вручную (например, через админку), возвращаем её
+    
+    // Если роль уже задана (с сервера), возвращаем её
     if (stats && stats.roleId && stats.roleId !== 'none') {
       const found = rolesMap.find(r => r.id === stats.roleId);
       if (found) return found;
     }
-
-    if (!stats || !stats.firstPassAttempt || stats.passed <= 0) {
+    
+    // Запасная локальная логика (на случай, если роль ещё не сохранена)
+    if (!stats || stats.passed <= 0) {
       return { id: null, name: "—", desc: "" };
     }
-
-    const failsBeforeFirst = (stats.firstPassAttempt || 1) - 1;
-    const firstScore = stats.firstPassScore || 0;
-
-    if (stats.firstPassAttempt === 1 && firstScore === 20) {
-      return rolesMap[0]; // oracle
-    }
-    if (failsBeforeFirst === 0) {
-      return rolesMap[1]; // archivist
-    }
-
-    const failsMap = rolesMap.slice(2); // Все остальные роли
-    if (failsBeforeFirst >= 8) {
-      return rolesMap[rolesMap.length - 1]; // survivor
-    }
-
-    const idx = Math.max(0, Math.min(failsMap.length - 1, failsBeforeFirst - 1));
-    return failsMap[idx];
+    
+    // Здесь можно добавить вычисление по `firstPassAttempt`, если оно есть,
+    // но сейчас сервер уже сохраняет роль, так что этот блок почти не нужен.
+    return { id: null, name: "—", desc: "" };
   }
 
   /* Admin Tools Logic */
@@ -7400,22 +7397,7 @@ window.addEventListener('beforeunload', () => {
 
         const savedUser = JSON.parse(localStorage.getItem('steam_user'));
         if (savedUser && savedUser.id === steamId) {
-          // Принудительное обновление профиля из отправленных данных
-          document.getElementById('statsPassed').textContent = statsVal.passed;
-          document.getElementById('statsFailed').textContent = statsVal.failed;
-          document.getElementById('statsBest').textContent = `${statsVal.best}/20`;
-          const role = computeExamRole(statsVal);
-          document.getElementById('passportRole').textContent = role.name;
-          document.getElementById('passportRoleDesc').textContent = role.desc;
-          
-          console.log('Принудительное обновление профиля из statsVal:', statsVal);
-          
-          // Обновление баланса
-          serverBalance = soulsVal;
-          updateBalanceUI(steamId);
-          const statsSoulsEl = document.getElementById('statsSouls');
-          if (statsSoulsEl) statsSoulsEl.textContent = soulsVal;
-          console.log('Баланс обновлён:', soulsVal);
+          await syncUserData(steamId); // перезагружаем данные для текущего пользователя
         }
         showToast(i18n[localStorage.getItem('lang')||'ru'].toast_admin_updated, 'success');
       } else {
