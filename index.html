@@ -4068,6 +4068,13 @@ input, textarea, select {
         <h2 class="synd-title" data-i18n="promo_title">Промокод</h2>
         <div class="promo-inputs">
           <input id="promoCodeInput" type="text" placeholder="Введите промокод" data-i18n="[placeholder]promo_placeholder" />
+          <div class="trace-container" style="display:inline-block;margin:0 auto;">
+            <div class="trace-line"><svg><rect class="comet-1"></rect><rect class="comet-2"></rect></svg></div>
+            <button class="btn-cta btn-cta-inner" type="button" onclick="redeemPromoCode()" data-i18n="promo_btn">Активировать</button>
+          </div>
+        </div>
+      </div>
+
       <div class="logout-container">
         <div class="trace-container logout-btn-box" style="display:inline-block">
           <div class="trace-line"><svg><rect class="comet-1"></rect><rect class="comet-2"></rect></svg></div>
