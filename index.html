@@ -5060,14 +5060,7 @@ input, textarea, select {
       </ul>
     </li>
     <li><a onclick="showPage('quenta'); closeMobileMenu()"><i class="fas fa-file-alt"></i>Квента</a></li>
-    <li>
-      <a onclick="toggleMobileBlackMarketDropdown()"><i class="fas fa-skull-crossbones"></i>Черный рынок</a>
-      <ul class="mobile-submenu" id="mobileBlackMarketSubmenu">
-        <li><a onclick="showPage('roulette'); closeMobileMenu()"><i class="fas fa-dice"></i>Рулетка</a></li>
-        <li><a onclick="showPage('poker'); closeMobileMenu()"><i class="fas fa-poker-chip"></i>Покер</a></li>
-        <li><a onclick="showPage('slots'); closeMobileMenu()"><i class="fas fa-slot-machine"></i>Слоты</a></li>
-      </ul>
-    </li>
+    <li><a onclick="showPage('slots'); closeMobileMenu()"><i class="fas fa-slot-machine"></i>Слоты</a></li>
     <li><a onclick="showPage('team'); closeMobileMenu()"><i class="fas fa-users"></i>Синдикат</a></li>
     <li><a onclick="showPage('links'); closeMobileMenu()"><i class="fas fa-link"></i>Ссылки</a></li>
   </ul>
@@ -5089,6 +5082,7 @@ input, textarea, select {
 
 <a onclick="showPage('quenta')"><i class="fas fa-file-alt"></i><span data-i18n="nav_quenta">Квента</span></a>
 
+<!-- Временно отключено для доработки
 <div class="nav-dropdown">
   <a onclick="toggleBlackMarketDropdown(event)" class="blackmarket-trigger-btn"><i class="fas fa-skull-crossbones"></i><span data-i18n="nav_blackmarket">Черный рынок</span></a>
   <div class="nav-submenu" id="blackmarketSubmenu">
@@ -5097,6 +5091,7 @@ input, textarea, select {
     <a onclick="showPage('slots')"><i class="fas fa-slot-machine"></i><span data-i18n="blackmarket_slots">Слоты</span></a>
   </div>
 </div>
+-->
 
 <a onclick="showPage('team')"><i class="fas fa-users"></i><span data-i18n="nav_team">Синдикат</span></a>
 <a onclick="showPage('links')"><i class="fas fa-link"></i><span data-i18n="nav_links">Ссылки</span></a>
@@ -5525,6 +5520,7 @@ input, textarea, select {
       </div>
     </div>
   </section>
+<!-- Временно отключено для доработки
 <div class="page" id="roulette">
   <div class="container">
     <div class="card">
@@ -5628,6 +5624,7 @@ input, textarea, select {
     </div>
   </div>
 </div>
+-->
         
 <div class="page" id="poker">
   <div class="container">
@@ -5999,34 +5996,68 @@ STARFALL SYNDICATE | AURORIA
 
 <script>
 // Баланс теперь хранится только в serverBalance и синхронизируется с сервером
+console.log("Рулетка временно отключена для доработки");
 
-function updateBalanceUI(steamId, diff) {
-  const value = serverBalance || 0;
+// Функция для повторных запросов с экспоненциальной задержкой
+async function fetchWithRetry(url, options = {}, retries = 3) {
+  for (let i = 0; i < retries; i++) {
+    try {
+      const response = await fetch(url, options);
+      
+      // Если статус успешный (2xx), возвращаем результат
+      if (response.ok) {
+        return response;
+      }
+      
+      // Если статус >= 500 (ошибка сервера), пробуем еще раз
+      if (response.status >= 500 && i < retries - 1) {
+        const delay = Math.pow(2, i) * 1000; // Экспоненциальная задержка: 1с, 2с, 4с
+        console.warn(`Server error ${response.status}, retrying in ${delay}ms... (attempt ${i + 1}/${retries})`);
+        await new Promise(resolve => setTimeout(resolve, delay));
+        continue;
+      }
+      
+      // Для других ошибок (4xx) возвращаем как есть
+      return response;
+    } catch (error) {
+      // При сетевой ошибке пробуем еще раз
+      if (i < retries - 1) {
+        const delay = Math.pow(2, i) * 1000; // Экспоненциальная задержка: 1с, 2с, 4с
+        console.warn(`Network error, retrying in ${delay}ms... (attempt ${i + 1}/${retries}):`, error.message);
+        await new Promise(resolve => setTimeout(resolve, delay));
+        continue;
+      }
+      
+      // Если все попытки исчерпаны, пробрасываем ошибку
+      throw error;
+    }
+  }
+}
+
+function updateBalanceUI(steamId, newValue) {
+  const value = newValue !== undefined ? newValue : serverBalance || 0;
   const balanceEl = document.getElementById('balanceAmount');
   const balanceContainer = document.getElementById('userBalance');
   const statsSoulsEl = document.getElementById('statsSouls');
   if (!balanceEl || !balanceContainer) return;
 
   const currentValue = parseInt(balanceEl.textContent) || 0;
-  const newValue = parseInt(value) || 0;
+  const finalValue = parseInt(value) || 0;
 
-  if (currentValue !== newValue) {
+  if (currentValue !== finalValue) {
     // Используем переданную разницу или вычисляем её
-    let difference = diff !== undefined ? Number(diff) : newValue - currentValue;
-    if (isNaN(difference)) {
-      difference = newValue - currentValue;
-    }
+    let difference = finalValue - currentValue;
     if (!window.skipBalanceAnimation) {
       showBalanceChangePopup(difference);
       addBalanceGlow(balanceContainer, difference);
-      animateBalanceCounter(balanceEl, currentValue, newValue);
+      animateBalanceCounter(balanceEl, currentValue, finalValue);
     }
-    balanceEl.textContent = newValue;
+    balanceEl.textContent = finalValue;
   }
   
   // Обновляем баланс в профиле (statsSouls)
   if (statsSoulsEl) {
-    statsSoulsEl.textContent = newValue;
+    statsSoulsEl.textContent = finalValue;
   }
   
   // Обновляем баланс в рулетке (если он отличается)
@@ -7986,13 +8017,22 @@ window.addEventListener('DOMContentLoaded', () => {
     fetchNotifications(savedUser.id);
 
     try {
-      await fetch('https://discord.xauroriax.ru/delete-notification', {
+      const response = await fetchWithRetry('https://discord.xauroriax.ru/delete-notification', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ steamId: savedUser.id, notifId: String(notifId) })
       });
+      
+      if (response.ok) {
+        // Успешно удалено, обновляем список
+        fetchNotifications(savedUser.id);
+      } else {
+        // Ошибка при удалении
+        showToast('Не удалось удалить, попробуйте позже', 'error');
+      }
     } catch (err) {
       console.warn('Failed to delete notification:', err);
+      showToast('Не удалось удалить, попробуйте позже', 'error');
     }
   };
 
@@ -8053,7 +8093,6 @@ window.addEventListener('DOMContentLoaded', () => {
         // Новый воркер возвращает { status: "...", reason?: "..." }
         const status = data.status || 'none';
         const oldStatus = localStorage.getItem(`quenta_status_${steamId}`);
-        localStorage.setItem(`quenta_status_${steamId}`, status);
         
         // Update UI if status changed
         if (oldStatus !== status) {
@@ -8176,16 +8215,19 @@ window.addEventListener('DOMContentLoaded', () => {
           }).catch(err => console.error('loadServerBalance error', err));
         }
         
-        // Принудительное обновление профиля из localStorage
-        const stats = JSON.parse(localStorage.getItem('exam_stats')) || { passed: 0, failed: 0, best: 0, roleId: 'none' };
-        console.log('updateSteamUI: stats из localStorage', stats);
-        document.getElementById('statsPassed').textContent = stats.passed;
-        document.getElementById('statsFailed').textContent = stats.failed;
-        document.getElementById('statsBest').textContent = `${stats.best}/20`;
-        // роль вычисляется функцией computeExamRole, которая использует stats
-        const role = computeExamRole(stats);
-        document.getElementById('passportRole').textContent = role.name;
-        document.getElementById('passportRoleDesc').textContent = role.desc;
+        // Обновление профиля через syncUserData - всегда берем с сервера
+        syncUserData(savedUser.id).then((data) => {
+          if (data && data.stats) {
+            const stats = data.stats;
+            document.getElementById('statsPassed').textContent = stats.passed;
+            document.getElementById('statsFailed').textContent = stats.failed;
+            document.getElementById('statsBest').textContent = `${stats.best}/20`;
+            // роль вычисляется функцией computeExamRole, которая использует stats
+            const role = computeExamRole(stats);
+            document.getElementById('passportRole').textContent = role.name;
+            document.getElementById('passportRoleDesc').textContent = role.desc;
+          }
+        }).catch(err => console.error('syncUserData error:', err));
       } else {
         console.log('updateSteamUI: no savedUser');
       }
@@ -8194,19 +8236,6 @@ window.addEventListener('DOMContentLoaded', () => {
       
       // Connect to SSE for real-time updates
       connectSSE();
-      
-      // Синхронизация данных с сервером
-      syncUserData(savedUser.id).then(() => {
-        // Обновление UI после синхронизации
-        const stats = JSON.parse(localStorage.getItem('exam_stats')) || { passed: 0, failed: 0, best: 0, roleId: 'none' };
-        console.log('updateSteamUI: stats после синхронизации', stats);
-        document.getElementById('statsPassed').textContent = stats.passed;
-        document.getElementById('statsFailed').textContent = stats.failed;
-        document.getElementById('statsBest').textContent = `${stats.best}/20`;
-        const role = computeExamRole(stats);
-        document.getElementById('passportRole').textContent = role.name;
-        document.getElementById('passportRoleDesc').textContent = role.desc;
-      }).catch(err => console.error('syncUserData error:', err));
       
       // Update profile page
       const avatarEl = document.getElementById('profileAvatar');
@@ -8217,40 +8246,9 @@ window.addEventListener('DOMContentLoaded', () => {
       if (nameEl) nameEl.textContent = savedUser.name;
       if (steamIdEl) steamIdEl.textContent = `SteamID: ${savedUser.id}`;
       
-      const stats = JSON.parse(localStorage.getItem('exam_stats')) || { passed: 0, failed: 0, best: 0, attempts: 0, firstPassAttempt: null, firstPassScore: null, roleId: null };
-      const sPassed = document.getElementById('statsPassed');
-      const sFailed = document.getElementById('statsFailed');
-      const sBest = document.getElementById('statsBest');
-      
-      if (sPassed) sPassed.textContent = stats.passed || 0;
-      if (sFailed) sFailed.textContent = stats.failed || 0;
-      if (sBest) sBest.textContent = `${stats.best || 0}/20`;
-      
-      const role = computeExamRole(stats);
-      const roleEl = document.getElementById('passportRole');
-      const roleDescEl = document.getElementById('passportRoleDesc');
-      if (roleEl) roleEl.textContent = role.name;
-      if (roleDescEl) roleDescEl.textContent = role.desc;
-
-      // Update quenta status using the shared render function
+      // Update quenta status using shared render function
       const savedStatus = localStorage.getItem(`quenta_status_${savedUser.id}`);
       renderQuentaStatus(savedStatus);
-
-      const resP = document.getElementById('resStatsPassed');
-      if (resP) resP.textContent = stats.passed;
-      const resF = document.getElementById('resStatsFailed');
-      if (resF) resF.textContent = stats.failed;
-      const resB = document.getElementById('resStatsBest');
-      if (resB) resB.textContent = `${stats.best}/20`;
-
-      // Update exam input
-      const steamInput = document.getElementById('steamIdInput');
-      if (steamInput) {
-        steamInput.value = savedUser.id;
-        steamInput.readOnly = true;
-        steamInput.style.opacity = '0.7';
-        steamInput.style.cursor = 'not-allowed';
-      }
     } else {
       // Clear interval on logout
       if (statusCheckInterval) {
@@ -8264,36 +8262,6 @@ window.addEventListener('DOMContentLoaded', () => {
         steamInput.style.opacity = '1';
         steamInput.style.cursor = 'text';
       }
-    }
-  }
-
-  // Добавляем функцию синхронизации данных с сервером
-  async function syncUserData(steamId) {
-    if (!steamId) return;
-    try {
-      console.log('syncUserData fetching:', `https://api.xauroriax.ru/get-user-data?steamId=${steamId}`);
-      const response = await fetch(`https://api.xauroriax.ru/get-user-data?steamId=${steamId}`);
-      if (response.ok) {
-        const data = await response.json();
-        
-        console.log('syncUserData: raw response data', data);
-        
-        // НЕ обновляем баланс здесь - баланс обновляется только при загрузке, ставках и админке
-        
-        // Обновляем статистику тестов
-        if (data && data.stats) {
-          console.log('syncUserData: stats сохранены', data.stats);
-          localStorage.setItem('exam_stats', JSON.stringify(data.stats));
-          console.log('syncUserData: stats after save', JSON.parse(localStorage.getItem('exam_stats')));
-        }
-        
-        // Проверка бана
-        if (data && data.isBanned) {
-          console.warn('User is banned');
-        }
-      }
-    } catch (e) {
-      console.warn('Sync error:', e);
     }
   }
 
@@ -8608,7 +8576,7 @@ async function placeBetOnMultiplier(multiplier) {
   const savedUser = JSON.parse(localStorage.getItem('steam_user'));
   if (!savedUser) return showToast('Авторизуйтесь через Steam для игры', 'error');
   try {
-    const response = await fetch('https://stalker-api.xauroriax.ru/bet', {
+    const response = await fetchWithRetry('https://stalker-api.xauroriax.ru/bet', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -8812,8 +8780,15 @@ function connectSSE() {
     }
   });
 
-  eventSource.onerror = () => {
-    console.warn('SSE connection lost, reconnecting...');
+  eventSource.onerror = (error) => {
+    console.warn('SSE connection lost, reconnecting in 5 seconds...', error);
+    eventSource.close();
+    
+    // Автоматическое переподключение через 5 секунд
+    setTimeout(() => {
+      console.log('Attempting to reconnect SSE...');
+      connectSSE();
+    }, 5000);
   };
 }
 
@@ -9189,7 +9164,7 @@ async function loadServerBalance(steamId) {
   }
   
   try {
-    const response = await fetch(`https://stalker-api.xauroriax.ru/balance?steam_id=${steamId}`);
+    const response = await fetchWithRetry(`https://stalker-api.xauroriax.ru/balance?steam_id=${steamId}`);
     if (!response.ok) throw new Error('Failed to load balance');
     
     const data = await response.json();
@@ -9893,10 +9868,12 @@ window.addEventListener('beforeunload', () => {
       
       if (res.ok && data && data.ok) {
         if (typeof data.newSouls === 'number') {
-          const oldBalance = serverBalance;
-          serverBalance = data.newSouls;
-          const diff = data.newSouls - oldBalance;
-          updateBalanceUI(savedUser.id, diff);
+          // Обновляем баланс с сервера
+          await loadServerBalance(savedUser.id);
+          updateBalanceUI(savedUser.id, data.newSouls);
+          
+          // Синхронизируем данные пользователя
+          await syncUserData(savedUser.id);
         }
         showToast(data.message || i18n[localStorage.getItem('lang')||'ru'].toast_promo_success, 'success');
         input.value = '';
@@ -10451,32 +10428,27 @@ function hideSlotsCooldown() {
   }
 
   async function submitResultToWorker(score, steamId) {
-    const stats = JSON.parse(localStorage.getItem('exam_stats')) || { passed: 0, failed: 0, best: 0, attempts: 0, firstPassAttempt: null, firstPassScore: null, roleId: null };
-    stats.attempts = (stats.attempts || 0) + 1;
-    if (score >= 18) {
-      stats.passed = (stats.passed || 0) + 1;
-      if (stats.best === undefined || score > stats.best) stats.best = score;
-      if (stats.firstPassAttempt == null) {
-        stats.firstPassAttempt = stats.attempts;
-        stats.firstPassScore = score;
-      }
-    } else {
-      stats.failed = (stats.failed || 0) + 1;
-    }
-
-    const role = computeExamRole(stats);
-    stats.roleId = role.id;
-    stats.roleName = role.name;
-    localStorage.setItem('exam_stats', JSON.stringify(stats));
-    updateSteamUI();
-
     try {
-      await fetch('https://api.xauroriax.ru/submit-test', {
+      const response = await fetch('https://api.xauroriax.ru/submit-test', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ steamId, score, passed: score >= 18 })
       });
-    } catch (e) { console.error("Failed to sync with worker", e); }
+      
+      if (response.ok) {
+        // После успешного ответа синхронизируем данные и обновляем UI
+        const data = await syncUserData(steamId);
+        const stats = data && data.stats ? data.stats : { passed: 0, failed: 0, best: 0, roleId: 'none' };
+        document.getElementById('statsPassed').textContent = stats.passed;
+        document.getElementById('statsFailed').textContent = stats.failed;
+        document.getElementById('statsBest').textContent = `${stats.best}/20`;
+        const role = computeExamRole(stats);
+        document.getElementById('passportRole').textContent = role.name;
+        document.getElementById('passportRoleDesc').textContent = role.desc;
+      }
+    } catch (e) { 
+      console.error("Failed to sync with worker", e); 
+    }
   }
 
   function computeExamRole(stats) {
@@ -10597,7 +10569,6 @@ function hideSlotsCooldown() {
         const savedUser = JSON.parse(localStorage.getItem('steam_user'));
         if (savedUser && savedUser.id === steamId) {
           // Принудительное обновление профиля из отправленных данных
-          localStorage.setItem('exam_stats', JSON.stringify(statsVal));
           document.getElementById('statsPassed').textContent = statsVal.passed;
           document.getElementById('statsFailed').textContent = statsVal.failed;
           document.getElementById('statsBest').textContent = `${statsVal.best}/20`;
@@ -10615,14 +10586,14 @@ function hideSlotsCooldown() {
           console.log('Баланс обновлён:', soulsVal);
           
           // Фоновая синхронизация с сервером (для гарантии)
-          syncUserData(steamId).then(() => {
-            const serverStats = JSON.parse(localStorage.getItem('exam_stats')) || { passed: 0, failed: 0, best: 0 };
-            console.log('syncUserData after admin:', serverStats);
-            // Обновляем интерфейс из serverStats (на всякий случай)
-            document.getElementById('statsPassed').textContent = serverStats.passed;
-            document.getElementById('statsFailed').textContent = serverStats.failed;
-            document.getElementById('statsBest').textContent = `${serverStats.best}/20`;
-            const role = computeExamRole(serverStats);
+          syncUserData(steamId).then((data) => {
+            const stats = data && data.stats ? data.stats : { passed: 0, failed: 0, best: 0 };
+            console.log('syncUserData after admin:', stats);
+            // Обновляем интерфейс из stats (на всякий случай)
+            document.getElementById('statsPassed').textContent = stats.passed;
+            document.getElementById('statsFailed').textContent = stats.failed;
+            document.getElementById('statsBest').textContent = `${stats.best}/20`;
+            const role = computeExamRole(stats);
             document.getElementById('passportRole').textContent = role.name;
             document.getElementById('passportRoleDesc').textContent = role.desc;
           });
@@ -10873,7 +10844,6 @@ if (window.innerWidth <= 480) {
       }
     };
   }
-}
 </script>
 
 </body>
