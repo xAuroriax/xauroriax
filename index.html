@@ -6524,32 +6524,17 @@ function updateSteamUI() {
             serverBalance = balance;
             updateBalanceUI(savedUser.id);
             window.skipBalanceAnimation = false;
+            
+            // Синхронизируем баланс в профиле
+            const statsSoulsEl = document.getElementById('statsSouls');
+            if (statsSoulsEl) statsSoulsEl.textContent = serverBalance;
           }).catch(err => console.error('loadServerBalance error', err));
         }
-        
-        // Обновление профиля через syncUserData - всегда берем с сервера
-        syncUserData(savedUser.id).then((data) => {
-          if (data && data.stats) {
-            const stats = data.stats;
-            document.getElementById('statsPassed').textContent = stats.passed;
-            document.getElementById('statsFailed').textContent = stats.failed;
-            document.getElementById('statsBest').textContent = `${stats.best}/20`;
-            // роль вычисляется функцией computeExamRole, которая использует stats
-            const role = computeExamRole(stats);
-            document.getElementById('passportRole').textContent = role.name;
-            document.getElementById('passportRoleDesc').textContent = role.desc;
-            
-            // Обновляем баланс в профиле
-            if (data.souls !== undefined) {
-              document.getElementById('statsSouls').textContent = data.souls;
-            }
-          }
-        }).catch(err => console.error('syncUserData error:', err));
       } else {
         console.log('updateSteamUI: no savedUser');
       }
 
-      startGlobalPolling(savedUser.id);
+      connectNotificationSSE();
       
       // Update profile page
       const avatarEl = document.getElementById('profileAvatar');
@@ -6589,28 +6574,28 @@ function updateSteamUI() {
     }
   }
 
-  function startGlobalPolling(steamId) {
-    if (!steamId || statusCheckInterval) return;
+  // function startGlobalPolling(steamId) {
+  //   if (!steamId || statusCheckInterval) return;
 
-    // Immediate initial checks
-    checkQuentaStatus(steamId);
-    fetchNotifications(steamId);
-    // syncUserData(steamId); // временно убрано, чтобы не перезаписывать профиль
+  //   // Immediate initial checks
+  //   checkQuentaStatus(steamId);
+  //   fetchNotifications(steamId);
+  //   // syncUserData(steamId); // временно убрано, чтобы не перезаписывать профиль
 
-    // Set interval for real-time updates every 5 seconds
-    statusCheckInterval = setInterval(() => {
-      const currentUser = JSON.parse(localStorage.getItem('steam_user'));
-      if (currentUser && currentUser.id === steamId) {
-        checkQuentaStatus(steamId);
-        fetchNotifications(steamId);
-        // syncUserData(steamId); // временно убрано, чтобы не перезаписывать профиль
-      } else {
-        // User logged out or changed
-        clearInterval(statusCheckInterval);
-        statusCheckInterval = null;
-      }
-    }, 5000);
-  }
+  //   // Set interval for real-time updates every 5 seconds
+  //   statusCheckInterval = setInterval(() => {
+  //     const currentUser = JSON.parse(localStorage.getItem('steam_user'));
+  //     if (currentUser && currentUser.id === steamId) {
+  //       checkQuentaStatus(steamId);
+  //       fetchNotifications(steamId);
+  //       // syncUserData(steamId); // временно убрано, чтобы не перезаписывать профиль
+  //     } else {
+  //       // User logged out or changed
+  //       clearInterval(statusCheckInterval);
+  //       statusCheckInterval = null;
+  //     }
+  //   }, 5000);
+  // }
 
   function ensureSteamForQuenta() {
     const savedUser = JSON.parse(localStorage.getItem('steam_user'));
@@ -7459,19 +7444,6 @@ window.addEventListener('beforeunload', () => {
           if (statsSoulsEl) statsSoulsEl.textContent = soulsVal;
           console.log('Баланс обновлён:', soulsVal);
           
-          // Фоновая синхронизация с сервером (для гарантии)
-          syncUserData(steamId).then((data) => {
-            const stats = data && data.stats ? data.stats : { passed: 0, failed: 0, best: 0 };
-            console.log('syncUserData after admin:', stats);
-            // Обновляем интерфейс из stats (на всякий случай)
-            document.getElementById('statsPassed').textContent = stats.passed;
-            document.getElementById('statsFailed').textContent = stats.failed;
-            document.getElementById('statsBest').textContent = `${stats.best}/20`;
-            const role = computeExamRole(stats);
-            document.getElementById('passportRole').textContent = role.name;
-            document.getElementById('passportRoleDesc').textContent = role.desc;
-          });
-          
           // Синхронизация баланса с stalker-api
           try {
             await fetch('https://stalker-api.xauroriax.ru/admin/update-user', {
@@ -7644,6 +7616,50 @@ window.addEventListener('orientationchange', () => {
 // Performance optimization for mobile
 if (window.innerWidth <= 480) {
   // Mobile optimizations applied
+}
+
+// SSE для уведомлений и статуса квенты
+let sseConnection = null;
+
+function connectNotificationSSE() {
+    if (sseConnection) {
+        sseConnection.close();
+    }
+    const savedUser = JSON.parse(localStorage.getItem('steam_user'));
+    if (!savedUser) return;
+
+    sseConnection = new EventSource('https://notify.xauroriax.ru/connect');
+    
+    sseConnection.addEventListener('quenta-status-update', (e) => {
+        try {
+            const data = JSON.parse(e.data);
+            if (data.steamId === savedUser.id) {
+                renderQuentaStatus(data.status);
+                if (data.status === 'approved') showToast('Квента одобрена!', 'success');
+                if (data.status === 'rejected') showToast(`Квента отклонена: ${data.reason || 'причина не указана'}`, 'error');
+            }
+        } catch (err) { console.error('SSE quenta-status-update error', err); }
+    });
+
+    sseConnection.addEventListener('new-notification', (e) => {
+        try {
+            const data = JSON.parse(e.data);
+            if (data.steamId === savedUser.id) {
+                let notifs = JSON.parse(localStorage.getItem('notifications_cache') || '[]');
+                notifs.unshift(data.notification);
+                if (notifs.length > 50) notifs.pop();
+                localStorage.setItem('notifications_cache', JSON.stringify(notifs));
+                renderNotifications(notifs);
+                playNotificationSound();
+            }
+        } catch (err) { console.error('SSE new-notification error', err); }
+    });
+
+    sseConnection.onerror = () => {
+        console.warn('SSE connection lost, reconnecting in 5 seconds');
+        sseConnection.close();
+        setTimeout(connectNotificationSSE, 5000);
+    };
 }
 </script>
 </body>
