@@ -4068,14 +4068,11 @@ input, textarea, select {
         <h2 class="synd-title" data-i18n="promo_title">Промокод</h2>
         <div class="promo-inputs">
           <input id="promoCodeInput" type="text" placeholder="Введите промокод" data-i18n="[placeholder]promo_placeholder" />
-          <div class="trace-container" style="display:inline-block;margin:0 auto;">
-            <div class="trace-line"><svg><rect class="comet-1"></rect><rect class="comet-2"></rect></svg></div>
-            <button class="btn-cta btn-cta-inner" type="button" onclick="redeemPromoCode()" data-i18n="promo_btn">Активировать</button>
-          </div>
-        </div>
       <div class="logout-container">
         <div class="trace-container logout-btn-box" style="display:inline-block">
           <div class="trace-line"><svg><rect class="comet-1"></rect><rect class="comet-2"></rect></svg></div>
+          <button class="btn-cta-inner logout-btn" onclick="logout()" data-i18n="logout" style="background:transparent !important; border:none">Выйти</button>
+        </div>
       </div>
     </div>
   </section>
@@ -6506,7 +6503,6 @@ function updateSteamUI() {
           <div class="steam-login-btn">
             <img src="${savedUser.avatar || 'favicon.png'}" alt="Avatar" onerror="this.src='favicon.png'">
             <span>${savedUser.name}</span>
-            <span id="steamIdDisplay">${savedUser.id}</span>
           </div>
         </div>
       `;
@@ -6535,6 +6531,11 @@ function updateSteamUI() {
             const role = computeExamRole(stats);
             document.getElementById('passportRole').textContent = role.name;
             document.getElementById('passportRoleDesc').textContent = role.desc;
+            
+            // Обновляем баланс в профиле
+            if (data.souls !== undefined) {
+              document.getElementById('statsSouls').textContent = data.souls;
+            }
           }
         }).catch(err => console.error('syncUserData error:', err));
       } else {
