@@ -7628,7 +7628,7 @@ function connectNotificationSSE() {
     const savedUser = JSON.parse(localStorage.getItem('steam_user'));
     if (!savedUser) return;
 
-    sseConnection = new EventSource('https://sse-hub.statkevichyt.workers.dev/connect');
+    sseConnection = new EventSource('https://notify.xauroriax.ru/connect');
     
     sseConnection.addEventListener('quenta-status-update', (e) => {
         try {
