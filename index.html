@@ -6840,43 +6840,16 @@ async function loadServerBalance(steamId) {
   }
   
   try {
-    const response = await fetchWithRetry(`https://stalker-api.xauroriax.ru/balance?steam_id=${steamId}`);
-    if (!response.ok) throw new Error('Failed to load balance');
-    
+    const response = await fetchWithRetry(`https://api.xauroriax.ru/get-user-data?steamId=${steamId}`);
+    if (!response.ok) throw new Error('Failed to fetch user data');
     const data = await response.json();
     const balance = parseInt(data.souls) || 0;
-    
-    // Update server balance variable
     serverBalance = balance;
-    
     console.log('loadServerBalance: balance =', balance);
     return balance;
   } catch (error) {
     console.error('loadServerBalance error:', error);
     return 0;
-  }
-}
-
-// Save balance to server
-async function saveBalanceToServer(amount) {
-  const savedUser = JSON.parse(localStorage.getItem('steam_user'));
-  if (!savedUser) return;
-  
-  try {
-    const response = await fetch('https://stalker-api.xauroriax.ru/balance', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ 
-        steam_id: savedUser.id, // Use steam_id
-        balance: amount 
-      })
-    });
-    
-    if (response.ok) {
-      serverBalance = amount;
-    }
-  } catch (error) {
-    console.error('Error saving balance:', error);
   }
 }
 
@@ -7443,23 +7416,7 @@ window.addEventListener('beforeunload', () => {
           const statsSoulsEl = document.getElementById('statsSouls');
           if (statsSoulsEl) statsSoulsEl.textContent = soulsVal;
           console.log('Баланс обновлён:', soulsVal);
-          
-          // Синхронизация баланса с stalker-api
-          try {
-            await fetch('https://stalker-api.xauroriax.ru/admin/update-user', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({
-                steam_id: steamId,
-                souls: soulsVal
-              })
-            });
-            console.log('Баланс синхронизирован с stalker-api');
-          } catch (e) {
-            console.error('Ошибка синхронизации баланса:', e);
-          }
         }
-        showToast(i18n[localStorage.getItem('lang')||'ru'].toast_admin_updated, 'success');
         showToast(i18n[localStorage.getItem('lang')||'ru'].toast_admin_updated, 'success');
       } else {
         throw new Error(res.statusText || 'Update failed');
@@ -7475,7 +7432,7 @@ window.addEventListener('beforeunload', () => {
       const steamId = document.getElementById('adminSearchId').value.trim();
       showToast(i18n[lang].toast_admin_resetting, 'success');
       try {
-        await fetch(`https://stalker-api.xauroriax.ru/admin/reset-user`, {
+        await fetch(`https://api.xauroriax.ru/admin-reset-user`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ adminId: '76561199427395346', steamId })
