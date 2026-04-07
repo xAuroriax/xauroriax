@@ -4379,6 +4379,7 @@ async function fetchWithRetry(url, options = {}, retries = 3) {
 }
 
 function updateBalanceUI(steamId, newValue) {
+  if (balanceAnimationLock) return;
   const value = newValue !== undefined ? newValue : serverBalance || 0;
   const balanceEl = document.getElementById('balanceAmount');
   const balanceContainer = document.getElementById('userBalance');
@@ -6530,9 +6531,9 @@ window.addEventListener('DOMContentLoaded', () => {
         const balanceEl = document.getElementById('userBalance');
         if (balanceEl) {
           balanceEl.style.display = 'flex';
-          loadServerBalance(savedUser.id).then(balance => {
+          loadServerBalance(savedUser.id, true).then(balance => {
             serverBalance = balance;
-            updateBalanceUI(savedUser.id);
+            updateBalanceUI(savedUser.id, balance);
             window.skipBalanceAnimation = false;
             
             // Синхронизируем баланс в профиле
@@ -6843,21 +6844,24 @@ ${motivation}`;
   }
 
   let serverBalance = 0; // Server-side balance
+  let balanceAnimationLock = false;
 
 // Load server balance with proper error handling
-async function loadServerBalance(steamId) {
-  if (!steamId) {
-    console.log('loadServerBalance: no steamId provided');
-    return 0;
-  }
-  
+async function loadServerBalance(steamId, skipAnimation = false) {
+  if (!steamId) return 0;
   try {
     const response = await fetchWithRetry(`https://api.xauroriax.ru/get-user-data?steamId=${steamId}`);
     if (!response.ok) throw new Error('Failed to fetch user data');
     const data = await response.json();
     const balance = parseInt(data.souls) || 0;
     serverBalance = balance;
-    console.log('loadServerBalance: balance =', balance);
+    if (!skipAnimation && !balanceAnimationLock) {
+      updateBalanceUI(steamId, balance);
+    } else {
+      document.getElementById('balanceAmount').textContent = balance;
+      const statsSouls = document.getElementById('statsSouls');
+      if (statsSouls) statsSouls.textContent = balance;
+    }
     return balance;
   } catch (error) {
     console.error('loadServerBalance error:', error);
