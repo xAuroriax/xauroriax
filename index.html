@@ -5165,7 +5165,8 @@ window.addEventListener('scroll',()=>{
 
 /* boot overlay once on load */
 window.addEventListener('load',()=>{
-initRulesData();
+  checkSteamAuth();
+  initRulesData();
 const savedLang=localStorage.getItem('lang')||'ru';
 applyI18n(savedLang);
 const hdr=document.querySelector('header');
@@ -6101,23 +6102,29 @@ window.addEventListener('DOMContentLoaded', () => {
       const steamId = urlParams.get('steamid');
       const persona = urlParams.get('nickname');
       const avatar = urlParams.get('avatar');
+      console.log('[Auth] Параметры из URL:', { steamId, persona, avatar });
 
       if (steamId && steamId.length > 5) {
+        console.log('[Auth] Сохраняем пользователя в localStorage');
         localStorage.setItem('steam_user', JSON.stringify({ 
           id: steamId, 
           name: persona || 'Stalker',
           avatar: avatar || ''
         }));
-        // Clean URL but keep the current path correctly
+        // Очищаем URL от параметров
         const cleanUrl = window.location.protocol + "//" + window.location.host + window.location.pathname;
         window.history.replaceState({}, document.title, cleanUrl);
+        console.log('[Auth] URL очищен, вызываем updateSteamUI');
+      } else {
+        console.log('[Auth] Параметров Steam нет, проверяем localStorage');
       }
+      
+      // Принудительно обновляем UI (даже если параметров не было – для синхронизации)
+      updateSteamUI();
+      initGratitudeAnimation();
     } catch (e) {
-      console.error("Auth check error:", e);
+      console.error('[Auth] Ошибка:', e);
     }
-
-    updateSteamUI();
-    initGratitudeAnimation();
   }
 
   let statusCheckInterval = null;
