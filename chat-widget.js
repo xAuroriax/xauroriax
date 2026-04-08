@@ -1,4 +1,4 @@
-// chat-widget.js – WebSocket версия (мгновенные сообщения)
+// chat-widget.js – WebSocket версия (мгновенные сообщения) без дублей
 (function() {
     if (document.getElementById('auroria-chat-root')) return;
     const root = document.createElement('div');
@@ -43,7 +43,7 @@
 
     let currentUser = null;
     let ws = null;
-    let lastSentMessageId = null;
+    let isSending = false; // блокировка повторной отправки
 
     const messagesContainer = document.getElementById('chatMessages');
     const inputArea = document.getElementById('chatInputArea');
@@ -101,8 +101,9 @@
                 const { event, data } = JSON.parse(e.data);
                 if (event === 'chat-message' && data.type === 'message') {
                     const payload = data.payload;
-                    if (currentUser && payload.steamId === currentUser.id && payload.message === lastSentMessageId) {
-                        console.log('[Widget] Duplicate message ignored');
+                    // Игнорируем сообщения от текущего пользователя (уже добавлены оптимистично)
+                    if (currentUser && payload.steamId === currentUser.id) {
+                        console.log('[Widget] Ignoring own message from WebSocket');
                         return;
                     }
                     addMessageToUI(payload, true);
@@ -121,6 +122,9 @@
         const text = messageInput.value.trim();
         if (!text) return;
         if (!currentUser) return alert('Авторизуйтесь через Steam');
+        if (isSending) return; // блокируем повторную отправку
+        
+        isSending = true;
         try {
             const res = await fetch('https://chat-api.xauroriax.ru/send', {
                 method: 'POST',
@@ -128,6 +132,7 @@
                 body: JSON.stringify({steamId:currentUser.id, nickname:currentUser.name, avatar:currentUser.avatar, message:text})
             });
             if (res.ok) {
+                // Оптимистичное добавление своего сообщения
                 addMessageToUI({
                     steamId: currentUser.id,
                     nickname: currentUser.name,
@@ -135,10 +140,15 @@
                     message: text,
                     timestamp: Date.now()
                 }, true);
-                lastSentMessageId = text;
                 messageInput.value = '';
-            } else alert('Ошибка отправки');
-        } catch(e) { alert('Ошибка соединения'); }
+            } else {
+                alert('Ошибка отправки');
+            }
+        } catch(e) {
+            alert('Ошибка соединения');
+        } finally {
+            isSending = false;
+        }
     }
 
     function updateAuthUI() {
