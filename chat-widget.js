@@ -1,4 +1,4 @@
-// chat-widget.js – финальная версия с мгновенной отправкой и SSE
+// chat-widget.js – финальная версия с фиксом видимости поля ввода и прокруткой
 (function() {
     if (document.getElementById('auroria-chat-root')) return;
     const root = document.createElement('div');
@@ -11,9 +11,9 @@
         .chat-toggle{width:60px;height:60px;border-radius:50%;background:#ff7a18;border:none;cursor:pointer;box-shadow:0 0 20px rgba(255,122,24,0.5);display:flex;align-items:center;justify-content:center;transition:transform 0.3s}
         .chat-toggle:hover{transform:scale(1.1)}
         .chat-toggle i{font-size:28px;color:#fff}
-        .chat-window{position:absolute;bottom:80px;right:0;width:380px;height:500px;background:rgba(10,10,10,0.95);backdrop-filter:blur(10px);border:1px solid rgba(255,122,24,0.3);border-radius:16px;flex-direction:column;overflow:hidden;box-shadow:0 10px 30px rgba(0,0,0,0.5);opacity:0;visibility:hidden;transform:scale(0.9);transform-origin:bottom right;transition:opacity 0.2s ease, visibility 0.2s ease, transform 0.2s ease;pointer-events:none}
+        .chat-window{position:absolute;bottom:80px;right:0;width:380px;height:500px;background:rgba(10,10,10,0.95);backdrop-filter:blur(10px);border:1px solid rgba(255,122,24,0.3);border-radius:16px;display:flex;flex-direction:column;overflow:hidden;box-shadow:0 10px 30px rgba(0,0,0,0.5);opacity:0;visibility:hidden;transform:scale(0.9);transform-origin:bottom right;transition:opacity 0.2s ease, visibility 0.2s ease, transform 0.2s ease;pointer-events:none}
         .chat-window.open{opacity:1;visibility:visible;transform:scale(1);pointer-events:auto}
-        .chat-header{background:rgba(0,0,0,0.8);padding:12px 16px;border-bottom:1px solid rgba(255,122,24,0.3);color:#ff7a18;font-weight:bold;display:flex;justify-content:space-between}
+        .chat-header{background:rgba(0,0,0,0.8);padding:12px 16px;border-bottom:1px solid rgba(255,122,24,0.3);color:#ff7a18;font-weight:bold;display:flex;justify-content:space-between;flex-shrink:0}
         .chat-messages{flex:1;overflow-y:auto;padding:12px;display:flex;flex-direction:column;gap:12px}
         .chat-message{display:flex;gap:10px;align-items:flex-start}
         .chat-message img{width:36px;height:36px;border-radius:50%;border:1px solid #ff7a18}
@@ -21,7 +21,7 @@
         .chat-message-name{font-weight:bold;color:#ff7a18;font-size:13px;margin-bottom:4px}
         .chat-message-text{color:#e0e0e0;font-size:14px;word-wrap:break-word}
         .chat-message-time{font-size:10px;color:#888;margin-top:4px;text-align:right}
-        .chat-input-area{padding:12px;border-top:1px solid rgba(255,122,24,0.2);display:flex;gap:8px}
+        .chat-input-area{padding:12px;border-top:1px solid rgba(255,122,24,0.2);display:flex;gap:8px;flex-shrink:0}
         .chat-input-area input{flex:1;background:rgba(0,0,0,0.6);border:1px solid rgba(255,122,24,0.3);border-radius:20px;padding:10px 14px;color:#fff;font-family:inherit}
         .chat-input-area button{background:#ff7a18;border:none;border-radius:20px;padding:0 16px;color:#fff;cursor:pointer;font-weight:bold}
         .chat-input-area button:hover{background:#ff9933}
@@ -43,7 +43,7 @@
 
     let currentUser = null;
     let notificationsEventSource = null;
-    let lastSentMessageId = null; // для защиты от дублей
+    let lastSentMessageId = null;
 
     const messagesContainer = document.getElementById('chatMessages');
     const inputArea = document.getElementById('chatInputArea');
@@ -64,9 +64,13 @@
     }
 
     function scrollToBottom() {
+        // Несколько попыток, чтобы DOM успел обновиться
         setTimeout(function() {
             messagesContainer.scrollTop = messagesContainer.scrollHeight;
         }, 50);
+        setTimeout(function() {
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        }, 150);
     }
 
     function addMessageToUI(msg, isNew) {
@@ -106,7 +110,6 @@
                 var data = JSON.parse(e.data);
                 if (data.type === 'message') {
                     var payload = data.payload;
-                    // Защита от дубля: если это сообщение только что отправил текущий пользователь – пропускаем
                     if (currentUser && payload.steamId === currentUser.id && payload.message === lastSentMessageId) {
                         return;
                     }
@@ -138,7 +141,6 @@
                 body: JSON.stringify({steamId:currentUser.id, nickname:currentUser.name, avatar:currentUser.avatar, message:text})
             });
             if (res.ok) {
-                // Мгновенно показываем своё сообщение (оптимистичное обновление)
                 var tempMsg = {
                     steamId: currentUser.id,
                     nickname: currentUser.name,
@@ -147,7 +149,6 @@
                     timestamp: Date.now()
                 };
                 addMessageToUI(tempMsg, true);
-                // Запоминаем текст, чтобы SSE не добавил дубль
                 lastSentMessageId = text;
                 messageInput.value = '';
             } else {
@@ -172,9 +173,13 @@
         }
     }
 
+    // При открытии чата принудительно скроллим вниз
     toggleBtn.addEventListener('click', function() {
         chatWindow.classList.toggle('open');
-        if (chatWindow.classList.contains('open')) updateAuthUI();
+        if (chatWindow.classList.contains('open')) {
+            updateAuthUI();
+            scrollToBottom(); // дополнительно
+        }
     });
     closeBtn.addEventListener('click', function() {
         chatWindow.classList.remove('open');
