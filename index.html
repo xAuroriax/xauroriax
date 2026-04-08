@@ -6656,10 +6656,10 @@ window.addEventListener('DOMContentLoaded', () => {
     let num = parseInt(val, 10);
     const errorDiv = document.getElementById('qHeightError');
     if (isNaN(num)) {
-      errorDiv.textContent = 'Ingrese un número de 160 a 210';
+      errorDiv.textContent = 'Введите число от 160 до 210';
       errorDiv.style.display = 'block';
     } else if (num < 160 || num > 210) {
-      errorDiv.textContent = 'La altura debe estar entre 160 y 210 cm';
+      errorDiv.textContent = 'Рост должен быть от 160 до 210 см';
       errorDiv.style.display = 'block';
     } else {
       errorDiv.style.display = 'none';
@@ -6677,11 +6677,11 @@ window.addEventListener('DOMContentLoaded', () => {
     } else if (num < 160) {
       input.value = 160;
       document.getElementById('qHeightError').style.display = 'none';
-      showToast('La altura se estableció en el valor mínimo de 160 cm', 'success');
+      showToast('Рост установлен на минимальное значение 160 см', 'success');
     } else if (num > 210) {
       input.value = 210;
       document.getElementById('qHeightError').style.display = 'none';
-      showToast('La altura se estableció en el valor máximo de 210 cm', 'success');
+      showToast('Рост установлен на максимальное значение 210 см', 'success');
     } else {
       input.value = num;
     }

@@ -1,4 +1,4 @@
-// chat-widget.js – автономный виджет чата
+// chat-widget.js – автономный виджет чата (SSE версия)
 (function() {
     if (document.getElementById('auroria-chat-root')) return;
     const root = document.createElement('div');
@@ -11,8 +11,8 @@
         .chat-toggle{width:60px;height:60px;border-radius:50%;background:#ff7a18;border:none;cursor:pointer;box-shadow:0 0 20px rgba(255,122,24,0.5);display:flex;align-items:center;justify-content:center;transition:transform 0.3s}
         .chat-toggle:hover{transform:scale(1.1)}
         .chat-toggle i{font-size:28px;color:#fff}
-        .chat-window{position:absolute;bottom:80px;right:0;width:380px;height:500px;background:rgba(10,10,10,0.95);backdrop-filter:blur(10px);border:1px solid rgba(255,122,24,0.3);border-radius:16px;display:none;flex-direction:column;overflow:hidden;box-shadow:0 10px 30px rgba(0,0,0,0.5)}
-        .chat-window.open{display:flex}
+        .chat-window{position:absolute;bottom:80px;right:0;width:380px;height:500px;background:rgba(10,10,10,0.95);backdrop-filter:blur(10px);border:1px solid rgba(255,122,24,0.3);border-radius:16px;flex-direction:column;overflow:hidden;box-shadow:0 10px 30px rgba(0,0,0,0.5);opacity:0;visibility:hidden;transform:scale(0.9);transform-origin:bottom right;transition:opacity 0.2s ease, visibility 0.2s ease, transform 0.2s ease;pointer-events:none}
+        .chat-window.open{opacity:1;visibility:visible;transform:scale(1);pointer-events:auto}
         .chat-header{background:rgba(0,0,0,0.8);padding:12px 16px;border-bottom:1px solid rgba(255,122,24,0.3);color:#ff7a18;font-weight:bold;display:flex;justify-content:space-between}
         .chat-messages{flex:1;overflow-y:auto;padding:12px;display:flex;flex-direction:column;gap:12px}
         .chat-message{display:flex;gap:10px;align-items:flex-start}
@@ -41,8 +41,8 @@
         </div>
     `;
 
-    let ws = null;
     let currentUser = null;
+    let eventSource = null;
     const messagesContainer = document.getElementById('chatMessages');
     const inputArea = document.getElementById('chatInputArea');
     const messageInput = document.getElementById('chatMessageInput');
@@ -89,26 +89,32 @@
             }
             scrollToBottom();
         } catch(e) {
-            console.error(e);
+            console.error('loadHistory error:', e);
         }
     }
 
-    function connectWebSocket() {
-        if (ws && ws.readyState === WebSocket.OPEN) return;
-        ws = new WebSocket('wss://chat-api.xauroriax.ru/ws');
-        ws.onopen = function() {
-            if (currentUser) {
-                ws.send(JSON.stringify({type:'auth', steamId:currentUser.id, nickname:currentUser.name, avatar:currentUser.avatar}));
-            }
-        };
-        ws.onmessage = function(event) {
+    function connectSSE() {
+        if (eventSource) {
+            eventSource.close();
+            eventSource = null;
+        }
+        if (!currentUser) return;
+        eventSource = new EventSource('https://chat-api.xauroriax.ru/sse?steamId=' + encodeURIComponent(currentUser.id));
+        eventSource.onmessage = function(event) {
             try {
                 var data = JSON.parse(event.data);
-                if (data.type === 'message') addMessageToUI(data.payload, true);
-            } catch(e) {}
+                if (data.type === 'message') {
+                    addMessageToUI(data.payload, true);
+                }
+            } catch(e) {
+                console.error('SSE parse error', e);
+            }
         };
-        ws.onclose = function() {
-            setTimeout(connectWebSocket, 3000);
+        eventSource.onerror = function(e) {
+            console.warn('SSE error, reconnecting in 5s');
+            eventSource.close();
+            eventSource = null;
+            setTimeout(connectSSE, 5000);
         };
     }
 
@@ -141,15 +147,15 @@
             currentUser = savedUser;
             inputArea.style.display = 'flex';
             loadHistory();
-            connectWebSocket();
+            connectSSE();
         } else {
+            if (eventSource) {
+                eventSource.close();
+                eventSource = null;
+            }
             currentUser = null;
             inputArea.style.display = 'none';
             messagesContainer.innerHTML = '<div class="chat-login-required">Авторизуйтесь через Steam, чтобы писать в чат</div>';
-            if (ws) {
-                ws.close();
-                ws = null;
-            }
         }
     }
 
