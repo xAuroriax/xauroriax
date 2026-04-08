@@ -1,4 +1,4 @@
-// chat-widget.js – WebSocket версия (мгновенные сообщения) без дублей
+// chat-widget.js – WebSocket версия (мгновенные сообщения) без дублей + мобильная адаптация
 (function() {
     if (document.getElementById('auroria-chat-root')) return;
     const root = document.createElement('div');
@@ -7,6 +7,7 @@
 
     root.innerHTML = `
         <style>
+        /* Базовые стили (десктоп) */
         .chat-widget{position:fixed;bottom:20px;right:20px;z-index:10000;font-family:'Share Tech Mono',monospace}
         .chat-toggle{width:60px;height:60px;border-radius:50%;background:#ff7a18;border:none;cursor:pointer;box-shadow:0 0 20px rgba(255,122,24,0.5);display:flex;align-items:center;justify-content:center;transition:transform 0.3s}
         .chat-toggle:hover{transform:scale(1.1)}
@@ -16,7 +17,7 @@
         .chat-header{background:rgba(0,0,0,0.8);padding:12px 16px;border-bottom:1px solid rgba(255,122,24,0.3);color:#ff7a18;font-weight:bold;display:flex;justify-content:space-between;flex-shrink:0}
         .chat-messages{flex:1;overflow-y:auto;padding:12px;display:flex;flex-direction:column;gap:12px}
         .chat-message{display:flex;gap:10px;align-items:flex-start}
-        .chat-message img{width:36px;height:36px;border-radius:50%;border:1px solid #ff7a18}
+        .chat-message img{width:36px;height:36px;border-radius:50%;border:1px solid #ff7a18;flex-shrink:0}
         .chat-message-content{flex:1;background:rgba(255,255,255,0.05);border-radius:12px;padding:8px 12px}
         .chat-message-name{font-weight:bold;color:#ff7a18;font-size:13px;margin-bottom:4px}
         .chat-message-text{color:#e0e0e0;font-size:14px;word-wrap:break-word}
@@ -26,7 +27,103 @@
         .chat-input-area button{background:#ff7a18;border:none;border-radius:20px;padding:0 16px;color:#fff;cursor:pointer;font-weight:bold}
         .chat-input-area button:hover{background:#ff9933}
         .chat-login-required{text-align:center;padding:20px;color:#aaa}
-        @media (max-width:480px){.chat-window{width:320px;height:450px;right:0;bottom:70px}}
+
+        /* --- Мобильная адаптация (планшеты и телефоны) --- */
+        @media (max-width: 768px) {
+            .chat-widget {
+                bottom: 10px;
+                right: 10px;
+            }
+            .chat-toggle {
+                width: 50px;
+                height: 50px;
+                bottom: 10px;
+                right: 10px;
+            }
+            .chat-toggle i {
+                font-size: 24px;
+            }
+            .chat-window {
+                width: calc(100vw - 20px);
+                max-width: 400px;
+                height: 70vh;
+                min-height: 350px;
+                bottom: 70px;
+                right: 10px;
+                border-radius: 20px;
+            }
+            .chat-messages {
+                padding: 10px;
+                gap: 10px;
+            }
+            .chat-message {
+                gap: 8px;
+            }
+            .chat-message img {
+                width: 32px;
+                height: 32px;
+            }
+            .chat-message-content {
+                padding: 6px 10px;
+            }
+            .chat-message-name {
+                font-size: 12px;
+            }
+            .chat-message-text {
+                font-size: 13px;
+            }
+            .chat-message-time {
+                font-size: 9px;
+            }
+            .chat-input-area {
+                padding: 10px;
+                gap: 6px;
+            }
+            .chat-input-area input {
+                padding: 8px 12px;
+                font-size: 14px;
+            }
+            .chat-input-area button {
+                min-width: 44px;
+                padding: 0 12px;
+                font-size: 16px;
+            }
+            /* Центрируем сообщения и даём отступы */
+            .chat-message {
+                margin: 0 5px;
+            }
+            .chat-message-content {
+                max-width: 85%;
+                margin-left: auto;
+                margin-right: 0;
+            }
+            /* Для своих сообщений можно было бы выровнять вправо, но оставим как есть */
+        }
+
+        /* Для очень маленьких телефонов (ширина ≤ 480px) */
+        @media (max-width: 480px) {
+            .chat-window {
+                width: calc(100vw - 20px);
+                max-width: none;
+                right: 10px;
+                bottom: 65px;
+                height: 65vh;
+            }
+            .chat-message-content {
+                max-width: 90%;
+            }
+            .chat-header {
+                padding: 10px 14px;
+                font-size: 14px;
+            }
+            .chat-messages {
+                padding: 8px;
+                gap: 8px;
+            }
+            .chat-input-area input {
+                font-size: 13px;
+            }
+        }
         </style>
         <div class="chat-widget">
             <button class="chat-toggle" id="chatToggleBtn"><i class="fas fa-comment-dots"></i></button>
@@ -43,7 +140,7 @@
 
     let currentUser = null;
     let ws = null;
-    let isSending = false; // блокировка повторной отправки
+    let isSending = false;
 
     const messagesContainer = document.getElementById('chatMessages');
     const inputArea = document.getElementById('chatInputArea');
@@ -101,7 +198,6 @@
                 const { event, data } = JSON.parse(e.data);
                 if (event === 'chat-message' && data.type === 'message') {
                     const payload = data.payload;
-                    // Игнорируем сообщения от текущего пользователя (уже добавлены оптимистично)
                     if (currentUser && payload.steamId === currentUser.id) {
                         console.log('[Widget] Ignoring own message from WebSocket');
                         return;
@@ -122,7 +218,7 @@
         const text = messageInput.value.trim();
         if (!text) return;
         if (!currentUser) return alert('Авторизуйтесь через Steam');
-        if (isSending) return; // блокируем повторную отправку
+        if (isSending) return;
         
         isSending = true;
         try {
@@ -132,7 +228,6 @@
                 body: JSON.stringify({steamId:currentUser.id, nickname:currentUser.name, avatar:currentUser.avatar, message:text})
             });
             if (res.ok) {
-                // Оптимистичное добавление своего сообщения
                 addMessageToUI({
                     steamId: currentUser.id,
                     nickname: currentUser.name,

@@ -859,6 +859,181 @@ margin-top:auto;
     color: #000;
     box-shadow: 0 0 15px var(--btn-clr);
   }
+  
+  /* ========== УЛУЧШЕННАЯ МОБИЛЬНАЯ АДАПТАЦИЯ ========== */
+
+/* Для всех устройств шире 768px ничего не меняем */
+@media (max-width: 768px) {
+  /* Общие отступы и центрирование */
+  .container, .hero, footer, .page {
+    padding-left: 16px !important;
+    padding-right: 16px !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+  }
+
+  /* Карточки и блоки — на всю ширину с отступами */
+  .card, .manifest, .rules-container, .profile-container, 
+  .settings-card, .links-card, .member-card, .link-item {
+    width: 100% !important;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+    padding: 16px !important;
+    box-sizing: border-box !important;
+  }
+
+  /* Текст — удобный размер */
+  body, p, li, td, th, .chat-message-text {
+    font-size: 15px !important;
+    line-height: 1.5 !important;
+  }
+
+  h1, h2, h3, .synd-title, .hero h1 {
+    font-size: 1.8rem !important;
+    text-align: center !important;
+    word-break: break-word;
+  }
+
+  /* Сетки — вертикально */
+  .links-grid, .team-grid, .stats-grid, .quenta-grid {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 16px !important;
+  }
+
+  /* Элементы в строку -> в колонку */
+  .hero .cta, .quenta-actions, .settings-btn-group {
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 12px !important;
+  }
+
+  /* Кнопки и интерактивные элементы — не меньше 44px */
+  button, .btn, .btn-cta, .btn-cta-inner, .setting-btn, 
+  .steam-login-btn, .link-item, .exam-answer-btn, 
+  .quenta-edit-btn, .quenta-delete-btn, .admin-link-btn,
+  .logout-btn, .promo-inputs button, #promoCodeInput {
+    min-height: 48px !important;
+    padding: 12px 16px !important;
+    font-size: 16px !important;
+  }
+
+  /* Поля ввода */
+  input, textarea, select {
+    min-height: 48px !important;
+    font-size: 16px !important; /* Предотвращает зум на iOS */
+    padding: 12px !important;
+  }
+
+  /* Шапка и навигация */
+  header {
+    width: 100% !important;
+    left: 0 !important;
+    transform: translateX(-100%);
+    transition: transform 0.3s ease;
+  }
+  header:not(.hidden) {
+    transform: translateX(0);
+  }
+  #navToggleBtn {
+    display: flex !important;
+    left: auto !important;
+    right: 16px !important;
+    top: 16px !important;
+    z-index: 1001;
+  }
+
+  /* Контейнер Steam и баланс — фиксированные, не перекрывают меню */
+  .steam-login-container {
+    top: 12px !important;
+    right: 12px !important;
+    gap: 8px !important;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+  }
+
+  /* Правила — боковое меню в строку, а не колонку */
+  .rules-sidebar {
+    flex-direction: row !important;
+    flex-wrap: wrap !important;
+    justify-content: center !important;
+    gap: 8px !important;
+    margin-bottom: 20px !important;
+    border-right: none !important;
+  }
+  .rules-sidebar a {
+    padding: 8px 12px !important;
+    font-size: 13px !important;
+  }
+
+  /* Таблицы — горизонтальный скролл */
+  .perks-table, .rules-content table {
+    display: block !important;
+    overflow-x: auto !important;
+    white-space: nowrap;
+  }
+
+  /* Благодарности — фиксированное положение не ломает */
+  .gratitude-box {
+    position: relative !important;
+    top: auto !important;
+    left: auto !important;
+    margin: 20px auto !important;
+    width: 90% !important;
+  }
+
+  /* Профиль */
+  .profile-header {
+    flex-direction: column !important;
+    text-align: center !important;
+  }
+  .stat-card {
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 8px;
+  }
+  .stat-value {
+    margin-left: 0 !important;
+  }
+
+  /* Квента — шаги на весь экран */
+  .quenta-step.active {
+    padding: 0 !important;
+  }
+  .quenta-step input, .quenta-step textarea {
+    width: 100% !important;
+  }
+  .quenta-actions {
+    flex-wrap: wrap !important;
+  }
+  .quenta-actions .trace-container {
+    width: 100% !important;
+    margin: 5px 0 !important;
+  }
+}
+
+/* Дополнительно для очень маленьких экранов (≤480px) */
+@media (max-width: 480px) {
+  .hero h1 {
+    font-size: 1.6rem !important;
+  }
+  .card, .manifest, .member-card {
+    padding: 12px !important;
+  }
+  .rules-sidebar a {
+    font-size: 11px !important;
+    padding: 6px 10px !important;
+  }
+  .steam-login-container {
+    gap: 4px !important;
+  }
+  .balance-amount {
+    font-size: 12px !important;
+  }
+}
 </style>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
