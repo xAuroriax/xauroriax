@@ -1,4 +1,4 @@
-// chat-widget.js – автономный виджет чата (SSE версия с реальным временем)
+// chat-widget.js – финальная версия с мгновенной отправкой и SSE
 (function() {
     if (document.getElementById('auroria-chat-root')) return;
     const root = document.createElement('div');
@@ -42,8 +42,9 @@
     `;
 
     let currentUser = null;
-    let eventSource = null;
     let notificationsEventSource = null;
+    let lastSentMessageId = null; // для защиты от дублей
+
     const messagesContainer = document.getElementById('chatMessages');
     const inputArea = document.getElementById('chatInputArea');
     const messageInput = document.getElementById('chatMessageInput');
@@ -94,7 +95,6 @@
         }
     }
 
-    // Подписка на общие уведомления (квенты и чат)
     function connectGlobalSSE() {
         if (notificationsEventSource) {
             notificationsEventSource.close();
@@ -105,7 +105,12 @@
             try {
                 var data = JSON.parse(e.data);
                 if (data.type === 'message') {
-                    addMessageToUI(data.payload, true);
+                    var payload = data.payload;
+                    // Защита от дубля: если это сообщение только что отправил текущий пользователь – пропускаем
+                    if (currentUser && payload.steamId === currentUser.id && payload.message === lastSentMessageId) {
+                        return;
+                    }
+                    addMessageToUI(payload, true);
                 }
             } catch(err) {
                 console.error('SSE chat-message error', err);
@@ -133,6 +138,17 @@
                 body: JSON.stringify({steamId:currentUser.id, nickname:currentUser.name, avatar:currentUser.avatar, message:text})
             });
             if (res.ok) {
+                // Мгновенно показываем своё сообщение (оптимистичное обновление)
+                var tempMsg = {
+                    steamId: currentUser.id,
+                    nickname: currentUser.name,
+                    avatar: currentUser.avatar,
+                    message: text,
+                    timestamp: Date.now()
+                };
+                addMessageToUI(tempMsg, true);
+                // Запоминаем текст, чтобы SSE не добавил дубль
+                lastSentMessageId = text;
                 messageInput.value = '';
             } else {
                 alert('Ошибка отправки');
@@ -148,7 +164,6 @@
             currentUser = savedUser;
             inputArea.style.display = 'flex';
             loadHistory();
-            // Подключаем глобальный SSE один раз при первом входе
             if (!notificationsEventSource) connectGlobalSSE();
         } else {
             currentUser = null;
