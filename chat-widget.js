@@ -1,4 +1,4 @@
-// chat-widget.js – финальная версия с улучшенным SSE
+// chat-widget.js – WebSocket версия (мгновенные сообщения)
 (function() {
     if (document.getElementById('auroria-chat-root')) return;
     const root = document.createElement('div');
@@ -42,9 +42,8 @@
     `;
 
     let currentUser = null;
-    let notificationsEventSource = null;
+    let ws = null;
     let lastSentMessageId = null;
-    let reconnectTimer = null;
 
     const messagesContainer = document.getElementById('chatMessages');
     const inputArea = document.getElementById('chatInputArea');
@@ -90,20 +89,17 @@
         } catch(e) { console.error('loadHistory error:', e); }
     }
 
-    function connectGlobalSSE() {
-        if (notificationsEventSource) {
-            notificationsEventSource.close();
-            notificationsEventSource = null;
-        }
-        if (reconnectTimer) clearTimeout(reconnectTimer);
-        console.log('[Widget] Connecting SSE to https://notify.xauroriax.ru/connect');
-        notificationsEventSource = new EventSource('https://notify.xauroriax.ru/connect');
-        notificationsEventSource.onopen = () => console.log('[Widget] SSE connection opened');
-        notificationsEventSource.addEventListener('chat-message', (e) => {
-            console.log('[Widget] SSE chat-message received:', e.data);
+    function connectWebSocket() {
+        if (ws && ws.readyState === WebSocket.OPEN) return;
+        const url = 'wss://notify.xauroriax.ru/ws';
+        console.log('[Widget] Connecting WebSocket to', url);
+        ws = new WebSocket(url);
+        ws.onopen = () => console.log('[Widget] WebSocket connected');
+        ws.onmessage = (e) => {
+            console.log('[Widget] WebSocket message:', e.data);
             try {
-                const data = JSON.parse(e.data);
-                if (data.type === 'message') {
+                const { event, data } = JSON.parse(e.data);
+                if (event === 'chat-message' && data.type === 'message') {
                     const payload = data.payload;
                     if (currentUser && payload.steamId === currentUser.id && payload.message === lastSentMessageId) {
                         console.log('[Widget] Duplicate message ignored');
@@ -111,14 +107,14 @@
                     }
                     addMessageToUI(payload, true);
                 }
-            } catch(err) { console.error('SSE parse error', err); }
-        });
-        notificationsEventSource.onerror = (e) => {
-            console.error('[Widget] SSE error:', e);
-            if (notificationsEventSource) notificationsEventSource.close();
-            notificationsEventSource = null;
-            reconnectTimer = setTimeout(() => connectGlobalSSE(), 5000);
+            } catch(err) { console.error('WebSocket parse error', err); }
         };
+        ws.onclose = () => {
+            console.log('[Widget] WebSocket disconnected, reconnecting in 3s');
+            ws = null;
+            setTimeout(connectWebSocket, 3000);
+        };
+        ws.onerror = (err) => console.error('[Widget] WebSocket error', err);
     }
 
     async function sendMessage() {
@@ -151,11 +147,12 @@
             currentUser = savedUser;
             inputArea.style.display = 'flex';
             loadHistory();
-            if (!notificationsEventSource) connectGlobalSSE();
+            connectWebSocket();
         } else {
             currentUser = null;
             inputArea.style.display = 'none';
             messagesContainer.innerHTML = '<div class="chat-login-required">Авторизуйтесь через Steam, чтобы писать в чат</div>';
+            if (ws) { ws.close(); ws = null; }
         }
     }
 
