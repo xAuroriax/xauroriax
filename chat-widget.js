@@ -91,7 +91,7 @@
 
     function connectWebSocket() {
         if (ws && ws.readyState === WebSocket.OPEN) return;
-        const url = 'wss://ws-hub.statkevichyt.workers.dev/ws';
+        const url = 'wss://ws.xauroriax.ru/ws';
         console.log('[Widget] Connecting WebSocket to', url);
         ws = new WebSocket(url);
         ws.onopen = () => console.log('[Widget] WebSocket connected');
