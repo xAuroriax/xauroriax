@@ -1,4 +1,4 @@
-// chat-widget.js – финальная версия с логированием и исправленным SSE
+// chat-widget.js – финальная версия (рабочая)
 (function() {
     if (document.getElementById('auroria-chat-root')) return;
     const root = document.createElement('div');
@@ -64,38 +64,29 @@
     }
 
     function scrollToBottom() {
-        setTimeout(function() {
-            messagesContainer.scrollTop = messagesContainer.scrollHeight;
-        }, 50);
-        setTimeout(function() {
-            messagesContainer.scrollTop = messagesContainer.scrollHeight;
-        }, 150);
+        setTimeout(() => messagesContainer.scrollTop = messagesContainer.scrollHeight, 50);
+        setTimeout(() => messagesContainer.scrollTop = messagesContainer.scrollHeight, 150);
     }
 
-    function addMessageToUI(msg, isNew) {
-        if (isNew === undefined) isNew = true;
-        var div = document.createElement('div');
+    function addMessageToUI(msg, isNew = true) {
+        const div = document.createElement('div');
         div.className = 'chat-message';
-        var avatar = msg.avatar || 'favicon.png';
-        var nickname = msg.nickname || 'Неизвестный';
-        var time = new Date(msg.timestamp).toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'});
-        div.innerHTML = '<img src="' + avatar + '" onerror="this.src=\'favicon.png\'"><div class="chat-message-content"><div class="chat-message-name">' + escapeHtml(nickname) + '</div><div class="chat-message-text">' + escapeHtml(msg.message) + '</div><div class="chat-message-time">' + time + '</div></div>';
+        const avatar = msg.avatar || 'favicon.png';
+        const nickname = msg.nickname || 'Неизвестный';
+        const time = new Date(msg.timestamp).toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'});
+        div.innerHTML = `<img src="${avatar}" onerror="this.src='favicon.png'"><div class="chat-message-content"><div class="chat-message-name">${escapeHtml(nickname)}</div><div class="chat-message-text">${escapeHtml(msg.message)}</div><div class="chat-message-time">${time}</div></div>`;
         messagesContainer.appendChild(div);
         if (isNew) scrollToBottom();
     }
 
     async function loadHistory() {
         try {
-            var res = await fetch('https://chat-api.xauroriax.ru/history');
-            var messages = await res.json();
+            const res = await fetch('https://chat-api.xauroriax.ru/history');
+            const messages = await res.json();
             messagesContainer.innerHTML = '';
-            for (var i = 0; i < messages.length; i++) {
-                addMessageToUI(messages[i], false);
-            }
+            for (const msg of messages) addMessageToUI(msg, false);
             scrollToBottom();
-        } catch(e) {
-            console.error('loadHistory error:', e);
-        }
+        } catch(e) { console.error('loadHistory error:', e); }
     }
 
     function connectGlobalSSE() {
@@ -105,71 +96,56 @@
         }
         console.log('[Widget] Connecting SSE to https://notify.xauroriax.ru/connect');
         notificationsEventSource = new EventSource('https://notify.xauroriax.ru/connect');
-        notificationsEventSource.onopen = function() {
-            console.log('[Widget] SSE connection opened');
-        };
-        notificationsEventSource.addEventListener('chat-message', function(e) {
+        notificationsEventSource.onopen = () => console.log('[Widget] SSE connection opened');
+        notificationsEventSource.addEventListener('chat-message', (e) => {
             console.log('[Widget] SSE chat-message received:', e.data);
             try {
-                var data = JSON.parse(e.data);
+                const data = JSON.parse(e.data);
                 if (data.type === 'message') {
-                    var payload = data.payload;
+                    const payload = data.payload;
                     if (currentUser && payload.steamId === currentUser.id && payload.message === lastSentMessageId) {
                         console.log('[Widget] Duplicate message ignored');
                         return;
                     }
                     addMessageToUI(payload, true);
-                } else {
-                    console.log('[Widget] Unknown message type:', data.type);
                 }
-            } catch(err) {
-                console.error('SSE chat-message error', err);
-            }
+            } catch(err) { console.error('SSE parse error', err); }
         });
-        notificationsEventSource.onerror = function(e) {
+        notificationsEventSource.onerror = (e) => {
             console.error('[Widget] SSE error:', e);
-            console.warn('Global SSE connection lost, reconnecting in 5s');
-            if (notificationsEventSource) notificationsEventSource.close();
+            notificationsEventSource.close();
             notificationsEventSource = null;
             setTimeout(connectGlobalSSE, 5000);
         };
     }
 
     async function sendMessage() {
-        var text = messageInput.value.trim();
+        const text = messageInput.value.trim();
         if (!text) return;
-        if (!currentUser) {
-            alert('Авторизуйтесь через Steam');
-            return;
-        }
+        if (!currentUser) return alert('Авторизуйтесь через Steam');
         try {
-            var res = await fetch('https://chat-api.xauroriax.ru/send', {
+            const res = await fetch('https://chat-api.xauroriax.ru/send', {
                 method: 'POST',
                 headers: {'Content-Type':'application/json'},
                 body: JSON.stringify({steamId:currentUser.id, nickname:currentUser.name, avatar:currentUser.avatar, message:text})
             });
             if (res.ok) {
-                var tempMsg = {
+                addMessageToUI({
                     steamId: currentUser.id,
                     nickname: currentUser.name,
                     avatar: currentUser.avatar,
                     message: text,
                     timestamp: Date.now()
-                };
-                addMessageToUI(tempMsg, true);
+                }, true);
                 lastSentMessageId = text;
                 messageInput.value = '';
-            } else {
-                alert('Ошибка отправки');
-            }
-        } catch(e) {
-            alert('Ошибка соединения');
-        }
+            } else alert('Ошибка отправки');
+        } catch(e) { alert('Ошибка соединения'); }
     }
 
     function updateAuthUI() {
-        var savedUser = JSON.parse(localStorage.getItem('steam_user'));
-        if (savedUser && savedUser.id) {
+        const savedUser = JSON.parse(localStorage.getItem('steam_user'));
+        if (savedUser?.id) {
             currentUser = savedUser;
             inputArea.style.display = 'flex';
             loadHistory();
@@ -181,19 +157,15 @@
         }
     }
 
-    toggleBtn.addEventListener('click', function() {
+    toggleBtn.addEventListener('click', () => {
         chatWindow.classList.toggle('open');
         if (chatWindow.classList.contains('open')) {
             updateAuthUI();
             scrollToBottom();
         }
     });
-    closeBtn.addEventListener('click', function() {
-        chatWindow.classList.remove('open');
-    });
+    closeBtn.addEventListener('click', () => chatWindow.classList.remove('open'));
     sendBtn.addEventListener('click', sendMessage);
-    messageInput.addEventListener('keypress', function(e) {
-        if (e.key === 'Enter') sendMessage();
-    });
+    messageInput.addEventListener('keypress', (e) => e.key === 'Enter' && sendMessage());
     setTimeout(updateAuthUI, 500);
 })();
