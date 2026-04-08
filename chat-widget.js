@@ -1,4 +1,4 @@
-// chat-widget.js – автономный виджет чата (SSE версия)
+// chat-widget.js – автономный виджет чата (SSE версия с реальным временем)
 (function() {
     if (document.getElementById('auroria-chat-root')) return;
     const root = document.createElement('div');
@@ -43,6 +43,7 @@
 
     let currentUser = null;
     let eventSource = null;
+    let notificationsEventSource = null;
     const messagesContainer = document.getElementById('chatMessages');
     const inputArea = document.getElementById('chatInputArea');
     const messageInput = document.getElementById('chatMessageInput');
@@ -93,28 +94,28 @@
         }
     }
 
-    function connectSSE() {
-        if (eventSource) {
-            eventSource.close();
-            eventSource = null;
+    // Подписка на общие уведомления (квенты и чат)
+    function connectGlobalSSE() {
+        if (notificationsEventSource) {
+            notificationsEventSource.close();
+            notificationsEventSource = null;
         }
-        if (!currentUser) return;
-        eventSource = new EventSource('https://chat-api.xauroriax.ru/sse?steamId=' + encodeURIComponent(currentUser.id));
-        eventSource.onmessage = function(event) {
+        notificationsEventSource = new EventSource('https://notify.xauroriax.ru/connect');
+        notificationsEventSource.addEventListener('chat-message', function(e) {
             try {
-                var data = JSON.parse(event.data);
+                var data = JSON.parse(e.data);
                 if (data.type === 'message') {
                     addMessageToUI(data.payload, true);
                 }
-            } catch(e) {
-                console.error('SSE parse error', e);
+            } catch(err) {
+                console.error('SSE chat-message error', err);
             }
-        };
-        eventSource.onerror = function(e) {
-            console.warn('SSE error, reconnecting in 5s');
-            eventSource.close();
-            eventSource = null;
-            setTimeout(connectSSE, 5000);
+        });
+        notificationsEventSource.onerror = function() {
+            console.warn('Global SSE connection lost, reconnecting in 5s');
+            if (notificationsEventSource) notificationsEventSource.close();
+            notificationsEventSource = null;
+            setTimeout(connectGlobalSSE, 5000);
         };
     }
 
@@ -147,12 +148,9 @@
             currentUser = savedUser;
             inputArea.style.display = 'flex';
             loadHistory();
-            connectSSE();
+            // Подключаем глобальный SSE один раз при первом входе
+            if (!notificationsEventSource) connectGlobalSSE();
         } else {
-            if (eventSource) {
-                eventSource.close();
-                eventSource = null;
-            }
             currentUser = null;
             inputArea.style.display = 'none';
             messagesContainer.innerHTML = '<div class="chat-login-required">Авторизуйтесь через Steam, чтобы писать в чат</div>';
