@@ -7715,85 +7715,130 @@ function connectNotificationSSE() {
 
 <script>
 (function(){
-let ws=null,currentUser=null;
-const messagesContainer=document.getElementById('chatMessages');
-const inputArea=document.getElementById('chatInputArea');
-const messageInput=document.getElementById('chatMessageInput');
-const sendBtn=document.getElementById('chatSendBtn');
-const toggleBtn=document.getElementById('chatToggleBtn');
-const closeBtn=document.getElementById('chatCloseBtn');
-const chatWindow=document.getElementById('chatWindow');
+let ws = null;
+let currentUser = null;
+const messagesContainer = document.getElementById('chatMessages');
+const inputArea = document.getElementById('chatInputArea');
+const messageInput = document.getElementById('chatMessageInput');
+const sendBtn = document.getElementById('chatSendBtn');
+const toggleBtn = document.getElementById('chatToggleBtn');
+const closeBtn = document.getElementById('chatCloseBtn');
+const chatWindow = document.getElementById('chatWindow');
 
-function escapeHtml(str){if(!str)return '';return str.replace(/[&<>]/g,function(m){if(m==='&')return'&amp;';if(m==='<')return'&lt;';if(m==='>')return'&gt;';return m;});}
+function escapeHtml(str) {
+  if (!str) return '';
+  return str.replace(/[&<>]/g, function(m) {
+    if (m === '&') return '&amp;';
+    if (m === '<') return '&lt;';
+    if (m === '>') return '&gt;';
+    return m;
+  });
+}
 
-function scrollToBottom(){setTimeout(()=>{messagesContainer.scrollTop=messagesContainer.scrollHeight;},50);}
+function scrollToBottom() {
+  setTimeout(function() {
+    messagesContainer.scrollTop = messagesContainer.scrollHeight;
+  }, 50);
+}
 
-function addMessageToUI(msg,isNew=true){
-  const div=document.createElement('div');div.className='chat-message';
-  const avatar=msg.avatar||'favicon.png';
-  const nickname=msg.nickname||'Неизвестный';
-  const time=new Date(msg.timestamp).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
-  div.innerHTML='<img src="'+avatar+'" onerror="this.src=\'favicon.png\'"><div class="chat-message-content"><div class="chat-message-name">'+escapeHtml(nickname)+'</div><div class="chat-message-text">'+escapeHtml(msg.message)+'</div><div class="chat-message-time">'+time+'</div></div>';
+function addMessageToUI(msg, isNew) {
+  if (isNew === undefined) isNew = true;
+  var div = document.createElement('div');
+  div.className = 'chat-message';
+  var avatar = msg.avatar || 'favicon.png';
+  var nickname = msg.nickname || 'Неизвестный';
+  var time = new Date(msg.timestamp).toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'});
+  div.innerHTML = '<img src="' + avatar + '" onerror="this.src=\'favicon.png\'"><div class="chat-message-content"><div class="chat-message-name">' + escapeHtml(nickname) + '</div><div class="chat-message-text">' + escapeHtml(msg.message) + '</div><div class="chat-message-time">' + time + '</div></div>';
   messagesContainer.appendChild(div);
-  if(isNew)scrollToBottom();
+  if (isNew) scrollToBottom();
 }
 
-async function loadHistory(){
-  try{
-    const res=await fetch('https://chat-api.xauroriax.ru/history');
-    const messages=await res.json();
-    messagesContainer.innerHTML='';
-    messages.forEach(m=>addMessageToUI(m,false));
+async function loadHistory() {
+  try {
+    var res = await fetch('https://chat-api.xauroriax.ru/history');
+    var messages = await res.json();
+    messagesContainer.innerHTML = '';
+    for (var i = 0; i < messages.length; i++) {
+      addMessageToUI(messages[i], false);
+    }
     scrollToBottom();
-  }catch(e){console.error(e);}
-}
-
-function connectWebSocket(){
-  if(ws&&ws.readyState===WebSocket.OPEN)return;
-  ws=new WebSocket('wss://chat-api.xauroriax.ru/ws');
-  ws.onopen=()=>{
-    if(currentUser)ws.send(JSON.stringify({type:'auth',steamId:currentUser.id,nickname:currentUser.name,avatar:currentUser.avatar}));
-  };
-  ws.onmessage=(event)=>{
-    try{
-      const data=JSON.parse(event.data);
-      if(data.type==='message')addMessageToUI(data.payload,true);
-    }catch(e){}
-  };
-  ws.onclose=()=>setTimeout(connectWebSocket,3000);
-}
-
-async function sendMessage(){
-  const text=messageInput.value.trim();
-  if(!text)return;
-  if(!currentUser){alert('Авторизуйтесь через Steam');return;}
-  try{
-    const res=await fetch('https://chat-api.xauroriax.ru/send',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({steamId:currentUser.id,nickname:currentUser.name,avatar:currentUser.avatar,message:text})});
-    if(res.ok)messageInput.value='';
-    else alert('Ошибка отправки');
-  }catch(e){alert('Ошибка соединения');}
-}
-
-function updateAuthUI(){
-  const savedUser=JSON.parse(localStorage.getItem('steam_user'));
-  if(savedUser&&savedUser.id){
-    currentUser=savedUser;
-    inputArea.style.display='flex';
-    loadHistory();
-    connectWebSocket();
-  }else{
-    currentUser=null;
-    inputArea.style.display='none';
-    messagesContainer.innerHTML='<div class="chat-login-required">Авторизуйтесь через Steam, чтобы писать в чат</div>';
-    if(ws){ws.close();ws=null;}
+  } catch(e) {
+    console.error(e);
   }
 }
 
-toggleBtn.addEventListener('click',()=>{chatWindow.classList.toggle('open');if(chatWindow.classList.contains('open'))updateAuthUI();});
-closeBtn.addEventListener('click',()=>chatWindow.classList.remove('open'));
-sendBtn.addEventListener('click',sendMessage);
-messageInput.addEventListener('keypress',(e)=>{if(e.key==='Enter')sendMessage();});
-setTimeout(updateAuthUI,500);
+function connectWebSocket() {
+  if (ws && ws.readyState === WebSocket.OPEN) return;
+  ws = new WebSocket('wss://chat-api.xauroriax.ru/ws');
+  ws.onopen = function() {
+    if (currentUser) {
+      ws.send(JSON.stringify({type:'auth', steamId:currentUser.id, nickname:currentUser.name, avatar:currentUser.avatar}));
+    }
+  };
+  ws.onmessage = function(event) {
+    try {
+      var data = JSON.parse(event.data);
+      if (data.type === 'message') addMessageToUI(data.payload, true);
+    } catch(e) {}
+  };
+  ws.onclose = function() {
+    setTimeout(connectWebSocket, 3000);
+  };
+}
+
+async function sendMessage() {
+  var text = messageInput.value.trim();
+  if (!text) return;
+  if (!currentUser) {
+    alert('Авторизуйтесь через Steam');
+    return;
+  }
+  try {
+    var res = await fetch('https://chat-api.xauroriax.ru/send', {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({steamId:currentUser.id, nickname:currentUser.name, avatar:currentUser.avatar, message:text})
+    });
+    if (res.ok) {
+      messageInput.value = '';
+    } else {
+      alert('Ошибка отправки');
+    }
+  } catch(e) {
+    alert('Ошибка соединения');
+  }
+}
+
+function updateAuthUI() {
+  var savedUser = JSON.parse(localStorage.getItem('steam_user'));
+  if (savedUser && savedUser.id) {
+    currentUser = savedUser;
+    inputArea.style.display = 'flex';
+    loadHistory();
+    connectWebSocket();
+  } else {
+    currentUser = null;
+    inputArea.style.display = 'none';
+    messagesContainer.innerHTML = '<div class="chat-login-required">Авторизуйтесь через Steam, чтобы писать в чат</div>';
+    if (ws) {
+      ws.close();
+      ws = null;
+    }
+  }
+}
+
+toggleBtn.addEventListener('click', function() {
+  chatWindow.classList.toggle('open');
+  if (chatWindow.classList.contains('open')) updateAuthUI();
+});
+closeBtn.addEventListener('click', function() {
+  chatWindow.classList.remove('open');
+});
+sendBtn.addEventListener('click', sendMessage);
+messageInput.addEventListener('keypress', function(e) {
+  if (e.key === 'Enter') sendMessage();
+});
+setTimeout(updateAuthUI, 500);
 })();
 </script>
 
