@@ -1,4 +1,4 @@
-// chat-widget.js – финальная версия (рабочая)
+// chat-widget.js – финальная версия с улучшенным SSE
 (function() {
     if (document.getElementById('auroria-chat-root')) return;
     const root = document.createElement('div');
@@ -44,6 +44,7 @@
     let currentUser = null;
     let notificationsEventSource = null;
     let lastSentMessageId = null;
+    let reconnectTimer = null;
 
     const messagesContainer = document.getElementById('chatMessages');
     const inputArea = document.getElementById('chatInputArea');
@@ -94,6 +95,7 @@
             notificationsEventSource.close();
             notificationsEventSource = null;
         }
+        if (reconnectTimer) clearTimeout(reconnectTimer);
         console.log('[Widget] Connecting SSE to https://notify.xauroriax.ru/connect');
         notificationsEventSource = new EventSource('https://notify.xauroriax.ru/connect');
         notificationsEventSource.onopen = () => console.log('[Widget] SSE connection opened');
@@ -113,9 +115,9 @@
         });
         notificationsEventSource.onerror = (e) => {
             console.error('[Widget] SSE error:', e);
-            notificationsEventSource.close();
+            if (notificationsEventSource) notificationsEventSource.close();
             notificationsEventSource = null;
-            setTimeout(connectGlobalSSE, 5000);
+            reconnectTimer = setTimeout(() => connectGlobalSSE(), 5000);
         };
     }
 
