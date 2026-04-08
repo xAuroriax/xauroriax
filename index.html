@@ -6627,17 +6627,25 @@ window.addEventListener('DOMContentLoaded', () => {
   }
 
   function updateBioCounter() {
-    const bio = document.getElementById('qBio').value.trim();
-    const words = bio.split(/\s+/).filter(w => w.length > 0);
-    const counter = document.getElementById('qBioCounter');
-    const lang = localStorage.getItem('lang') || 'ru';
-    if (counter) {
-      if (lang === 'en') {
-        counter.textContent = `${words.length} words of 600 (max 800)`;
-      } else {
-        counter.textContent = `${words.length} слов из 600 (max 800)`;
-      }
-      if (words.length < 600) counter.style.color = '#888';
+  const bio = document.getElementById('qBio').value.trim();
+  const words = bio.split(/\s+/).filter(w => w.length > 0);
+  const counter = document.getElementById('qBioCounter');
+  const lang = localStorage.getItem('lang') || 'ru';
+  if (counter) {
+    if (lang === 'en') {
+      counter.textContent = `${words.length} words of 600 (max 800)`;
+    } else {
+      counter.textContent = `${words.length} слов из 600 (max 800)`;
+    }
+    if (words.length < 600) {
+      counter.style.color = '#888';
+    } else if (words.length > 800) {
+      counter.style.color = '#ff4b4b';
+    } else {
+      counter.style.color = '#4ade80';
+	  }
+   }
+  }
   function validateHeightInput(input) {
     let val = input.value.trim();
     if (val === '') {
