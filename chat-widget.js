@@ -1,4 +1,4 @@
-// chat-widget.js – финальная версия с фиксом видимости поля ввода и прокруткой
+// chat-widget.js – финальная версия с логированием и исправленным SSE
 (function() {
     if (document.getElementById('auroria-chat-root')) return;
     const root = document.createElement('div');
@@ -64,7 +64,6 @@
     }
 
     function scrollToBottom() {
-        // Несколько попыток, чтобы DOM успел обновиться
         setTimeout(function() {
             messagesContainer.scrollTop = messagesContainer.scrollHeight;
         }, 50);
@@ -104,22 +103,31 @@
             notificationsEventSource.close();
             notificationsEventSource = null;
         }
+        console.log('[Widget] Connecting SSE to https://notify.xauroriax.ru/connect');
         notificationsEventSource = new EventSource('https://notify.xauroriax.ru/connect');
+        notificationsEventSource.onopen = function() {
+            console.log('[Widget] SSE connection opened');
+        };
         notificationsEventSource.addEventListener('chat-message', function(e) {
+            console.log('[Widget] SSE chat-message received:', e.data);
             try {
                 var data = JSON.parse(e.data);
                 if (data.type === 'message') {
                     var payload = data.payload;
                     if (currentUser && payload.steamId === currentUser.id && payload.message === lastSentMessageId) {
+                        console.log('[Widget] Duplicate message ignored');
                         return;
                     }
                     addMessageToUI(payload, true);
+                } else {
+                    console.log('[Widget] Unknown message type:', data.type);
                 }
             } catch(err) {
                 console.error('SSE chat-message error', err);
             }
         });
-        notificationsEventSource.onerror = function() {
+        notificationsEventSource.onerror = function(e) {
+            console.error('[Widget] SSE error:', e);
             console.warn('Global SSE connection lost, reconnecting in 5s');
             if (notificationsEventSource) notificationsEventSource.close();
             notificationsEventSource = null;
@@ -173,12 +181,11 @@
         }
     }
 
-    // При открытии чата принудительно скроллим вниз
     toggleBtn.addEventListener('click', function() {
         chatWindow.classList.toggle('open');
         if (chatWindow.classList.contains('open')) {
             updateAuthUI();
-            scrollToBottom(); // дополнительно
+            scrollToBottom();
         }
     });
     closeBtn.addEventListener('click', function() {
